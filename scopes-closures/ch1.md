@@ -1,35 +1,35 @@
-# You Don't Know JS Yet: Scope & Closures - 2nd Edition
-# Chapter 1: What's the Scope?
+# You Don't Know JS Yet: Області видимості та замикання - Друге видання
+# Розділ 1: Що таке область видимості?
 
-By the time you've written your first few programs, you're likely getting somewhat comfortable with creating variables and storing values in them. Working with variables is one of the most foundational things we do in programming!
+Ті з вас, хто вже написав бодай кілька програм, скоріш за все досить впевнено створюють змінні та зберігають значення у них. Робота зі змінними — це одна з фундаментальних речей у програмуванні!
 
-But you may not have considered very closely the underlying mechanisms used by the engine to organize and manage these variables. I don't mean how the memory is allocated on the computer, but rather: how does JS know which variables are accessible by any given statement, and how does it handle two variables of the same name?
+Але чи замислювалися ви колись над механізмом, який використовує рушій для організації та управління змінними? Я зараз не про виділення пам'яті у комп'ютері. Моє питання ось у чому: як JS знає, які змінні доступні певній інструкції, і як він обходиться з двома змінними на одне ім'я (з однаковим ім'ям)?
 
-The answers to questions like these take the form of well-defined rules called scope. This book will dig through all aspects of scope—how it works, what it's useful for, gotchas to avoid—and then point toward common scope patterns that guide the structure of programs.
+Для відповіді на подібні питання необхідна певна форма визначених правил, що називається областю видимості. Ця книга пройде усі аспекти областей видимості — як вони працюють, для чого потрібні, розгляне ситуації, яких варто уникати, а потім наведе загально використовувані шаблони роботи з областями видимості, що керують структурами програм. 
 
-Our first step is to uncover how the JS engine processes our program **before** it runs.
+Нашим першим кроком буде розібратися з тим, як JS-рушій опрацьовує програму **до** того, як почне її виконувати.
 
-## About This Book
+## Про цю книгу
 
-Welcome to book 2 in the *You Don't Know JS Yet* series! If you already finished *Get Started* (the first book), you're in the right spot! If not, before you proceed I encourage you to *start there* for the best foundation.
+Ласкаво просимо до другої книги з серії *You Don't Know JS Yet*! Якщо ви вже закінчили першу книгу *Get Started*, то ви у вірному місці. Якщо ні, то я рекомендую почати звідти.
 
-Our focus will be the first of three pillars in the JS language: the scope system and its function closures, as well as the power of the module design pattern.
+Ми зосередимося на першій з трьох опор JS: на системі областей видимості та замикання функцій, а також поговоримо про силу шаблону проєктування "Модуль".
 
-JS is typically classified as an interpreted scripting language, so it's assumed by most that JS programs are processed in a single, top-down pass. But JS is in fact parsed/compiled in a separate phase **before execution begins**. The code author's decisions on where to place variables, functions, and blocks with respect to each other are analyzed according to the rules of scope, during the initial parsing/compilation phase. The resulting scope structure is generally unaffected by runtime conditions.
+JS, як правило, класифікують як інтерпретовану скриптову мову, тому більшість припускають, що програми на JS обробляються за один прохід зверху вниз. Та насправді програми на JS перед виконанням проходять окрему стадію парсинга та компіляції. Під час цієї фази аналізуються рішення автора коду щодо розміщення змінних, функцій та блоків відносно один одного згідно з правилами створення областей видимості. Зазвичай створена структура областей видимості не змінюється під час виконання (у рантаймі).
 
-JS functions are themselves first-class values; they can be assigned and passed around just like numbers or strings. But since these functions hold and access variables, they maintain their original scope no matter where in the program the functions are eventually executed. This is called closure.
+Функції у JS — значення першого класу: їх можна присвоювати у змінні та передавати, як числа або рядки. Але через те, що функції містять власні змінні та мають доступ до змінних ззовні, вони зберігають власну початкову область видимості, бодай де в програмі функція виконуватиметься. Це називається замикання.
 
-Modules are a code organization pattern characterized by public methods that have privileged access (via closure) to hidden variables and functions in the internal scope of the module.
+Модулі — це шаблон організації коду, що характеризується публічними методами, які через замикання мають привілейований доступ до прихованих змінних та функцій у внутрішній області видимості модуля.
 
-## Compiled vs. Interpreted
+## Компіляція проти інтерпретації
 
-You may have heard of *code compilation* before, but perhaps it seems like a mysterious black box where source code slides in one end and executable programs pop out the other.
+Можливо, ви вже чули про компіляцію коду, але також цілком можливо, що цей процес здається загадковою чорною скринькою, що проковтує вихідний код та видає придатну до виконання програму.
 
-It's not mysterious or magical, though. Code compilation is a set of steps that process the text of your code and turn it into a list of instructions the computer can understand. Typically, the whole source code is transformed at once, and those resulting instructions are saved as output (usually in a file) that can later be executed.
+Однак нічого загадкового або магічного у компіляції немає. Компіляція коду — це набір кроків, що обробляють текст вашого коду та перетворюють його на список інструкцій, зрозумілих комп'ютеру. Зазвичай весь вихідний код трансформується за один раз, а інструкції, що створюються на виході, зберігаються як в певному вигляді (зазвичай у файлі), що може бути виконаний.
 
-You also may have heard that code can be *interpreted*, so how is that different from being *compiled*?
+Також ви могли чути про те, що код можна інтерпретувати. Чим це відрізняється від компіляції?
 
-Interpretation performs a similar task to compilation, in that it transforms your program into machine-understandable instructions. But the processing model is different. Unlike a program being compiled all at once, with interpretation the source code is transformed line by line; each line or statement is executed before immediately proceeding to processing the next line of the source code.
+Інтерпретація коду подібна до компіляції у тому сенсі, що інтерпретація також перетворює програму на інструкції, зрозумілі машині. Але інтерпретація відрізняється від компіляції моделлю обробки коду. На відміну від компіляції, що обробляє усю програму за раз, інтерпретація трансформує вихідний код рядок за рядком. Кожен рядок або інструкція одразу виконуються, після чого інтерпретатор переходить до наступного рядка.
 
 <figure>
     <img src="images/fig1.png" width="650" alt="Code Compilation and Code Interpretation" align="center">
@@ -37,53 +37,54 @@ Interpretation performs a similar task to compilation, in that it transforms you
     <br><br>
 </figure>
 
-Figure 1 illustrates compilation vs. interpretation of programs.
+Рисунок 1 ілюструє компіляцію та інтерпретацію програм.
 
-Are these two processing models mutually exclusive? Generally, yes. However, the issue is more nuanced, because interpretation can actually take other forms than just operating line by line on source code text. Modern JS engines actually employ numerous variations of both compilation and interpretation in the handling of JS programs.
+Чи ці моделі повністю виключають одна одну? Зазвичай так. Але проблема трохи складніша, бо інтерпретація може приймати інші форми, ніж обробка рядків вихідного коду один за одним. Сучасні рушії використовують для роботи з програмами на JS численні варіація як компіляції, так і інтерпретації.
 
-Recall that we surveyed this topic in Chapter 1 of the *Get Started* book. Our conclusion there is that JS is most accurately portrayed as a **compiled language**. For the benefit of readers here, the following sections will revisit and expand on that assertion.
+Згадайте, що при торкалися цієї теми у розділі 1 книги *Get Started*. Наш висновок тоді був такий, що найбільш точним буде описувати JS як компільовану мову. Наступний розділ перегляне та розширить це твердження.
 
-## Compiling Code
+## Компіляція коду
 
-But first, why does it even matter whether JS is compiled or not?
+Для початку розберемося з тим, яке значення має те, чи є JS компільованою чи інтерпретованою мовою.
 
-Scope is primarily determined during compilation, so understanding how compilation and execution relate is key in mastering scope.
+Області видимості визначаються під час компіляції, тому зв'язок між компіляцією та виконанням є ключовим моментом у розумінні областей видимості.
 
-In classic compiler theory, a program is processed by a compiler in three basic stages:
+У класичній теорії компіляторів програма обробляється компілятором за три стадії:
 
-1. **Tokenizing/Lexing:** breaking up a string of characters into meaningful (to the language) chunks, called tokens. For instance, consider the program: `var a = 2;`. This program would likely be broken up into the following tokens: `var`, `a`, `=`, `2`, and `;`. Whitespace may or may not be persisted as a token, depending on whether it's meaningful or not.
+1. **Токенізація чи лексичний аналіз** - це розбиття рядка символів на фрагменти, що мають сенс для певної мови. Ці фрагменти називаються токенами. Наприклад, візьмемо програму `var a = 2;`. Ймовірно цю програму буде розбито на токени наступним чином: `var`, `a`, `=`, `2`, та `;`. Символ пробілу може бути або не бути токеном залежно від того, чи він впливає на значення.
 
-    (The difference between tokenizing and lexing is subtle and academic, but it centers on whether or not these tokens are identified in a *stateless* or *stateful* way. Put simply, if the tokenizer were to invoke stateful parsing rules to figure out whether `a` should be considered a distinct token or just part of another token, *that* would be **lexing**.)
 
-2. **Parsing:** taking a stream (array) of tokens and turning it into a tree of nested elements, which collectively represent the grammatical structure of the program. This is called an Abstract Syntax Tree (AST).
+    Різниця між токенізацією та лексичним аналізом досить тонка та представляє інтерес скоріш в академічному контексті; найбільш важливим аспектом є те, чи ідентифікуються токени зі збереженням стану. Простіше кажучи, якщо токенізатор використовуватиме правила парсингу зі збереженням стану, щоб дізнатися, чи `a` слід вважати окремим токеном або частиною іншого токену, то це буде лексичним аналізом.
 
-    For example, the tree for `var a = 2;` might start with a top-level node called `VariableDeclaration`, with a child node called `Identifier` (whose value is `a`), and another child called `AssignmentExpression` which itself has a child called `NumericLiteral` (whose value is `2`).
+2. **Парсинг** перетворює потік (масив) токенів на дерево вкладених елементів, які разом представляють граматичну структуру програми. Ця структура називається абстрактним синтаксичним деревом (АСД).
 
-3. **Code Generation:** taking an AST and turning it into executable code. This part varies greatly depending on the language, the platform it's targeting, and other factors.
+    Наприклад, для `var a = 2;` дерево може починатися з вузла найвищого рівня, що називається `VariableDeclaration`, із дочірніми вузлами `Identifier`, що має значення `a`, та `NumericLiteral`, що має значення `2`.
 
-    The JS engine takes the just described AST for `var a = 2;` and turns it into a set of machine instructions to actually *create* a variable called `a` (including reserving memory, etc.), and then store a value into `a`.
+3. **Генерація коду** перетворює АСД на код, що може бути виконаний. Ця частина сильно залежить від мови, платформи виконання та інших факторів.
 
-| NOTE: |
+    Рушій JS перетворює щойно описане АСД для `var a = 2;` на набір машинних інструкцій, що врешті решт створять змінну на ім'я `a`, з урахуванням резервування пам'яті й так далі, а потім збережуть у ній значення.
+
+| ПРИМІТКА: |
 | :--- |
-| The implementation details of a JS engine (utilizing system memory resources, etc.) is much deeper than we will dig here. We'll keep our focus on the observable behavior of our programs and let the JS engine manage those deeper system-level abstractions. |
+| Реалізації рушія JS, зокрема використання системних ресурсів пам'яті, насправді значно складніша. Ми зосередимо увагу на видимій поведінці програми та залишимо управління цими глибокими системними абстракціями за рушієм |
 
-The JS engine is vastly more complex than *just* these three stages. In the process of parsing and code generation, there are steps to optimize the performance of the execution (i.e., collapsing redundant elements). In fact, code can even be re-compiled and re-optimized during the progression of execution.
+Рушій JS значно складніший за ті три фази, що ми описали. В процесі парсингу та генерації коду вживаються міри до оптимізації ефективності виконання, наприклад прибираються зайві елементи. Насправді код навіть може бути компільований повторно або повторно оптимізований під час виконання.
 
-So, I'm painting only with broad strokes here. But you'll see shortly why *these* details we *do* cover, even at a high level, are relevant.
+Отже, я окреслюю лише загальну картину. Але скоро ви побачите, чому *ті деталі, яких ми торкаємося*, навіть дуже поверхнево, мають значення.
 
-JS engines don't have the luxury of an abundance of time to perform their work and optimizations, because JS compilation doesn't happen in a build step ahead of time, as with other languages. It usually must happen in mere microseconds (or less!) right before the code is executed. To ensure the fastest performance under these constraints, JS engines use all kinds of tricks (like JITs, which lazy compile and even hot re-compile); these are well beyond the "scope" of our discussion here.
+У порівнянні з іншими мовами рушії JS мають небагато часу для виконання своєї основної роботи та проведення оптимізації, бо компіляція JS не виконується завчасно. Зазвичай процес обробки коду має відбуватися безпосередньо перед його виконанням та тривати лічені мікросекунди (чи навіть менше!). Щоб забезпечити найкращу швидкодію за цих обмежень, рушії JS вдаються до усіляких хитрощів (наприклад, JIT - компіляція «на льоту», яка ліниво* компілює і навіть перекомпілює код під час виконання); подробиці таких оптимізацій виходять за рамки нашої теми.
 
-### Required: Two Phases
+### Необхідна умова: Дві фази
 
-To state it as simply as possible, the most important observation we can make about processing of JS programs is that it occurs in (at least) two phases: parsing/compilation first, then execution.
+Щоб висловити це якомога простіше, найважливішим зауваженням, яке ми можемо зробити щодо обробки програм JS, є те, що вона складається принаймні з двох фаз: спочатку парсинг і компіляція, потім виконання.
 
-The separation of a parsing/compilation phase from the subsequent execution phase is observable fact, not theory or opinion. While the JS specification does not require "compilation" explicitly, it requires behavior that is essentially only practical with a compile-then-execute approach.
+Те, що фаза парсингу або компіляції відокремлена від фази виконання, не припущення і не особиста думка, а факт, який ви можете побачити на власні очі. Хоча специфікація JS явно не вимагає "компіляції", вона все ж вимагає поведінки, яка, по суті, є практичною лише за умови виконання коду після завершення компіляції.
 
-There are three program characteristics you can observe to prove this to yourself: syntax errors, early errors, and hoisting.
+Існує три видимі характеристики програми, які доводять моє твердження: синтаксичні помилки, ранні помилки та підняття змінних (hoisting).
 
-#### Syntax Errors from the Start
+#### Синтаксичні помилки видно одразу
 
-Consider this program:
+Розглянемо таку програму:
 
 ```js
 var greeting = "Hello";
@@ -94,13 +95,13 @@ greeting = ."Hi";
 // SyntaxError: unexpected token .
 ```
 
-This program produces no output (`"Hello"` is not printed), but instead throws a `SyntaxError` about the unexpected `.` token right before the `"Hi"` string. Since the syntax error happens after the well-formed `console.log(..)` statement, if JS was executing top-down line by line, one would expect the `"Hello"` message being printed before the syntax error being thrown. That doesn't happen.
+Ця програма не видає жодних результатів (`"Hello"` не виводиться). Замість цього виникає помилка `SyntaxError` через несподіваний токен `.` безпосередньо перед рядком `"Hi"`. Оскільки синтаксична помилка знаходиться після добре сформованої інструкції `console.log (..)`, можна було б очікувати, що при виконанні коду рядок за рядком зверху вниз перед появою синтаксичної помилки буде виведено повідомлення `"Hello"`. Але цього не відбувається.
 
-In fact, the only way the JS engine could know about the syntax error on the third line, before executing the first and second lines, is by the JS engine first parsing the entire program before any of it is executed.
+Насправді єдиний спосіб, в який рушій JS міг дізнатися про синтаксичну помилку у третьому рядку до того, як виконав перший та другий, — це розпарсити всю програму перед виконанням будь-якої її частини.
 
-#### Early Errors
+#### Ранні помилки
 
-Next, consider:
+Наступний приклад:
 
 ```js
 console.log("Howdy");
@@ -115,19 +116,19 @@ function saySomething(greeting,greeting) {
 }
 ```
 
-The `"Howdy"` message is not printed, despite being a well-formed statement.
+Повідомлення `"Howdy"` не виводиться, попри те, що це коректно сформована інструкція.
 
-Instead, just like the snippet in the previous section, the `SyntaxError` here is thrown before the program is executed. In this case, it's because strict-mode (opted in for only the `saySomething(..)` function here) forbids, among many other things, functions to have duplicate parameter names; this has always been allowed in non-strict-mode.
+Натомість подібно до фрагмента коду з попереднього розділу, до початку виконання програми виводиться помилка `SyntaxError`. У цьому випадку суворий режим виконання (strict mode), який ми активували лише для функції `saySomething(..)`, серед іншого, забороняє функції мати однойменні параметри. У несуворому режимі це завжди було дозволено.
 
-The error thrown is not a syntax error in the sense of being a malformed string of tokens (like `."Hi"` prior), but in strict-mode is nonetheless required by the specification to be thrown as an "early error" before any execution begins.
+Помилка не синтаксична у тому сенсі, що код неправильно сформований, як `."Hi"` у попередньому прикладі, але згідно до специфікації у суворому режимі таку помилку має бути викинуто як ранню помилку ("early error") до початку виконання коду.
 
-But how does the JS engine know that the `greeting` parameter has been duplicated? How does it know that the `saySomething(..)` function is even in strict-mode while processing the parameter list (the `"use strict"` pragma appears only later, in the function body)?
+Але звідки рушій JS знає, що параметр `greeting` дублюється? Звідки він знає під час обробки списку параметрів, що функція `saySomething(..)` виконується у суворому режимі, адже прагма `"use strict"` з'являється пізніше, у тілі функції?
 
-Again, the only reasonable explanation is that the code must first be *fully* parsed before any execution occurs.
+Повторю: єдине розумне пояснення у тому, що код було розпарсено перед виконанням.
 
-#### Hoisting
+#### Підняття змінних (Hoisting)
 
-Finally, consider:
+Насамкінець давайте розглянемо такий код:
 
 ```js
 function saySomething() {
@@ -144,33 +145,33 @@ saySomething();
 // initialization
 ```
 
-The noted `ReferenceError` occurs from the line with the statement `greeting = "Howdy"`. What's happening is that the `greeting` variable for that statement belongs to the declaration on the next line, `let greeting = "Hi"`, rather than to the previous `var greeting = "Hello"` statement.
+Помилка `ReferenceError` з'являється на рядку, де знаходиться інструкція `greeting = "Howdy"`. Річ у тому, що змінна `greeting`, до якої звертається інструкція, належить до оголошення, що відбувається у наступному рядку `let greeting = "Hi"`, а не до попередньої інструкції `var greeting = "Hello"`.
 
-The only way the JS engine could know, at the line where the error is thrown, that the *next statement* would declare a block-scoped variable of the same name (`greeting`) is if the JS engine had already processed this code in an earlier pass, and already set up all the scopes and their variable associations. This processing of scopes and declarations can only accurately be accomplished by parsing the program before execution.
+Єдиний спосіб, у який рушій JS у рядку, де виникає помилка, може знати, що *наступна інструкція* оголосить змінну блокової області видимості з тим самим іменем (`greeting`), це якщо рушій вже обробив цей код у попередній прохід і вже визначив усі області видимості та пов'язані з ними змінні. Цю обробку областей і оголошень можна точно здійснити, лише проаналізувавши програму перед виконанням.
 
-The `ReferenceError` here technically comes from `greeting = "Howdy"` accessing the `greeting` variable **too early**, a conflict referred to as the Temporal Dead Zone (TDZ). Chapter 5 will cover this in more detail.
+Суворо кажучи, `ReferenceError` з'являється в інструкції `greeting = "Howdy"`, яка звертається до змінної `greeting` зарано і провокує конфлікт, що називається "тимчасова мертва зона" (Temporal Dead Zone), скорочено ТМЗ. Ми розглянемо цю тему детальніше у розділі 5.
 
-| WARNING: |
+| УВАГА: |
 | :--- |
-| It's often asserted that `let` and `const` declarations are not hoisted, as an explanation of the TDZ behavior just illustrated. But this is not accurate. We'll come back and explain both the hoisting and TDZ of `let`/`const` in Chapter 5. |
+| Часто стверджують, що змінні, оголошені через `let` та `const`, не підіймаються, і саме цим пояснюється ТМЗ. Але це не точно. Ми повернемось до підняття і ТМЗ `let` та `const` у розділі 5.|
 
-Hopefully you're now convinced that JS programs are parsed before any execution begins. But does it prove they are compiled?
+Я сподіваюся, що переконав вас у тому, що JS-програми парсяться до того, як почнеться їхнє виконання. Але чи це доводить, що вони також компілюються?
 
-This is an interesting question to ponder. Could JS parse a program, but then execute that program by *interpreting* operations represented in the AST **without** first compiling the program? Yes, that is *possible*. But it's extremely unlikely, mostly because it would be extremely inefficient performance wise.
+Цікаве питання! Чи можливо, що JS парсить програму, а потім інтерпретує операції, представлені у вигляді АСТ, одну за одною, але не виконує попередню компіляцію? Так, це можливо. Але дуже малоймовірно, здебільшого через те, що це було б вкрай неефективно. 
 
-It's hard to imagine a production-quality JS engine going to all the trouble of parsing a program into an AST, but not then converting (aka, "compiling") that AST into the most efficient (binary) representation for the engine to then execute.
+Важко уявити собі якісний JS-рушій, що виконує складний парсинг програми в АСД, але не перетворює (тобто, не "скомпілює") АСД на найбільш ефективне для виконання бінарне представлення. 
 
-Many have endeavored to split hairs with this terminology, as there's plenty of nuance and "well, actually..." interjections floating around. But in spirit and in practice, what the engine is doing in processing JS programs is **much more alike compilation** than not.
+Багато хто докладав зусиль до прояснення нюансів термінології, і тут їх справді чимало, але за духом та з практичної точки зору те, що робить JS-рушій, скоріш схоже на компіляцію, ніж ні.
 
-Classifying JS as a compiled language is not concerned with the distribution model for its binary (or byte-code) executable representations, but rather in keeping a clear distinction in our minds about the phase where JS code is processed and analyzed; this phase observably and indisputedly happens *before* the code starts to be executed.
+Коли ми відносимо JS до компільованих мов, ми маємо на увазі не спосіб розповсюдження бінарного представлення, а те, що треба мати на увазі фазу, під час якої проходить обробка та аналіз JS-коду. Ми легко можемо переконатися у тому, що ця фаза передує початку виконання коду.
 
-We need proper mental models of how the JS engine treats our code if we want to understand JS and scope effectively.
+Якщо ми хочемо добре зрозуміти області видимості, нам потрібна належна ментальна модель того, як рушій JS обходиться з нашим кодом.
 
-## Compiler Speak
+## Жаргон компілятора
 
-With awareness of the two-phase processing of a JS program (compile, then execute), let's turn our attention to how the JS engine identifies variables and determines the scopes of a program as it is compiled.
+Тепер, коли ми знаємо про двофазну обробку JS-програми (спочатку компіляція, потім виконання), звернімо увагу на те, як рушій  під час компіляції знаходить змінні та визначає області видимості програми.
 
-First, let's examine a simple JS program to use for analysis over the next several chapters:
+Почнемо з простої програми на JS, яку ми використовуватимемо як приклад для кількох наступних розділів:
 
 ```js
 var students = [
@@ -194,79 +195,79 @@ console.log(nextStudent);
 // Suzy
 ```
 
-Other than declarations, all occurrences of variables/identifiers in a program serve in one of two "roles": either they're the *target* of an assignment or they're the *source* of a value.
+За винятком оголошень, змінних або ідентифікатори у програмі виконують одну з двох "ролей": вони є або *ціллю* призначення, або *джерелом* походження значення.
 
-(When I first learned compiler theory while earning my computer science degree, we were taught the terms "LHS" (aka, *target*) and "RHS" (aka, *source*) for these roles, respectively. As you might guess from the "L" and the "R", the acronyms mean "Left-Hand Side" and "Right-Hand Side", as in left and right sides of an `=` assignment operator. However, assignment targets and sources don't always literally appear on the left or right of an `=`, so it's probably clearer to think in terms of *target* / *source* rather than *left* / *right*.)
+(Коли я був студентом фаху Computer Science та тільки вивчав теорію компіляторів, нас навчили термінів "LHS" (відповідає *цілі*) і "RHS" (відповідає *джерелу*). Як ви могли здогадатися за літерами "L" та "R", ці абревіатури означають "Ліва сторона" та "Права сторона". Мається на увазі ліворуч або праворуч від оператора присвоєння `=`. Однак цілі призначення та джерела не завжди знаходяться буквально ліворуч або праворуч від `=`, тому, мабуть, простіше мислити термінами *ціль* та *джерело*, а не *ліворуч* та *праворуч*.)
 
-How do you know if a variable is a *target*? Check if there is a value that is being assigned to it; if so, it's a *target*. If not, then the variable is a *source*.
+Як дізнатися, чи є змінна *ціллю*? Перевірте, чи їй присвоєне значення; якщо так, то це *ціль*. Якщо ні, тоді змінна є *джерелом*.
 
-For the JS engine to properly handle a program's variables, it must first label each occurrence of a variable as *target* or *source*. We'll dig in now to how each role is determined.
+Щоб рушій JS правильно обробляв змінні програми, він повинен спочатку позначити кожну появу змінної як *ціль* або *джерело*. Зараз ми розглянемо, як визначається ця роль.
 
-### Targets
+### Цілі
 
-What makes a variable a *target*? Consider:
+Що робить змінну *ціллю*? Розглянемо:
 
 ```js
 students = [ // ..
 ```
 
-This statement is clearly an assignment operation; remember, the `var students` part is handled entirely as a declaration at compile time, and is thus irrelevant during execution; we left it out for clarity and focus. Same with the `nextStudent = getStudentName(73)` statement.
+Ця інструкція явно є операцією присвоєння; згадайте, що фрагмент `var students` обробляється як оголошення під час компіляції, отже, під час виконання не має значення; для ясності та зосередженості ми його пропустили. Те саме стосується інструкції `nextStudent = getStudentName (73)`.
 
-But there are three other *target* assignment operations in the code that are perhaps less obvious. One of them:
+Але в коді є ще три операції присвоєння *цілі*, які, мабуть, менш очевидні. Одна з них:
 
 ```js
 for (let student of students) {
 ```
 
-That statement assigns a value to `student` for each iteration of the loop. Another *target* reference:
+Ця інструкція на кожній ітерації циклу присвоює змінній `student` нове значення. Ще одне *цільове* посилання:
 
 ```js
 getStudentName(73)
 ```
 
-But how is that an assignment to a *target*? Look closely: the argument `73` is assigned to the parameter `studentID`.
+Але чому ми говоримо про *ціль* у цьому випадку? Подивіться уважно: аргумент `73` присвоюється параметру `studentID`.
 
-And there's one last (subtle) *target* reference in our program. Can you spot it?
-
-..
+В нашій програмі є ще одне найнепомітніше *цільове* посилання. Бачите?
 
 ..
 
 ..
 
-Did you identify this one?
+..
+
+Чи помітили ви оце?
 
 ```js
 function getStudentName(studentID) {
 ```
 
-A `function` declaration is a special case of a *target* reference. You can think of it sort of like `var getStudentName = function(studentID)`, but that's not exactly accurate. An identifier `getStudentName` is declared (at compile time), but the `= function(studentID)` part is also handled at compilation; the association between `getStudentName` and the function is automatically set up at the beginning of the scope rather than waiting for an `=` assignment statement to be executed.
+Оголошення `function` є особливим випадком посилання на ціль. Ви можете думати про нього як `var getStudentName = function(studentID)`, але це не зовсім точно. Ідентифікатор `getStudentName` оголошується під час компіляції, але і фрагмент `= function (studentID)` також обробляється під час компіляції; зв'язок між `getStudentName` і функцією автоматично встановлюється на початку області видимості, рушій не чекає на виконання оператора присвоєння `=`.
 
-| NOTE: |
+| ПРИМІТКА: |
 | :--- |
-| This automatic association of function and variable is referred to as "function hoisting", and is covered in detail in Chapter 5. |
+| Це автоматичне поєднання функції та змінної називається "підняттям функції". Детально воно висвітлене в розділі 5. |
 
-### Sources
+### Джерела
 
-So we've identified all five *target* references in the program. The other variable references must then be *source* references (because that's the only other option!).
+Отже, ми визначили всі п’ять посилань типу *ціль* у програмі. Тоді інші посилання на змінну повинні бути *джерелами*, оскільки інших варіантів не лишилося.
 
-In `for (let student of students)`, we said that `student` is a *target*, but `students` is a *source* reference. In the statement `if (student.id == studentID)`, both `student` and `studentID` are *source* references. `student` is also a *source* reference in `return student.name`.
+Про `for (let student of students)` ми сказали, що `student` —  це *ціль*, але `students` —  це *джерело* посилання. В інструкції `if (student.id == studentID)`  `student` і `studentID` обидва є *джерелом* посилань. `student` також є посиланням на *джерело* у `return student.name`.
 
-In `getStudentName(73)`, `getStudentName` is a *source* reference (which we hope resolves to a function reference value). In `console.log(nextStudent)`, `console` is a *source* reference, as is `nextStudent`.
+У `getStudentName (73)`, `getStudentName` є посиланням типу *джерело* (яке, як ми сподіваємось, перетворюється на значення посилання на функцію). У `console.log (nextStudent)`, `console` є посиланням на *джерело*, як і `nextStudent`.
 
-| NOTE: |
+| ПРИМІТКА: |
 | :--- |
-| In case you were wondering, `id`, `name`, and `log` are all properties, not variable references. |
+| Якщо вам цікаво, `id`,` name` та `log` —  це властивості, а не посилання на змінні. |
 
-What's the practical importance of understanding *targets* vs. *sources*? In Chapter 2, we'll revisit this topic and cover how a variable's role impacts its lookup (specifically, if the lookup fails).
+В чому практична цінність розуміння різниці між *цілями* та *джерелами*? У розділі 2 ми повернемося до цієї теми та розглянемо вплив ролі змінної на процес пошуку значення (особливо у тих випадках, коли значення не знайдене).
 
-## Cheating: Runtime Scope Modifications
+## Як обманути рушій: Модифікація області видимості під час виконання
 
-It should be clear by now that scope is determined as the program is compiled, and should not generally be affected by runtime conditions. However, in non-strict-mode, there are technically still two ways to cheat this rule, modifying a program's scopes during runtime.
+На цей момент має бути зрозуміло, що області видимості визначаються під час компіляції програми та не залежать від умов рантайму. Але у несуворому режимі існує два способи порушити це правило завдяки зміні області видимості під час виконання.
 
-Neither of these techniques *should* be used—they're both dangerous and confusing, and you should be using strict-mode (where they're disallowed) anyway. But it's important to be aware of them in case you run across them in some programs.
+Жодну з цих технік не рекомендована до використання, бо вони небезпечні та незрозумілі. Крім того, варто у будь-якому разі писати у суворому режимі, де ці техніки недоступні. Але про них важливо знати на випадок, якщо ви натрапите на них у коді інших розробників.
 
-The `eval(..)` function receives a string of code to compile and execute on the fly during the program runtime. If that string of code has a `var` or `function` declaration in it, those declarations will modify the current scope that the `eval(..)` is currently executing in:
+Функція `eval (..)` очікує рядок коду, який вона компілює на льоту та виконує під час роботи програми. Якщо в цьому рядку коду є декларація `var` або` function`, ці декларації змінять область видимості, в якій виконується `eval (..)`:
 
 ```js
 function badIdea() {
@@ -276,9 +277,9 @@ function badIdea() {
 badIdea();   // Ugh!
 ```
 
-If the `eval(..)` had not been present, the `oops` variable in `console.log(oops)` would not exist, and would throw a `ReferenceError`. But `eval(..)` modifies the scope of the `badIdea()` function at runtime. This is bad for many reasons, including the performance hit of modifying the already compiled and optimized scope, every time `badIdea()` runs.
+Без `eval (..)` змінна `oops` у `console.log (oops)` не було і звернення до неї призвело б до появи помилки `ReferenceError`. Але `eval (..)` змінює область видимості функції `badIdea ()` під час виконання. Це погано з багатьох причин, не в останню чергу через погіршення швидкодії: щоразу при виклику `badIdea ()`  область видимості доводиться повторно компілювати та оптимізувати.
 
-The second cheat is the `with` keyword, which essentially dynamically turns an object into a local scope—its properties are treated as identifiers in that new scope's block:
+Другий спосіб обману — це ключове слово `with`, яке по суті динамічно перетворює об'єкт на локальну область видимості — його властивості розглядаються як ідентифікатори в новому блоці області:
 
 ```js
 var badIdea = { oops: "Ugh!" };
@@ -288,22 +289,24 @@ with (badIdea) {
 }
 ```
 
-The global scope was not modified here, but `badIdea` was turned into a scope at runtime rather than compile time, and its property `oops` becomes a variable in that scope. Again, this is a terrible idea, for performance and readability reasons.
+Глобальна область видимості не змінювалася, але  під час виконання, а не під час компіляції,  в області видимості виник об'єкт `badIdea` та його властивість `oops` стала змінною у цій області видимості. Ще раз нагадаю, що з точки зору швидкодії та простоти читання коду це погана ідея.
 
-At all costs, avoid `eval(..)` (at least, `eval(..)` creating declarations) and `with`. Again, neither of these cheats is available in strict-mode, so if you just use strict-mode (you should!) then the temptation goes away!
+Уникайте `eval(..)` за будь-якої ціни  (принаймні `eval(..)`, що оголошує змінні) та `with`. Повторю, що жоден з цих інструментів не доступний у суворому режимі, тож, якщо ви використовуєте цей режим (а я вам дуже раджу це робити), то боротися зі спокусою вам не доведеться.
 
-## Lexical Scope
+## Лексичні області видимості
 
-We've demonstrated that JS's scope is determined at compile time; the term for this kind of scope is "lexical scope". "Lexical" is associated with the "lexing" stage of compilation, as discussed earlier in this chapter.
+Ми переконалися у тому, що області видимості у JS визначаються на момент компіляції. Області видимості такого типу називаються лексичними. Слово "лексичний" відсилає до lexing - лексичного аналізу під час компіляції, про який ми говорили раніше у цьому розділі.
 
-To narrow this chapter down to a useful conclusion, the key idea of "lexical scope" is that it's controlled entirely by the placement of functions, blocks, and variable declarations, in relation to one another.
+Практичний висновок, який варто винести з цього розділу, такий: ключова ідея лексичної області видимості полягає у тому, що вона цілком залежить від взаємного розташування функцій, блоків та оголошень змінних.
 
-If you place a variable declaration inside a function, the compiler handles this declaration as it's parsing the function, and associates that declaration with the function's scope. If a variable is block-scope declared (`let` / `const`), then it's associated with the nearest enclosing `{ .. }` block, rather than its enclosing function (as with `var`).
+Якщо ви розміщуєте оголошення змінної в тілі функції, компілятор обробляє це оголошення під час парсингу функції та поєднує це оголошення з областю видимості функції. Якщо змінна оголошена у блоці (з `let` / `const`), то вона прив'язується до найближчого блоку `{ .. }`, а не до функції (як було б із `var`)
 
-Furthermore, a reference (*target* or *source* role) for a variable must be resolved as coming from one of the scopes that are *lexically available* to it; otherwise the variable is said to be "undeclared" (which usually results in an error!). If the variable is not declared in the current scope, the next outer/enclosing scope will be consulted. This process of stepping out one level of scope nesting continues until either a matching variable declaration can be found, or the global scope is reached and there's nowhere else to go.
+Більш того, для кожного посилання на змінну (чи то ціль, чи то джерело) в одній з лексично досяжних областей видимості має бути знайдена відповідна змінна. Інакше змінна вважається не оголошеною, що зазвичай приводить до помилки. Якщо змінна не оголошена у поточній області видимості, перевіряється наступна, тобто та, що містить поточну. Цей процес переходу від одного рівня областей видимості до наступного продовжується, аж поки знаходиться відповідне оголошення змінної, або поки процес дістається глобальної області видимості й далі йти нікуди.
 
-It's important to note that compilation doesn't actually *do anything* in terms of reserving memory for scopes and variables. None of the program has been executed yet.
+Важливо зауважити, що компіляція не резервує пам'ять під області видимості чи змінні. Жодна частина програми ще не виконується.
 
-Instead, compilation creates a map of all the lexical scopes that lays out what the program will need while it executes. You can think of this plan as inserted code for use at runtime, which defines all the scopes (aka, "lexical environments") and registers all the identifiers (variables) for each scope.
+Натомість компіляція створює мапу усіх лексичних областей видимості, яка окреслює усе, що знадобиться програмі під час виконання. Ви можете дивитися на цю мапу як на код, який буде вставлений у програму під час виконання, та який визначає всі області видимості, також відомі як лексичні оточення, та реєструє  для кожної такої області всі ідентифікатори (змінні).
 
-In other words, while scopes are identified during compilation, they're not actually created until runtime, each time a scope needs to run. In the next chapter, we'll sketch out the conceptual foundations for lexical scope.
+Іншими словами, області видимості визначаються під час компіляції, але створюються лише під час виконання, щоразу як область видимості виконується. У наступному розділі ми визначимо концептуальні основи лексичної області видимості.
+
+* мається на увазі стратегія лінивих обчислень - https://en.wikipedia.org/wiki/Lazy_evaluation (прим.перекл.)
