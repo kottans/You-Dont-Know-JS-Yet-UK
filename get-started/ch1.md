@@ -1,221 +1,222 @@
-# Ти ще не знаєш JS: Початок. Друге видання
-# Chapter 1: What *Is* JavaScript?
+# Серія "Ти поки що не знаєш JS". Книга 1: "Почнемо!". Друге видання
+# Глава 1: Що таке JavaScript?
 
-You don't know JS, yet. Neither do I, not fully anyway. None of us do. But we can all start getting to know JS better.
+Ти поки що не знаєш JS. Я теж ще ні. Принаймні, не знаю його досконально. І ніхто з нас не знає. Але всі ми можемо почати пізнавати JS краще.
 
-In this first chapter of the first book of the *You Don't Know JS Yet* (YDKJSY) series, we will take some time to build a foundation to move forward on. We need to start by covering a variety of important background housekeeping details, clearing up some myths and misconceptions about what the language really is (and isn't!).
+У першій главі першої книги серії *Ти поки що не знаєш JS*(далі скорочено YDKJSY) ми витратимо трохи часу на те, щоб закласти підґрунтя для подальшого руху. Треба почати з огляду різноманітних важливих допоміжних знань та з розвіяння деяких міфів та хибних уявлень про те, чим мова є насправді, а чим — ні.
 
-This is valuable insight into the identity and process of how JS is organized and maintained; all JS developers should understand it. If you want to get to know JS, this is how to *get started* taking the first steps in that journey.
+Йдеться про цінне розуміння того, як мова організована та підтримує своє існування; всім JS-розробникам варто мати це розуміння. Якщо ви хочете вивчити JS по-справжньому, саме з цього слід *розпочинати* вашу мандрівки.
 
-## About This Book
+## Про цю книгу
 
-I emphasize the word journey because *knowing JS* is not a destination, it's a direction. No matter how much time you spend with the language, you will always be able to find something else to learn and understand a little better. So don't look at this book as something to rush through for a quick achievement. Instead, patience and persistence are best as you take these first few steps.
+Я наголошую на слові "мандрівка", тому що *розуміння JS* - це не пункт призначення, це напрямок. Скільки б часу ви не проводили з мовою, ви завжди зможете знайти щось таке, чому можна навчитися чи зрозуміти глибше. Тож не дивіться на цю книгу як на таку, що потрібно прочитати якнайшвидше. Терпіння та наполегливість будуть найкращою допомогою  під час ваших початкових кроків.
 
-Following this background chapter, the rest of the book lays out a high-level map of what you will find as you dig into and study JS with the YDKJSY books.
+Після першої довідкової глави в решті книги викладається огляд того, що на вас чекає, якщо ви вирішите вивчати JS із книгами YDKJSY.
 
-In particular, Chapter 4 identifies three main pillars around which the JS language is organized: scope/closures, prototypes/objects, and types/coercion. JS is a broad and sophisticated language, with many features and capabilities. But all of JS is founded on these three foundational pillars.
+Зокрема, глава 4 визначає три основні опори, навколо яких організована мова JS: області видимості та замикання, прототипи та об'єкти і типи та приведення типів. JS - широка та вишукана мова, що має безліч функцій та можливостей, але весь JS ґрунтується на цих трьох опорах.
 
-Keep in mind that even though this book is titled "Get Started," it's **not intended as a beginner/intro book**. This book's main job is to get you ready for studying JS deeply throughout the rest of the series; it's written assuming you already have familiarity with JS over at least several months experience before moving on in YDKJSY. So to get the most out of *Get Started*, make sure you spend plenty of time writing JS code to build up your experience.
+Майте на увазі, що хоча ця книга називається "Почнемо!", вона **не призначена для початківців або для використання у якості першого підручника з JS**. Основна задача цієї книги - підготувати вас до глибокого вивчення JS з книгами решти серії; текст книги припускає, що ви вже маєте принаймні кілька місяців досвіду написання коду на JS. Тож, щоб отримати максимальну віддачу від *Почнемо!*, переконайтеся, що витратили достатньо часу на написання коду на JS та отримали свій досвід.
 
-Even if you've already written a lot of JS before, this book should not be skimmed over or skipped; take your time to fully process the material here. **A good start always depends on a solid first step.**
+Якщо ви вже написали чимало JS-коду, цю книгу все одно не слід продивлятися неуважно або геть пропускати; виділіть достатньо часу на опрацювання цього матеріалу. **Для хорошого старту необхідний надійний перший крок.**
 
-## What's With That Name?
+## А що з назвою?
 
-The name JavaScript is probably the most mistaken and misunderstood programming language name.
+Мабуть, "JavaScript" - це назва, що найчастіше серед мов програмування наводить на хибні думки чи уявлення.
 
-Is this language related to Java? Is it only the script form for Java? Is it only for writing scripts and not real programs?
+Чи має ця мова відношення до Java? Це лише скриптова форма Java? Вона тільки для написання сценаріїв, тобто скриптів, а не справжніх програм?
 
-The truth is, the name JavaScript is an artifact of marketing shenanigans. When Brendan Eich first conceived of the language, he code-named it Mocha. Internally at Netscape, the brand LiveScript was used. But when it came time to publicly name the language, "JavaScript" won the vote.
+Правда в тому, що назва JavaScript - це артефакт маркетингових хитрощів. Коли Брендан Ейх вперше задумав цю мову, він дав їй кодову назву Мокка. Для внутрішніх потреб в Netscape використовували бренд LiveScript, але коли прийшов час публічно назвати мову, переміг "JavaScript".
 
-Why? Because this language was originally designed to appeal to an audience of mostly Java programmers, and because the word "script" was popular at the time to refer to lightweight programs. These lightweight "scripts" would be the first ones to embed inside of pages on this new thing called the web!
+Чому? Бо мова від початку мала сподобатись аудиторії програмістів, що переважно писали на Java, а слово "скрипт"(тобто, "сценарій") було у той час популярним для позначення легких програм. Ці полегшені "сценарії" будуть першими, що вставлять всередину сторінок у цю нову штуку, що називається "Всесвітнє павутиння"!
 
-In other words, JavaScript was a marketing ploy to try to position this language as a palatable alternative to writing the heavier and more well-known Java of the day. It could just as easily have been called "WebJava," for that matter.
+Іншими словами, JavaScript був маркетинговим трюком, до якого вдалися, щоб позиціонувати цю мову як приємну альтернативу важчій та відомішій того часу Java. За цією логікою мова могла називатися, скажімо, "WebJava".
 
-There are some superficial resemblances between JavaScript's code and Java code. Those similarities don't particularly come from shared development, but from both languages targeting developers with assumed syntax expectations from C (and to an extent, C++).
+Між кодом на JavaScript і кодом на Java є деякі поверхневі подібності. Ці подібності походять не від спільного розвитку мов, а від того, що обидві мови орієнтовані на розробників, що звикли до мов з синтаксисом C (а також певною мірою C++).
 
-For example, we use the `{` to begin a block of code and the `}` to end that block of code, just like C/C++ and Java. We also use the `;` to punctuate the end of a statement.
+Наприклад, ми ставимо `{` на початку блоку коду та `}` наприкінці, як у C чи C++ та Java. Також ми використовуємо `;` для закінчення інструкції.
 
-In some ways, legal relationships run even deeper than the syntax. Oracle (via Sun), the company that still owns and runs Java, also owns the official trademark for the name "JavaScript" (via Netscape). This trademark is almost never enforced, and likely couldn't be at this point.
+Певним чином правовідносини між JS та Java сягають навіть глибше, ніж синтаксис. Компанія Oracle (через Sun), яка все ще володіє і керує Java, також (через Netscape) володіє офіційною торговою маркою "JavaScript". Ця торгова марка майже ніколи не застосовується і, напевно, не могла б на цю мить.
 
-For these reasons, some have suggested we use JS instead of JavaScript. That is a very common shorthand, if not a good candidate for an official language branding itself. Indeed, these books use JS almost exclusively to refer to the language.
+З цих причин дехто пропонує називати мову JS замість JavaScript. Це дуже поширене скорочення, і, можливо, хороший кандидат для офіційного бренду мови. Для посилання на мову у книгах цієї серії майже виключно використовується саме JS.
 
-Further distancing the language from the Oracle-owned trademark, the official name of the language specified by TC39 and formalized by the ECMA standards body is **ECMAScript**. And indeed, since 2016, the official language name has also been suffixed by the revision year; as of this writing, that's ECMAScript 2019, or otherwise abbreviated ES2019.
+Щоб відмежувати мову від торгової марки, що належить Oracle, ще сильніше, офіційною назвою мови, визначеної TC39 та формалізованою організацією стандартизації ECMA, є **ECMAScript**. І справді, з 2016 року офіційна назва мови також доповненюэться роком перегляду; на момент написання статті це версія ECMAScript 2019, або скорочено ES2019.
 
-In other words, the JavaScript/JS that runs in your browser or in Node.js, is *an* implementation of the ES2019 standard.
+Іншими словами, JavaScript або JS, який працює у вашому браузері або в Node.js, є *однією з* реалізацій стандарту ES2019.
 
-| NOTE: |
+| ПРИМІТКА: |
 | :--- |
-| Don't use terms like "JS6" or "ES8" to refer to the language. Some do, but those terms only serve to perpetuate confusion. "ES20xx" or just "JS" are what you should stick to. |
+| Не використовуйте такі терміни, як "JS6" або "ES8", для позначення мови. Дехто так робить, але ці терміни лише посилюють плутанину. Слід дотримуватися назви "ES20xx" або просто "JS". |
 
-Whether you call it JavaScript, JS, ECMAScript, or ES2019, it's most definitely not a variant of the Java language!
+Як би ви не називали цю мову - JavaScript, JS, ECMAScript або ES2019, це точно не варіант мови Java!
 
-> "Java is to JavaScript as ham is to hamster." --Jeremy Keith, 2009
+> "Java is to JavaScript as ham is to hamster." --Jeremy Keith, 2009" - Джеремі Кіт, 2009
+Гра слів, яку приблизно можна перекласти так: "Java має таке ж відношення до JavaScript, як осел до оселедця".
 
-## Language Specification
+## Специфікація мови
 
-I mentioned TC39, the technical steering committee that manages JS. Their primary task is managing the official specification for the language. They meet regularly to vote on any agreed changes, which they then submit to ECMA, the standards organization.
+Я згадував TC39 - технічний координацыйний комітет, який керує JS. Його основним завданням є управління офіційною специфікацією мови. Члени комітету регулярно збираються для голосування щодо будь-яких узгоджених змін, які потім подають до ECMA, організації зі стандартизації.
 
-JS's syntax and behavior are defined in the ES specification.
+Синтаксис та поведінка JS визначені у специфікації ES.
 
-ES2019 happens to be the 10th major numbered specification/revision since JS's inception in 1995, so in the specification's official URL as hosted by ECMA, you'll find "10.0":
+Версія ES2019 є 10-ю версією специфікації з мажорним номером з моменту створення JS у 1995 році, тому в офіційній URL-адресі специфікації на сайті ECMA ви знайдете "10.0":
 
 https://www.ecma-international.org/ecma-262/10.0/
 
-The TC39 committee is comprised of between 50 and about 100 different people from a broad section of web-invested companies, such as browser makers (Mozilla, Google, Apple) and device makers (Samsung, etc). All members of the committee are volunteers, though many of them are employees of these companies and so may receive compensation in part for their duties on the committee.
+До складу комітету TC39 входить від 50 до 100 осіб з широкого кола компаній, що зацікавлені у розвитку Вебу, таких як розробники браузерів (Mozilla, Google, Apple) та виробники пристроїв (Samsung тощо). Всі члени комітету працюють на волонтерських засадах, хоча багато хто з них є працівниками вище згаданих компаній, і тому за виконання обов'язків в комітеті вони можуть отримувати часткову компенсацію.
 
-TC39 meets generally about every other month, usually for about three days, to review work done by members since the last meeting, discuss issues, and vote on proposals. Meeting locations rotate among member companies willing to host.
+TC39 збирається приблизно раз на місяць, як правило, три дні, щоб переглянути роботу, виконану членами з часу останнього засідання, обговорити питання та проголосувати за пропозиції. Місце проведення засідань чергуються між компаніями-членами комітету, які бажають прийняти у себе засідання.
 
-All TC39 proposals progress through a five-stage process—of course, since we're programmers, it's 0-based!—Stage 0 through Stage 4. You can read more about the Stage process here: https://tc39.es/process-document/
+Усі пропозиції TC39 проходять процес з п'яти етапів. Авжеж відлік, починається з 0, ми ж програмісти! Тож етапи мають номери від 0 до 4. Більше про процес можна прочитати тут: https://tc39.es/process-document/
 
-Stage 0 means roughly, someone on TC39 thinks it's a worthy idea and plans to champion and work on it. That means lots of ideas that non-TC39 members "propose," through informal means such as social media or blog posts, are really "pre-stage 0." You have to get a TC39 member to champion a proposal for it to be considered "Stage 0" officially.
+Етап 0 приблизно означає, що хтось із TC39 вважає певну ідею непоганою і планує взяти участь в роботі над нею. Це означає, що безліч ідей, які пропонують особи, які не є членами TC39, за допомогою неформальних засобів, таких як соціальні медіа чи публікації в блогах, насправді ще не досягли Етапу 0. Щоб вважати Етап 0 розпочатим, потрібно знайти члена TC39, який погодиться відстоювати вашу пропозицію.
 
-Once a proposal reaches "Stage 4" status, it is eligible to be included in the next yearly revision of the language. It can take anywhere from several months to a few years for a proposal to work its way through these stages.
+Як тільки пропозиція досягне Етапу 4, вона може бути включена до наступного щорічного перегляду мови. Проходження усіх цих етапів може тривати від кількох місяців до кількох років.
 
-All proposals are managed in the open, on TC39's Github repository: https://github.com/tc39/proposals
+Усі пропозиції обговорюються відкрито у репозиторії TC39 Github: https://github.com/tc39/proposals
 
-Anyone, whether on TC39 or not, is welcome to participate in these public discussions and the processes for working on the proposals. However, only TC39 members can attend meetings and vote on the proposals and changes. So in effect, the voice of a TC39 member carries a lot of weight in where JS will go.
+Будь-хто може взяти участь у цих публічних обговореннях та у процесі роботи над пропозиціями, однак лише члени TC39 можуть відвідувати засідання та голосувати за пропозиції чи зміни. Отже, насправді голос члена TC39 має велику вагу в тому, куди розвиватиметься JS.
 
-Contrary to some established and frustratingly perpetuated myth, there are *not* multiple versions of JavaScript in the wild. There's just **one JS**, the official standard as maintained by TC39 and ECMA.
+Попри деякі усталені і прикро увічнені міфи, жодних версій JavaScript не існує. Існує лише **один JS**, офіційний стандарт, який підтримується TC39 та ECMA.
 
-Back in the early 2000s, when Microsoft maintained a forked and reverse-engineered (and not entirely compatible) version of JS called "JScript," there were legitimately "multiple versions" of JS. But those days are long gone. It's outdated and inaccurate to make such claims about JS today.
+На початку 2000-х років, коли Microsoft створив шляхом зворотної розробки власну (і не зовсім сумісну зі специфікацією) версію JS під назвою "JScript", фактично існували кілька версій JS. Ті часи давно минули, тому сьогодні заявляти таке про JS є неактуальним і неточним.
 
-All major browsers and device makers have committed to keeping their JS implementations compliant with this one central specification. Of course, engines implement features at different times. But it should never be the case that the v8 engine (Chrome's JS engine) implements a specified feature differently or incompatibly as compared to the SpiderMonkey engine (Mozilla's JS engine).
+ При розробці власних реалізацій JS усі основні браузери та виробники пристроїв зобов'язуються дотримуватися цієї єдиної центральної специфікації. Звичайно, рушії реалізують певні функції в різний час. Але ніколи не повинно бути так, щоб рушій v8 (JS-рушій у Chrome) реалізовував зазначену функцію інакше або несумісно у порівнянні з рушієм SpiderMonkey (рушій JS Mozilla).
 
-That means you can learn **one JS**, and rely on that same JS everywhere.
+Це означає, що ви можете вивчити **один JS** і покладатися на нього скрізь.
 
-### The Web Rules Everything About (JS)
+### Веб керує усім (усім JS-ом)
 
-While the array of environments that run JS is constantly expanding (from browsers, to servers (Node.js), to robots, to lightbulbs, to...), the one environment that rules JS is the web. In other words, how JS is implemented for web browsers is, in all practicality, the only reality that matters.
+Масив середовищ, у яких можна запустити JS, постійно розширюється (від браузерів до серверів (Node.js), роботів, лампочок і так далі), але єдиним середовищем, яке керує JS, є Веб. Іншими словами, те, як реалізується JS для веббраузерів, є, по суті, єдиною реальністю, яка має значення.
 
-For the most part, the JS defined in the specification and the JS that runs in browser-based JS engines is the same. But there are some differences that must be considered.
+Здебільшого JS, визначений у специфікації, і JS, який працює в браузерних рушіях JS, однаковий. Але є деякі відмінності, які необхідно враховувати.
 
-Sometimes the JS specification will dictate some new or refined behavior, and yet that won't exactly match with how it works in browser-based JS engines. Such a mismatch is historical: JS engines have had 20+ years of observable behaviors around corner cases of features that have come to be relied on by web content. As such, sometimes the JS engines will refuse to conform to a specification-dictated change because it would break that web content.
+Іноді специфікація JS диктує якусь нову або вдосконалену поведінку, і все ж це не буде точно відповідати тому, як вона працює в браузерних рушіях JS. Така невідповідність є історичною: рушії JS мали понад 20 років видимої поведінки навколо граничних випадків, на які покладається веб. Таким чином, іноді рушії JS відмовляються відповідати вимогам специфікації, оскільки це порушить наявний контент Вебу.
 
-In these cases, often TC39 will backtrack and simply choose to conform the specification to the reality of the web. For example, TC39 planned to add a `contains(..)` method for Arrays, but it was found that this name conflicted with old JS frameworks still in use on some sites, so they changed the name to a non-conflicting `includes(..)`. The same happened with a comedic/tragic JS *community crisis* dubbed "smooshgate," where the planned `flatten(..)` method was eventually renamed `flat(..)`.
+У цих випадках часто TC39 відступає і погоджується увідповіднити специфікацію до реальності Вебу. Наприклад, TC39 планував додати метод `contains(..)` до масивів, але було виявлено, що це ім'я конфліктує зі старими JS-фреймворками, які все ще використовуються на деяких сайтах, тому назву змінили на неконфліктну `includes(..)`. Те ж саме спричинило трагікомічну кризу JS-спільноти, яку назвали "smooshgate", коли запланований метод `flatten (..)` з часом був перейменований на `flat (..)`.
 
-But occasionally, TC39 will decide the specification should stick firm on some point even though it is unlikely that browser-based JS engines will ever conform.
+Але іноді TC39 вирішує, що специфікація не можу відступитися від якогось пункту, хоча малоймовірно, що JS-рушії у браузерах коли-небудь будуть дотримуватися цього пункта.
 
-The solution? Appendix B, "Additional ECMAScript Features for Web Browsers".[^specApB] The JS specification includes this appendix to detail out any known mismatches between the official JS specification and the reality of JS on the web. In other words, these are exceptions that are allowed *only* for web JS; other JS environments must stick to the letter of the law.
+Що робити? Додаток B, "Додаткові функції ECMAScript для веббраузерів". [^ SpecApB] Специфікація JS містить цей додаток, щоб деталізувати всі відомі невідповідності між офіційною специфікацією JS та реальним JS у Вебі. Іншими словами, це винятки, дозволені *лише* для веб-JS; інші середовища JS повинні дотримуватися букви закону.
 
-Section B.1 and B.2 cover *additions* to JS (syntax and APIs) that web JS includes, again for historical reasons, but which TC39 does not plan to formally specify in the core of JS. Examples include `0`-prefixed octal literals, the global `escape(..)` / `unescape(..)` utilities, String "helpers" like `anchor(..)` and `blink()`, and the RegExp `compile(..)` method.
+Розділи B.1 та B.2 охоплюють *доповнення* до JS (синтаксис та програмні інтерфейси), які знову ж таки, з історичних причин, включає вебверсія JS, але які TC39 не планує формально описувати як частину ядра JS. Приклади включають вісімкові літерали з префіксом `0`, глобальні утиліти `escape (..)`/`unescape (..)`, рядкові "помічники", такі як `anchor (..)` та `blink ()`, і метод RegExp `compile (..)`.
 
-Section B.3 includes some conflicts where code may run in both web and non-web JS engines, but where the behavior *could* be observably different, resulting in different outcomes. Most of the listed changes involve situations that are labeled as early errors when code is running in strict mode.
+Розділ B.3 включає деякі конфлікти, коли код може працювати як у вебрушіях, так і в рушіях інших середовищ, але поведінка *може* помітно відрізнятися, що призводить до різних результатів. Більшість перелічених змін стосуються ситуацій, які позначені як ранні помилки у суворому режимі виконання("strict mode").
 
-Appendix B *gotchas* aren't encountered very often, but it's still a good idea to avoid these constructs to be future safe. Wherever possible, adhere to the JS specification and don't rely on behavior that's only applicable in certain JS engine environments.
+Додаток B перелічує деякі неочевидні випадки, що трапляються не дуже часто, але все ж корисно уникати цих конструкцій для безпеки коду у майбутньому. Де тільки можливо, дотримуйтесь специфікації JS і не покладайтесь на поведінку, яка застосовується лише у JS-рушіях для певних середовищ.
 
-### Not All (Web) JS...
+### Не все те JS...
 
-Is this code a JS program?
+Чи є цей код програмою на JS?
 
 ```js
 alert("Hello, JS!");
 ```
 
-Depends on how you look at things. The `alert(..)` function shown here is not included in the JS specification, but it *is* in all web JS environments. Yet, you won't find it in Appendix B, so what gives?
+Залежить від вашої точки зору. Функція `alert (..)` не включена до специфікації JS, але *реалізована* у всіх вебсередовищах, що підтримують JS. Проте в Додатку B ви її не знайдете, то як це розуміти?
 
-Various JS environments (like browser JS engines, Node.js, etc.) add APIs into the global scope of your JS programs that give you environment-specific capabilities, like being able to pop an alert-style box in the user's browser.
+Різні JS-середовища (наприклад, JS-рушії браузера, Node.js тощо) додають до глобальної області видимості ваших JS-програм програмні інтерфейси(API), що надають доступ до специфічних для цього середовища можливостей, як-от можливість виводити спливаюче вікно з попередженням в браузері користувача.
 
-In fact, a wide range of JS-looking APIs, like `fetch(..)`, `getCurrentLocation(..)`, and `getUserMedia(..)`, are all web APIs that look like JS. In Node.js, we can access hundreds of API methods from various built-in modules, like `fs.write(..)`.
+Насправді чимало програмних інтерфейсів, що дуже схожі на JS, наприклад, `fetch (..)`, `getCurrentLocation (..)` та `getUserMedia (..)`, насправді є веб-API, схожими на JS. Натомість у Node.js ми можемо отримати доступ до сотень методів API з різних вбудованих модулів, наприклад `fs.write (..)`.
 
-Another common example is `console.log(..)` (and all the other `console.*` methods!). These are not specified in JS, but because of their universal utility are defined by pretty much every JS environment, according to a roughly agreed consensus.
+Іншим поширеним прикладом є `console.log (..)` і всі інші методи `console. *`. Вони не вказані в специфікації JS, але через їх універсальну корисність визначені майже в кожному JS-середовищі, згідно з приблизно узгодженим консенсусом.
 
-So `alert(..)` and `console.log(..)` are not defined by JS. But they *look* like JS. They are functions and object methods and they obey JS syntax rules. The behaviors behind them are controlled by the environment running the JS engine, but on the surface they definitely have to abide by JS to be able to play in the JS playground.
+Отже, JS не визначає `alert (..)` і `console.log (..)`. Але вони *схожі* на JS. Вони є функціями та об'єктними методами і вони відповідають правилам синтаксису JS. Їхню поведінку контролює середовище, що запустило JS-рушій, але на поверхні вони, безумовно, повинні зважати на JS, щоб мати можливість грати на його полі.
 
-Most of the cross-browser differences people complain about with "JS is so inconsistent!" claims are actually due to differences in how those environment behaviors work, not in how the JS itself works.
+Більшість відмінностей між браузерами, на які люди скаржаться, коли говорять про неконсистентність JS, насправді пов'язані з різницею в тому, як працює певна поведінка в певному середовищі, а не в тому, як працює сам JS.
 
-So an `alert(..)` call *is* JS, but `alert` itself is really just a guest, not part of the official JS specification.
+Отже, виклик `alert (..)` — це JS, але сам `alert` насправді є лише гостем, а не частиною офіційної специфікації JS.
 
-### It's Not Always JS
+### Не завжди JS
 
-Using the console/REPL (Read-Evaluate-Print-Loop) in your browser's Developer Tools (or Node) feels like a pretty straightforward JS environment at first glance. But it's not, really.
+Консоль або REPL (Read-Evaluate-Print-Loop, цикл читання-обчислення-друк) в інструментах розробника (dev tools) вашого браузера або Node на перший погляд здається досить звичайним JS-середовищем. Але насправді це не так.
 
-Developer Tools are... tools for developers. Their primary purpose is to make life easier for developers. They prioritize DX (Developer Experience). It is *not* a goal of such tools to accurately and purely reflect all nuances of strict-spec JS behavior. As such, there's many quirks that may act as "gotchas" if you're treating the console as a *pure* JS environment.
+Інструменти розробника це, власне, інструменти для розробників. Їх головне призначення - полегшити життя розробникам. Вони надають пріоритет приємному розробницькому досвіду (DX, developer experience). Точно і чисто відбивати всі нюанси поведінки JS із суворими специфікаціями не є метою таких інструментів. Таким чином, існує безліч особливостей поведінки, які можуть видатися неочікуваними, якщо ви розглядаєте консоль як *чисте* JS-середовище.
 
-This convenience is a good thing, by the way! I'm glad Developer Tools make developers' lives easier! I'm glad we have nice UX charms like auto-complete of variables/properties, etc. I'm just pointing out that we can't and shouldn't expect such tools to *always* adhere strictly to the way JS programs are handled, because that's not the purpose of these tools.
+До речі, ця зручність це добре! Я радий, що інструменти розробника полегшують життя розробників! Я радий, що у нас є приємні принади UX, такі як автодоповнення імен змінних або властивостей. Я просто хочу привернути увагу до того, що ми не можемо і не повинні очікувати, що такі інструменти *завжди* чітко дотримуються того, як працюють  JS-програми, тому що вони існують не для цього.
 
-Since such tools vary in behavior from browser to browser, and since they change (sometimes rather frequently), I'm not going to "hardcode" any of the specific details into this text, thereby ensuring this book text is outdated quickly.
+Оскільки такі інструменти відрізняються за поведінкою у різних браузерах і оскільки вони змінюються (іноді досить часто), в цьому тексті я не збираюся вказувати конкретні деталі, тим самим забезпечуючи швидке застаріння тексту цієї книги.
 
-But I'll just hint at some examples of quirks that have been true at various points in different JS console environments, to reinforce my point about not assuming native JS behavior while using them:
+Але все ж таки я натякну на деякі приклади дивної поведінки, які можна було спостерігати в різні моменти в різних консольних середовищах JS, щоб підкріпити міркування, що з цими інструментами не вато очікуати нативної поведінки JS:
 
-* Whether a `var` or `function` declaration in the top-level "global scope" of the console actually creates a real global variable (and mirrored `window` property, and vice versa!).
+* Чи створює оголошення з `var` або `function` на верхньому рівні так званої глобальної області видимості консолі  реальну глобальну змінну, а також віддзеркалену одноіменну властивість на `window`, і навпаки.
 
-* What happens with multiple `let` and `const` declarations in the top-level "global scope."
+*  Що відбувається з безліччю оголошень `let` і` const` у глобальній області видимості верхнього рівня.
 
-* Whether `"use strict";` on one line-entry (pressing `<enter>` after) enables strict mode for the rest of that console session, the way it would on the first line of a .js file, as well as whether you can use `"use strict";` beyond the "first line" and still get strict mode turned on for that session.
+* Коли ви вводите `"use strict";` в одному рядку (натискаючи` <enter> `після), чи вмикається суворий режим для решти сеансу консолі, як це робиться в першому рядку файлу .js, а також чи можна використовувати `"use strict";` після "першого рядка" і все одно переходити до суворого режиму для цього сеансу.
 
-* How non-strict mode `this` default-binding works for function calls, and whether the "global object" used will contain expected global variables.
+* Як працює у несуворому режимі прив'язка `this` за замовчуванням для викликів функцій та чи буде глобальний об'єкт містити очікувані глобальні змінні.
 
-* How hoisting (see Book 2, *Scope & Closures*) works across multiple line entries.
+* Принцип роботи підняття (див. Книгу 2, *Області видимості та замикання*) у коді на кілька рядків.
 
-* ...several others
+* ...та декілька інших
 
-The developer console is not trying to pretend to be a JS compiler that handles your entered code exactly the same way the JS engine handles a .js file. It's trying to make it easy for you to quickly enter a few lines of code and see the results immediately. These are entirely different use cases, and as such, it's unreasonable to expect one tool to handle both equally.
+Консоль розробника не намагається удавати JS-компілятор, який обробляє введений код так само, як JS-рушій обробляє файл .js. Вона намагається полегшити вам швидке введення кількох рядків коду та негайний перегляд результатів. Це абсолютно різні варіанти використання, і тому нерозумно очікувати, що один інструмент обробляє обидва випадки однаково.
 
-Don't trust what behavior you see in a developer console as representing *exact* to-the-letter JS semantics; for that, read the specification. Instead, think of the console as a "JS-friendly" environment. That's useful in its own right.
+Не думайте, що поведінка, яку ви бачите в консолі розробника, є відображенням *точної* буквальної семантики JS; для цього прочитайте специфікацію. Натомість думайте про консоль як про середовище, що просто вміє виконувати JS. Це корисно саме по собі.
 
-## Many Faces
+## Багато облич
 
-The term "paradigm" in programming language context refers to a broad (almost universal) mindset and approach to structuring code. Within a paradigm, there are myriad variations of style and form that distinguish programs, including countless different libraries and frameworks that leave their unique signature on any given code.
+Термін "парадигма" в контексті мови програмування описує спосіб мислення в широкому сенсі та підход до структурування коду. У рамках парадигми існує безліч варіацій стилю та форми, які відрізняють програми, включаючи незліченну кількість різних бібліотек та фреймворків, що залишають свій унікальний відбиток на коді.
 
-But no matter what a program's individual style may be, the big picture divisions around paradigms are almost always evident at first glance of any program.
+Але незалежно від індивідуального стилю програми, майже завжди з першого погляду можна визначити парадигми.
 
-Typical paradigm-level code categories include procedural, object-oriented (OO/classes), and functional (FP):
+Зазвичай на рівні парадигми код розподіляють на процедурний, об'єктно-орієнтований (або класово-орієнтований) та функційний:
 
-* Procedural style organizes code in a top-down, linear progression through a pre-determined set of operations, usually collected together in related units called procedures.
+* Процедурний стиль організовує код в лінійній прогресії зверху вниз за допомогою заздалегідь визначеного набору операцій, зазвичай зібраних разом у зв'язні одиниці, які називаються процедурами.
 
-* OO style organizes code by collecting logic and data together into units called classes.
+* Об'єктно-орієнтований стиль організовує код, збираючи логіку та дані разом у блоки, які називаються класами.
 
-* FP style organizes code into functions (pure computations as opposed to procedures), and the adaptations of those functions as values.
+* Функційний стиль організовує код у функції, що відрізняються від процедур чистими обчисленнями, та адаптації цих функцій як значення.
 
-Paradigms are neither right nor wrong. They're orientations that guide and mold how programmers approach problems and solutions, how they structure and maintain their code.
+Парадигми не бувать ані правильними, ані хибними. Вони є орієнтаціями, які визначають, як підходити до проблем та рішень, як структурувати та підтримувати код.
 
-Some languages are heavily slanted toward one paradigm—C is procedural, Java/C++ are almost entirely class oriented, and Haskell is FP through and through.
+Деякі мови сильно схильні до певної парадигми - C є процедурною мовою, Java / C ++ майже повністю орієнтована на класи, а Haskell - на функційне програмування.
 
-But many languages also support code patterns that can come from, and even mix and match from, different paradigms. So called "multi-paradigm languages" offer ultimate flexibility. In some cases, a single program can even have two or more expressions of these paradigms sitting side by side.
+Але багато мов підтримують шаблони організації коду, які можуть походити з різних парадигм і навіть змішують їх між собою. Так звані мультипардигменні мови пропонують надзвичайну гнучкість. У деяких випадках в одній програмі можуть навіть водночас бути прояви двох чи більше цих парадигм.
 
-JavaScript is most definitely a multi-paradigm language. You can write procedural, class-oriented, or FP-style code, and you can make those decisions on a line-by-line basis instead of being forced into an all-or-nothing choice.
+JavaScript - це, безумовно, багатопарадигменна мова. Ви можете писати процедурний, класовий або функційний код, і ви можете змінювати своє рішення ледь не кожного рядка, замість того, щоб вибрати один раз і не мати можливості передумати.
 
-## Backwards & Forwards
+## Пряма та зворотна сумісність
 
-One of the most foundational principles that guides JavaScript is preservation of *backwards compatibility*. Many are confused by the implications of this term, and often confuse it with a related but different term: *forwards compatibility*.
+Одним з найбільш фундаментальних принципів, яким керується JavaScript, є збереження *зворотної сумісності*. Багатьох людей бентежить прихований зміст цього терміна. Також його часто плутають з пов'язаним терміном *пряма сумісність*.
 
-Let's set the record straight.
+Давайте розберемося.
 
-Backwards compatibility means that once something is accepted as valid JS, there will not be a future change to the language that causes that code to become invalid JS. Code written in 1995—however primitive or limited it may have been!—should still work today. As TC39 members often proclaim, "we don't break the web!"
+Зворотна сумісність означає, що як тільки щось визнається валідним JS-кодом, в мову більше не може бути внесено таких змін, що зроблять цей код невалідним. Код, написаний у 1995 р. - яким би примітивним чи обмеженим він не був! - повинен працювати і сьогодні. Як часто заявляють члени TC39, "не можна ламати Веб!"
 
-The idea is that JS developers can write code with confidence that their code won't stop working unpredictably because a browser update is released. This makes the decision to choose JS for a program a more wise and safe investment, for years into the future.
+Ідея полягає в тому, що JS-розробники можуть писати код із впевненістю, що цей код не перестане працювати через оновлення браузера. Це робить рішення вибрати JS для написання програми більш розумною та безпечною інвестицією на роки в майбутнє.
 
-That "guarantee" is no small thing. Maintaining backwards compatibility, stretched out across almost 25 years of the language's history, creates an enormous burden and a whole slew of unique challenges. You'd be hard pressed to find many other examples in computing of such a commitment to backwards compatibility.
+Ця "гарантія" - то не дрібниця. Підтримка зворотної сумісності, розтягнута на вже майже 25 років історії мови, створює величезний тягар та цілу низку унікальних задач. У світі обчислювальних технологій буде важко знайти багато інших прикладів такой відданості ідеї зворотної сумісності.
 
-The costs of sticking to this principle should not be casually dismissed. It necessarily creates a very high bar to including changing or extending the language; any decision becomes effectively permanent, mistakes and all. Once it's in JS, it can't be taken out because it might break programs, even if we'd really, really like to remove it!
+Варто пам'ятатми про ціну дотримання цього принципу. Вона складається з дуже високих вимог до змін чи розширення мови; будь-яке рішення фактично стає незворотним. Як тільки щось потрапляє в JS, його неможливо вийняти, оскільки це може зламати програми, навіть якщо іноді дуже, дуже сильно хочеться щось видалити!
 
-There are some small exceptions to this rule. JS has had some backwards-incompatible changes, but TC39 is extremely cautious in doing so. They study existing code on the web (via browser data gathering) to estimate the impact of such breakage, and browsers ultimately decide and vote on whether they're willing to take the heat from users for a very small-scale breakage weighed against the benefits of fixing or improving some aspect of the language for many more sites (and users).
+З цього правила є кілька невеликих винятків. У JS відбулися деякі зміни, що порушили зворотну сумісність, але TC39 робить такі зміни дуже обережно. TC39 оцінює негативний вплив такої зміни за допомогою зібраних браузерами даних , а браузери в кінцевому підсумку приймають рішення і голосують, чи готові взяти на себе негатив від користувачів через дуже дрібну поломку, зважену на користь виправлення або вдосконалення деяких аспектів мови для багатьох інших сайтів і користувачів.
 
-These kinds of changes are rare, and are almost always in corner cases of usage that are unlikely to be observably breaking in many sites.
+Такі зміни трапляються рідко і майже завжди стосуються граничних випадках використання, тому навряд чи будуть помітними на багатьох сайтах.
 
-Compare *backwards compatibility* to its counterpart, *forwards compatibility*. Being forwards-compatible means that including a new addition to the language in a program would not cause that program to break if it were run in an older JS engine. **JS is not forwards-compatible**, despite many wishing such, and even incorrectly believing the myth that it is.
+Порівняйте *зворотну сумісність* з аналогом, *прямою сумісністю*. Пряма сумісність означає, що включення в програму нового доповнення до мови не призведе до поломки цієї програми, якщо вона запускається у старому рушії JS. **JS не є прямо сумісним**, незважаючи на те, що багато хто цього бажає і навіть вірить, що цей міф відповідає дійсності.
 
-HTML and CSS, by contrast, are forwards-compatible but not backwards-compatible. If you dug up some HTML or CSS written back in 1995, it's entirely possible it would not work (or work the same) today. But, if you use a new feature from 2019 in a browser from 2010, the page isn't "broken" -- the unrecognized CSS/HTML is skipped over, while the rest of the CSS/HTML would be processed accordingly.
+HTML і CSS, навпаки, дотримуються прямої сумісності, але не зворотньої. Якщо ви викопали якийсь HTML або CSS, написані ще в 1995 році, цілком можливо, що сьогодні цей код геть не працюватим або працюватиме не належним чином. Але якщо ви використовуєте нову функцію, додану у 2019 році, в браузері 2010 року, сторінка не зламається - нерозпізнаний CSS / HTML пропускається, тоді як решта CSS / HTML буде оброблена коректно.
 
-It may seem desirable for forwards-compatibility to be included in programming language design, but it's generally impractical to do so. Markup (HTML) or styling (CSS) are declarative in nature, so it's much easier to "skip over" unrecognized declarations with minimal impact to other recognized declarations.
+Пряма сумісність може здатися бажаною рисою мови програмування, але, як правило, це непрактично. Розмітка (HTML) або стилі (CSS) мають декларативний характер, тому набагато простіше "пропустити" нерозпізнані декларації з мінімальним впливом на розпізнані.
 
-But chaos and non-determinism would ensue if a programming language engine selectively skipped statements (or even expressions!) that it didn't understand, as it's impossible to ensure that a subsequent part of the program wasn't expecting the skipped-over part to have been processed.
+ Але якби рушій мови програмування вибірково пропускав інструкції або навіть цілі вирази, яких він не розуміє, це призвело б до хаосу і недетермінованості, оскільки неможливо переконатись, що наступна частина програми не залежить від пропущеного фрагменту.
 
-Though JS isn't, and can't be, forwards-compatible, it's critical to recognize JS's backwards compatibility, including the enduring benefits to the web and the constraints and difficulties it places on JS as a result.
+Незважаючи на те, що JS не є і не може бути прямо-сумісною мовою, важливо визнати зворотну сумісність JS, включаючи стійкі переваги для Всесвітньої мережі та обмеження та труднощі, які вона спричиняє для JS.
 
-### Jumping the Gaps
+### Стрибки через прогалини
 
-Since JS is not forwards-compatible, it means that there is always the potential for a gap between code that you can write that's valid JS, and the oldest engine that your site or application needs to support. If you run a program that uses an ES2019 feature in an engine from 2016, you're very likely to see the program break and crash.
+Оскільки JS не дотримується прямої сумісності, завжди існує можливість розриву між валідним JS-кодом, і найстарішим рушієм, який ваш веб-сайт або програма має підтримувати. Якщо ви запускаєте програму, яка використовує можливості ES2019, на рушії 2016 року, швидше за все ваша програма зламається.
 
-If the feature is a new syntax, the program will in general completely fail to compile and run, usually throwing a syntax error. If the feature is an API (such as ES6's `Object.is(..)`), the program may run up to a point but then throw a runtime exception and stop once it encounters the reference to the unknown API.
+Якщо йдеться про новий синтаксис, програма, як правило, повністю не зможе скомпілюватися та запуститися, через синтаксичну помилку. Якщо функція є програмний інтерфейсом (наприклад, `Object.is (..)` з ES6), програма може запуститись до певної точки, але потім викинути виняток виконання та зупинитися, як тільки зустріне посилання на невідомий інтерфейс.
 
-Does this mean JS developers should always lag behind the pace of progress, using only code that is on the trailing edge of the oldest JS engine environments they need to support? No!
+Чи означає це, що JS-розробники приречені завжди відставати від темпів прогресу, використовуючи лише той код, який зрозумілий найстарішим JS-рушіям тих середовищ, які вони повинні підтримувати? Зовсім ні!
 
-But it does mean that JS developers need to take special care to address this gap.
+Натомість це означає, що JS-розробники повинні докладати особливих зусиль, щоб заповнити цю прогалину.
 
-For new and incompatible syntax, the solution is transpiling. Transpiling is a contrived and community-invented term to describe using a tool to convert the source code of a program from one form to another (but still as textual source code). Typically, forwards-compatibility problems related to syntax are solved by using a transpiler (the most common one being Babel (https://babeljs.io)) to convert from that newer JS syntax version to an equivalent older syntax.
+Рішення для проблеми нового та несумісного синтаксису - транспіляція. Транспіляція - це винайдений спільнотою термін для опису використання інструменту для перетворення вихідного коду програми з однієї форми на іншу (але все ще як текстовий вихідний код). Як правило, проблеми прямої суміснсті, пов'язані з синтаксисом, вирішуються за допомогою транспілятора (найпоширенішим є Babel (https://babeljs.io)), що перетворює синтаксис цієї нової версії на еквівалентний старий синтаксис.
 
-For example, a developer may write a snippet of code like:
+Наприклад, розробник може написати такий фрагмент коду:
 
 ```js
 if (something) {
@@ -228,7 +229,7 @@ else {
 }
 ```
 
-This is how the code would look in the source code tree for that application. But when producing the file(s) to deploy to the public website, the Babel transpiler might convert that code to look like this:
+Ось як виглядатиме код у дереві вихідного коду для цієї програми. Але під час створення файлу чи файлів для запуску на загальнодоступному веб-сайті транспілятор Babel може перетворити код таким чином:
 
 ```js
 var x$0, x$1;
@@ -242,21 +243,22 @@ else {
 }
 ```
 
-The original snippet relied on `let` to create block-scoped `x` variables in both the `if` and `else` clauses which did not interfere with each other. An equivalent program (with minimal re-working) that Babel can produce just chooses to name two different variables with unique names, producing the same non-interference outcome.
+Оригінальний фрагмент використовував `let` для створення блокової змінної `x` в обох гілках конструкції `if`, тобто як у `if`, так і у `else`, які не заважали одна одній. Еквівалентна програма (з мінімальною переробкою), яку Babel може створити, просто вирішує назвати дві різні змінні унікальними іменами, створюючи однаковий результат, коли імена не конфліктують.
 
-| NOTE: |
+| ПРИМІТКА: |
 | :--- |
-| The `let` keyword was added in ES6 (in 2015). The preceding example of transpiling would only need to apply if an application needed to run in a pre-ES6 supporting JS environment. The example here is just for simplicity of illustration. When ES6 was new, the need for such a transpilation was quite prevalent, but in 2020 it's much less common to need to support pre-ES6 environments. The "target" used for transpiliation is thus a sliding window that shifts upward only as decisions are made for a site/application to stop supporting some old browser/engine. |
+| Ключове слово `let` було додано до мови разом з ES6 (у 2015 році). Попередній приклад транспіляції мав би застосовуватися лише в тому випадку, коли застосунку потрібно працювати в середовищі JS, що підтримує попередню ES6. Приклад наведено лише для простоти ілюстрації. Коли стандарт ES6 тільки вийшов, потреба в такій транспіляції була досить поширеною, але в 2020 році набагато рідше виникає потреба підтримувати середовища, що не підтримують ES6. Таким чином, визначення "цільової мови", яка використовується для транпіляції, є розсувним вікном, яке зміщується вгору лише тоді, коли приймаються рішення припинити підтримку якогось старого браузера або рушія. |
 
-You may wonder: why go to the trouble of using a tool to convert from a newer syntax version to an older one? Couldn't we just write the two variables and skip using the `let` keyword? The reason is, it's strongly recommended that developers use the latest version of JS so that their code is clean and communicates its ideas most effectively.
 
-Developers should focus on writing the clean, new syntax forms, and let the tools take care of producing a forwards-compatible version of that code that is suitable to deploy and run on the oldest-supported JS engine environments.
+Ви можете задатися питанням: навіщо взагалі ускладнювати собі життя використанням інструменту для перетворення нової версії синтаксису на стару? Чи не могли б ми просто написати дві змінні, використовуючи ключове слово `let`? Причина полягає в тому, що розробникам наполегливо рекомендується використовувати найновішу версію JS, щоб їх код був чистим та найбільш ефективно передавав свої ідеї.
 
-### Filling the Gaps
+Розробники повинні зосередитись на написанні чистих нових форм синтаксису, і нехай інструменти подбають про створення сумісної з перевагами версії цього коду, яка підходить для розгортання та запуску в найстаріших підтримуваних середовищах JS.
 
-If the forwards-compatibility issue is not related to new syntax, but rather to a missing API method that was only recently added, the most common solution is to provide a definition for that missing API method that stands in and acts as if the older environment had already had it natively defined. This pattern is called a polyfill (aka "shim").
+### Заповнення прогалин
 
-Consider this code:
+Якщо проблема прямої сумісності пов'язана не з новим синтаксисом, а, скоріше, з відсутнім методом програмного інтенфейсу, який був нещодавно доданий, найпоширенішим рішенням є надання визначення для цього відсутнього методу, який діє так, ніби старе середовище це вже було визначено в природі. Цей шаблон називається "поліфіл" (polyfil),він же shim ("шім").
+
+Розглянемо такий код:
 
 ```js
 // getSomeRecords() returns us a promise for some
@@ -272,9 +274,9 @@ pr
 .finally(hideSpinner)  // always hide the spinner
 ```
 
-This code uses an ES2019 feature, the `finally(..)` method on the promise prototype. If this code were used in a pre-ES2019 environment, the `finally(..)` method would not exist, and an error would occur.
+Цей код використовує метод `finally(..)` на прототипі промісу, що вуб доданий у ES2019. Якби цей код запустили у середовищі до ES2019, метод `finally(..)` не існував би, і сталася б помилка.
 
-A polyfill for `finally(..)` in pre-ES2019 environments could look like this:
+Поліфіл для `finally(..)` в середовищах до ES2019 може виглядати так:
 
 ```js
 if (!Promise.prototype.finally) {
@@ -297,29 +299,29 @@ if (!Promise.prototype.finally) {
 }
 ```
 
-| WARNING: |
+| ПОПЕРЕДЖЕННЯ: |
 | :--- |
-| This is only a simple illustration of a basic (not entirely spec-compliant) polyfill for `finally(..)`. Don't use this polyfill in your code; always use a robust, official polyfill wherever possible, such as the collection of polyfills/shims in ES-Shim. |
+| Код поліфіла `finally(..)` наведений як ілюстрація. Це спрощена та не повністю сумісна зі специфікацією версія. Не використовуйте цей поліфіл у своєму коді; завжди використовуйте надійний, офіційний поліфіл, де це можливо, наприклад, з колекції поліфілів та шимів ES-Shim. |
 
-The `if` statement protects the polyfill definition by preventing it from running in any environment where the JS engine has already defined that method. In older environments, the polyfill is defined, but in newer environments the `if` statement is quietly skipped.
+Оператор `if` захищає визначення поліфілу, запобігаючи його запуску у середовищі, де рушій JS вже визначив цей метод. У старих середовищах поліфіл визначається, але в нових середовищах оператор if тихо пропускається.
 
-Transpilers like Babel typically detect which polyfills your code needs and provide them automatically for you. But occasionally you may need to include/define them explicitly, which works similar to the snippet we just looked at.
+Транспілятори, такі як Babel, зазвичай визначають поліфіли, які вашому коду, і надають їх автоматично. Але іноді вам може знадобитися включити або визначити їх явно, подібно до фрагменту, який ми щойно розглядали.
 
-Always write code using the most appropriate features to communicate its ideas and intent effectively. In general, this means using the most recent stable JS version. Avoid negatively impacting the code's readability by trying to manually adjust for the syntax/API gaps. That's what tools are for!
+Завжди пишіть код з використанням тих можливостей мови, що найкраще передають ваші думки та наміри. В загальному випадку це означає використання останньої стабільної версії JS. Уникайте негативного впливу на читабельність коду через спроби вручну компенсувати синтаксису або програмні інтерфейси, яких бракує. Інструменти існують саме для цього!
 
-Transpilation and polyfilling are two highly effective techniques for addressing that gap between code that uses the latest stable features in the language and the old environments a site or application needs to still support. Since JS isn't going to stop improving, the gap will never go away. Both techniques should be embraced as a standard part of every JS project's production chain going forward.
+Транспіляція та поліфіли - це два високоефективних прийоми для усунення розриву між кодом, який використовує найновіші стабільні можливості мови, та старими середовищами, які сайт чи застосунок все ще мають підтримувати. Оскільки JS не збирається припиняти вдосконалення, цей розрив ніколи не зникне. Обидва методи повинні бути прийняті як стандартна частина виробничого ланцюжка кожного проєкту на JS.
 
-## What's in an Interpretation?
+## А що в інтерпретації?
 
-A long-debated question for code written in JS: is it an interpreted script or a compiled program? The majority opinion seems to be that JS is an interpreted (scripting) language. But the truth is more complicated than that.
+Довго обговорюване питання щодо коду, написаного на JS: це інтерпретований скрипт чи скомпільована програма? Здається, думка більшості полягає в тому, що JS - це інтерпретована (скриптова) мова. Але правда складніша.
 
-For much of the history of programming languages, "interpreted" languages and "scripting" languages have been looked down on as inferior compared to their compiled counterparts. The reasons for this acrimony are numerous, including the perception that there is a lack of performance optimization, as well as dislike of certain language characteristics, such as scripting languages generally using dynamic typing instead of the "more mature" statically typed languages.
+Впродовж майже всієї історії мов програмування "інтерпретовані" та "скриптові" мови вважалися нижчими за статусом у порівнянні з мовами, що компілюються. Причин для такого негативного ставлення чимало, включаючи уявлення про відсутність оптимізації продуктивності, а також неприязнь до певних мовних характеристик, таких як динамічна типізація, яку скриптові мови використавують замість "більш зрілої" статичної типізації.
 
-Languages regarded as "compiled" usually produce a portable (binary) representation of the program that is distributed for execution later. Since we don't really observe that kind of model with JS (we distribute the source code, not the binary form), many claim that disqualifies JS from the category. In reality, the distribution model for a program's "executable" form has become drastically more varied and also less relevant over the last few decades; to the question at hand, it doesn't really matter so much anymore what form of a program gets passed around.
+Мови, які вважаються "компільованими", як правило, створюють переносне (двійкове) представлення програми, яке розповсюджується для подальшого виконання. Оскільки з JS ми дійсно не спостерігаємо такого, бо ми розповсюджуємо вихідний код, а не двійкову форму, багато хто стверджує, що це виключає JS із категорії мов, що компілюються. Насправді за останні кілька десятиліть модель розповсюдження "виконуваної" форми програми стала значно біль різноманітною, а також менш актуальною; щодо самого питання, то насправді не так вже й важливо, в якій формі розповсюджують програми.
 
-These misinformed claims and criticisms should be set aside. The real reason it matters to have a clear picture on whether JS is interpreted or compiled relates to the nature of how errors are handled.
+Ці необґрунтовані претензії та критику слід відкинути. Справжня причина, коли важливо мати чітке уявлення про те, чи інтерпретується або компілюється JS, пов’язана з природою способу обробки помилок.
 
-Historically, scripted or interpreted languages were executed in generally a top-down and line-by-line fashion; there's typically not an initial pass through the program to process it before execution begins (see Figure 1).
+Раніше код на скриптових або інтерпретованих мовах виконувався найчастіше зверху вниз рядок за рядком; як правило, немає початкового проходу через програму для її обробки до початку виконання (див. рисунок 1).
 
 <figure>
     <img src="images/fig1.svg" width="650" alt="Interpreting a script to execute it" align="center">
@@ -327,9 +329,9 @@ Historically, scripted or interpreted languages were executed in generally a top
     <br><br>
 </figure>
 
-In scripted or interpreted languages, an error on line 5 of a program won't be discovered until lines 1 through 4 have already executed. Notably, the error on line 5 might be due to a runtime condition, such as some variable or value having an unsuitable value for an operation, or it may be due to a malformed statement/command on that line. Depending on context, deferring error handling to the line the error occurs on may be a desirable or undesirable effect.
+У скриптових або інтерпретованих мовах помилка у п'ятому рядку програми не буде виявлена, поки не будуть виконані рядки з 1 по 4. Примітно, що помилка в рядку 5 може бути пов’язана з умовою часу виконання, наприклад, якоюсь змінною чи значенням, що має невідповідне значення для операції, або через неправильний вираз чи команду на цьому рядку. Залежно від контексту перенесення обробки помилок на рядок, на якому виникає помилка, може бути бажаним або небажаним ефектом.
 
-Compare that to languages which do go through a processing step (typically, called parsing) before any execution occurs, as illustrated in Figure 2:
+Порівняйте це з мовами, які проходять етап обробки, як правило, так званий парсинг, до початку виконання, як показано на малюнку 2:
 
 <figure>
     <img src="images/fig2.svg" width="650" alt="Parsing, compiling, and executing a program" align="center">
@@ -337,37 +339,37 @@ Compare that to languages which do go through a processing step (typically, call
     <br><br>
 </figure>
 
-In this processing model, an invalid command (such as broken syntax) on line 5 would be caught during the parsing phase, before any execution has begun, and none of the program would run. For catching syntax (or otherwise "static") errors, generally it's preferred to know about them ahead of any doomed partial execution.
+У цій моделі обробки помилкова команда (наприклад, з порушенням синтаксису) у рядку 5 буде перехоплена на етапі парсингу, перш ніж розпочнеться будь-яке виконання, і програма не запуститься. Для лову синтаксичних (так званих "статичних") помилок, як правило, бажано знати про них перед будь-яким частковим виконанням.
 
-So what do "parsed" languages have in common with "compiled" languages? First, all compiled languages are parsed. So a parsed language is quite a ways down the road toward being compiled already. In classic compilation theory, the last remaining step after parsing is code generation: producing an executable form.
+Тож що спільного у мов, що парсяться, та «компільованих» мов? По-перше, всі компільовані мови парсяться. Отже, парсинг - це вже половина роботи з компіляції. У класичній теорії компіляції останнім кроком, що залишився після парсингу, є генерація коду, тобто створення виконуваної форми.
 
-Once any source program has been fully parsed, it's very common that its subsequent execution will, in some form or fashion, include a translation from the parsed form of the program—usually called an Abstract Syntax Tree (AST)—to that executable form.
+Як тільки будь-яку програму-джерело буде повністю розпарсено, дуже часто, що її подальше виконання, в тій чи іншій формі, включатиме переклад із розпарсеної форми програми - зазвичай її називають абстрактним синтаксичним деревом (AST) - на цю виконувану форми.
 
-In other words, parsed languages usually also perform code generation before execution, so it's not that much of a stretch to say that, in spirit, they're compiled languages.
+Іншими словами, мови, що парсяться, зазвичай також виконують генерацію коду перед виконанням, тому не так вже й важко стверджувати, що ідейно вони компільовані мови.
 
-JS source code is parsed before it is executed. The specification requires as much, because it calls for "early errors"—statically determined errors in code, such as a duplicate parameter name—to be reported before the code starts executing. Those errors cannot be recognized without the code having been parsed.
+Вихідний код JS парситься перед виконанням. Специфікація вимагає цього, оскільки вона вимагає повідомляти про "ранні помилки" - статистично визначені помилки в коді, такі як подвоєння імені параметра, перед початком виконання коду. Ці помилки неможливо розпізнати без парсингу коду.
 
-So **JS is a parsed language**, but is it *compiled*?
+Отже **JS парситься**, але чи він *компілюється*?
 
-The answer is closer to yes than no. The parsed JS is converted to an optimized (binary) form, and that "code" is subsequently executed (Figure 2); the engine does not commonly switch back into line-by-line execution (like Figure 1) mode after it has finished all the hard work of parsing—most languages/engines wouldn't, because that would be highly inefficient.
+Скоріш так, ніж ні. Розпарсений JS перетворюється на оптимізовану (двійкову) форму, і цей "код" згодом виконується (рис. 2); рушій зазвичай не переходить назад у режим послідовного виконання (як на малюнку 1) після того, як закінчить усю важку роботу з синтаксичного аналізу - більшість мов / рушіїв цього не робить, оскільки це буде дуже неефективно.
 
-To be specific, this "compilation" produces a binary byte code (of sorts), which is then handed to the "JS virtual machine" to execute. Some like to say this VM is "interpreting" the byte code. But then that means Java, and a dozen other JVM-driven languages, for that matter, are interpreted rather than compiled. Of course, that contradicts the typical assertion that Java/etc are compiled languages.
+Точніше кажучи, ця "компіляція" створює свого роду двійковий байт-код, який потім передається на виконання віртуальній машині JS. Деякі люблять стверджувати, що ця ВМ "інтерпретує" байт-код. Але тоді це означає, що Java, а також десяток інших мов на базі JVM інтерпретуються, а не компілюються. Звичайно, це суперечить типовому твердженню про те, що Java та подібні їй - це компільовані мови.
 
-Interestingly, while Java and JavaScript are very different languages, the question of interpreted/compiled is pretty closely related between them!
+Цікаво, що хоча Java та JavaScript - це дуже різні мови, питання інтерпретації чи компіляції між ними досить тісно пов’язане!
 
-Another wrinkle is that JS engines can employ multiple passes of JIT (Just-In-Time) processing/optimization on the generated code (post parsing), which again could reasonably be labeled either "compilation" or "interpretation" depending on perspective. It's actually a fantastically complex situation under the hood of a JS engine.
+Інша складність полягає в тому, що рушії JS можуть використовувати декілька проходів обробки / оптимізації JIT (Just-In-Time) згенерованого коду (після синтаксичного аналізу), які знову можна обгрунтовано позначити або "компіляцією", або "інтерпретацією" залежно від точки зору. Насправді те, що відбувається під капотом рушія JS, фантастично складна річ.
 
-So what do these nitty-gritty details boil down to? Step back and consider the entire flow of a JS source program:
+То до чого зводяться ці дрібні деталі? Зробіть крок назад і розгляньте весь потік вихідної програми JS:
 
-1. After a program leaves a developer's editor, it gets transpiled by Babel, then packed by Webpack (and perhaps half a dozen other build processes), then it gets delivered in that very different form to a JS engine.
+1. Після того, як програма залишає редактор розробника, її транспілює Babel, потім збирає Webpack (і, можливо, ще півдюжини інших процесів збірки), а потім в зовсім іншій формі вона потрапляє до рушія JS.
 
-2. The JS engine parses the code to an AST.
+2. Рушій JS парсить код на AST.
 
-3. Then the engine converts that AST to a kind-of byte code, a binary intermediate representation (IR), which is then refined/converted even further by the optimizing JIT compiler.
+3. Потім рушій перетворює цей AST на своєрідний байт-код, двійкове проміжне представлення (IR), яке потім уточнюється / трансформується ще більше оптимізуючим компілятором JIT.
 
-4. Finally, the JS VM executes the program.
+4. Нарешті, віртуальна машина JS виконує програму.
 
-To visualize those steps, again:
+Візуалізуємо ці кроки:
 
 <figure>
     <img src="images/fig3.svg" width="650" alt="Steps of JS compilation and execution" align="center">
@@ -375,53 +377,53 @@ To visualize those steps, again:
     <br><br>
 </figure>
 
-Is JS handled more like an interpreted, line-by-line script, as in Figure 1, or is it handled more like a compiled language that's processed in one-to-several passes first, before execution (as in Figures 2 and 3)?
+Чи обробляється JS більше як інтерпретований скрипт рядок за рядком, як на малюнку 1, або він обробляється більше як компільована мова, яка обробляється спочатку від одного до кількох проходів, перед виконанням (як на малюнках 2 та 3) ?
 
-I think it's clear that in spirit, if not in practice, **JS is a compiled language**.
+Я думаю, зрозуміло, що за духом, якщо не на практиці, **JS - це компільована мова**.
 
-And again, the reason that matters is, since JS is compiled, we are informed of static errors (such as malformed syntax) before our code is executed. That is a substantively different interaction model than we get with traditional "scripting" programs, and arguably more helpful!
+І знову ж таки, важлива особливість полягає в тому, що, оскільки JS компілюється, ми отримуємо інформацію про статичні помилки (наприклад, неправильний синтаксис) перед тим, як виконати наш код. Це істотно інша модель взаємодії, ніж ми отримуємо з традиційними скриптовими програмами, і, можливо, корисніша!
 
 ### Web Assembly (WASM)
 
-One dominating concern that has driven a significant amount of JS's evolution is performance, both how quickly JS can be parsed/compiled and how quickly that compiled code can be executed.
+Основною проблемою, яка мотивувала значну частину розвитку JS, є продуктивність, як швидкість парсингу / компіляції JS, так і швидкість виконання цього скомпільованого коду.
 
-In 2013, engineers from Mozilla Firefox demonstrated a port of the Unreal 3 game engine from C to JS. The ability for this code to run in a browser JS engine at full 60fps performance was predicated on a set of optimizations that the JS engine could perform specifically because the JS version of the Unreal engine's code used a style of code that favored a subset of the JS language, named "ASM.js".
+У 2013 році інженери з Mozilla Firefox продемонстрували порт ігрового рушія Unreal 3 з C на JS. Можливість запуску цього коду на рушії JS браузера з повною продуктивністю 60 кадрів в секунду була заснована на наборі оптимізацій, які механізм JS міг би виконати спеціально, оскільки версія JS коду рушія Unreal використовувала стиль коду, який надавав перевагу підмножині JS, названа "ASM.js".
 
-This subset is valid JS written in ways that are somewhat uncommon in normal coding, but which signal certain important typing information to the engine that allow it to make key optimizations. ASM.js was introduced as one way of addressing the pressures on the runtime performance of JS.
+Ця підмножина є валідним JS, написаним дещо незвичним чином, але який передає певну важливу інформацію про типи рушієві, що дозволяє йому робити ключові оптимізації. ASM.js було введено як один із способів подолання тиску на продуктивність виконання JS.
 
-But it's important to note that ASM.js was never intended to be code that was authored by developers, but rather a representation of a program having been transpiled from another language (such as C), where these typing "annotations" were inserted automatically by the tooling.
+Але важливо зауважити, що ASM.js ніколи не був кодом, авторством якого були розробники, а скоріше подання програми, яка була перекладена з іншої мови (наприклад, C), де ці введені "анотації" автоматично вставлялися оснащення.
 
-Several years after ASM.js demonstrated the validity of tooling-created versions of programs that can be processed more efficiently by the JS engine, another group of engineers (also, initially, from Mozilla) released Web Assembly (WASM).
+Через кілька років після того, як ASM.js продемонстрував валідність створених інструментальних версій програм, які можуть бути оброблені JS-рушієм більш ефективно, інша група інженерів (також, спочатку з Mozilla) випустила Web Assembly (WASM).
 
-WASM is similar to ASM.js in that its original intent was to provide a path for non-JS programs (C, etc.) to be converted to a form that could run in the JS engine. Unlike ASM.js, WASM chose to additionally get around some of the inherent delays in JS parsing/compilation before a program can execute, by representing the program in a form that is entirely unlike JS.
+WASM схожий на ASM.js тим, що його початковий намір полягав у забезпеченні шляху для програм, що не належать до JS (C тощо), які слід перетворити у форму, яка може працювати в рушії JS. На відміну від ASM.js, WASM вирішив додатково обійти деякі притаманні затримки при синтаксичному аналізі / компіляції JS перед тим, як програма зможе виконати, представляючи програму у формі, яка абсолютно не схожа на JS.
 
-WASM is a representation format more akin to Assembly (hence, its name) that can be processed by a JS engine by skipping the parsing/compilation that the JS engine normally does. The parsing/compilation of a WASM-targeted program happen ahead of time (AOT); what's distributed is a binary-packed program ready for the JS engine to execute with very minimal processing.
+WASM - це формат представлення, більш схожий на Assembly (звідти його назва), який може оброблятися рушієм JS, пропускаючи синтаксичний аналіз / компіляцію, який зазвичай робить рушій JS. Синтаксичний аналіз / компіляція програми, орієнтованої на WASM, відбувається заздалегідь (AOT, ahead-of-time); що розповсюджується, це програма в двійковому пакеті, готова для роботи рушія JS з мінімальною обробкою.
 
-An initial motivation for WASM was clearly the potential performance improvements. While that continues to be a focus, WASM is additionally motivated by the desire to bring more parity for non-JS languages to the web platform. For example, if a language like Go supports threaded programming, but JS (the language) does not, WASM offers the potential for such a Go program to be converted to a form the JS engine can understand, without needing a threads feature in the JS language itself.
+Початковою мотивацією для WASM було явно потенційне покращення продуктивності. Незважаючи на те, що це продовжує залишатися в центрі уваги, WASM додатково мотивоване бажанням привнести більше паритету для мов, які не є JS, на веб-платформу. Наприклад, якщо така мова, як Go, підтримує багатопоточне програмування, а JS , WASM пропонує можливість перетворення такої програми на Go у форму, яку може зрозуміти рушій JS, без необхідності реалізації потоків у JS.
 
-In other words, WASM relieves the pressure to add features to JS that are mostly/exclusively intended to be used by transpiled programs from other languages. That means JS feature development can be judged (by TC39) without being skewed by interests/demands in other language ecosystems, while still letting those languages have a viable path onto the web.
+Іншими словами, WASM знімає тиск на додавання до JS функцій, які здебільшого / виключно призначені для використання у програмах з інших мов. Це означає, що про розвиток функцій JS можна судити (за допомогою TC39), не збиваючись на інтереси / вимоги в інших мовних екосистемах, при цьому дозволяючи цим мовам мати життєздатний шлях до Інтернету.
 
-Another perspective on WASM that's emerging is, interestingly, not even directly related to the web (W). WASM is evolving to become a cross-platform virtual machine (VM) of sorts, where programs can be compiled once and run in a variety of different system environments.
+Інший погляд на WASM, що виникає, що цікаво, навіть не пов’язаний безпосередньо з Інтернетом (W). WASM перетворюється на своєрідну міжплатформенну віртуальну машину (VM), де програми можуть бути скомпільовані один раз і запущені в безлічі різних системних середовищ.
 
-So, WASM isn't only for the web, and WASM also isn't JS. Ironically, even though WASM runs in the JS engine, the JS language is one of the least suitable languages to source WASM programs with, because WASM relies heavily on static typing information. Even TypeScript (TS)—ostensibly, JS + static types—is not quite suitable (as it stands) to transpile to WASM, though language variants like AssemblyScript are attempting to bridge the gap between JS/TS and WASM.
+Отже, WASM не тільки для Інтернету, а WASM також не є JS. За іронією долі, навіть незважаючи на те, що WASM працює на рушії JS, мова JS є однією з найменш придатних мов для джерел програм WASM, оскільки WASM значною мірою покладається на статичну типізацію. Навіть TypeScript (TS) - очевидно, статичні типи JS + - не зовсім придатний (як зараз) для транспіляції до WASM, хоча мовні варіанти, такі як AssemblyScript, намагаються подолати розрив між JS / TS і WASM.
 
-This book isn't about WASM, so I won't spend much more time discussing it, except to make one final point. *Some* folks have suggested WASM points to a future where JS is excised from, or minimized in, the web. These folks often harbor ill feelings about JS, and want some other language—any other language!—to replace it. Since WASM lets other languages run in the JS engine, on its face this isn't an entirely fanciful fairytale.
+Ця книга не стосується WASM, тому я не буду витрачати більше часу на її обговорення, окрім як на останню думку. *Деякі* люди припускають, що WASM вказує на майбутнє, де JS вирізається або зводиться до використання тільки у Веб. Ці люди часто мають негативні почуття щодо JS і хочуть замінити його якоюсь іншою мовою - будь-якою іншою! Оскільки WASM дозволяє іншими мовами працювати на рушії JS, на перший погляд це не зовсім фантастика.
 
-But let me just state simply: WASM will not replace JS. WASM significantly augments what the web (including JS) can accomplish. That's a great thing, entirely orthogonal to whether some people will use it as an escape hatch from having to write JS.
+Але дозвольте просто сказати: WASM не замінить JS. WASM значно збільшує те, що може зробити у Веб (включаючи розширення можливостей JS). Це чудова річ, цілком ортогональна тому, чи будуть деякі люди використовувати це як можливість не писати на JS.
 
-## *Strict*ly Speaking
+## Суворо кажучи
 
-Back in 2009 with the release of ES5, JS added *strict mode* as an opt-in mechanism for encouraging better JS programs.
+Ще в 2009 році, коли вийшов ES5, JS додав опцію *суворий режим* для заохочення кращих програм на JS.
 
-The benefits of strict mode far outweigh the costs, but old habits die hard and the inertia of existing (aka "legacy") code bases is really hard to shift. So sadly, more than 10 years later, strict mode's *optionality* means that it's still not necessarily the default for JS programmers.
+Переваги суворого режиму значно перевищують витрати, але старі звички важко вмирають, і інерцію існуючих (інакше "застарілих") основ коду насправді важко змінити. На жаль, більш ніж через 10 років опціональність суворого режиму  означає, що він все ще не обов'язковим для програмістів JS.
 
-Why strict mode? Strict mode shouldn't be thought of as a restriction on what you can't do, but rather as a guide to the best way to do things so that the JS engine has the best chance of optimizing and efficiently running the code. Most JS code is worked on by teams of developers, so the *strict*-ness of strict mode (along with tooling like linters!) often helps collaboration on code by avoiding some of the more problematic mistakes that slip by in non-strict mode.
+Навіщо потрібний суворий режим? Суворий режим не слід розглядати як обмеження, а скоріше як керівництво найкращим способом зробити те, щоб оушій JS мав найкращі шанси на оптимізацію та ефективний запуск коду. Найчастіше на JS-кодом працюють цілі команди розробників, тому суворий режим (разом із інструментами, такими як лінтери!) Часто допомагає співпраці над кодом, зокрема униканню деяких найбільш проблемних помилок, які проскакують у нестрогому режимі.
 
-Most strict mode controls are in the form of *early errors*, meaning errors that aren't strictly syntax errors but are still thrown at compile time (before the code is run). For example, strict mode disallows naming two function parameters the same, and results in an early error. Some other strict mode controls are only observable at runtime, such as how `this` defaults to `undefined` instead of the global object.
+Найбільш суворі режими керування мають форму ранніх помилок, тобто помилки, які не є суто синтаксичними помилками, але все одно видаються під час компіляції (до запуску коду). Наприклад, суворий режим забороняє однакові імена двох параметрів функції і призводить до ранньої помилки. Деякі інші відмінності суворого режиму можна спостерігати лише під час виконання, наприклад, як `this` за замовчуванням має значення `undefined` замість глобального об'єкта.
 
-Rather than fighting and arguing with strict mode, like a kid who just wants to defy whatever their parents tell them not to do, the best mindset is that strict mode is like a linter reminding you how JS *should* be written to have the highest quality and best chance at performance. If you find yourself feeling handcuffed, trying to work around strict mode, that should be a blaring red warning flag that you need to back up and rethink the whole approach.
+Замість того, щоб битися і сперечатися у суворому режимі, як дитина, яка просто хоче кинути виклик тому, що батьки скажуть не робити, найкраще мислення полягає в тому, що суворий режим - це як лінтер, який нагадує вам, як слід писати JS *, щоб мати найвищу якість та найкращі шанси на продуктивність. Якщо ви відчуваєте себе в наручниках, намагаючись обійти суворий режим, це має бути для вас знаком того, що варто зробити крок назад та переглянути весь підхід.
 
-Strict mode is switched on per file with a special pragma (nothing allowed before it except comments/whitespace):
+Суворий режим вмикається для кожного файлу спеціальною прагмою (до нього не допускається нічого, крім коментарів / пробілів):
 
 ```js
 // only whitespace and comments are allowed
@@ -430,11 +432,11 @@ Strict mode is switched on per file with a special pragma (nothing allowed befor
 // the rest of the file runs in strict mode
 ```
 
-| WARNING: |
+| ЗАСТЕРЕЖЕННЯ: |
 | :--- |
-| Something to be aware of is that even a stray `;` all by itself appearing before the strict mode pragma will render the pragma useless; no errors are thrown because it's valid JS to have a string literal expression in a statement position, but it also will silently *not* turn on strict mode! |
+| Слід пам’ятати, що навіть заблукалі крапка з комою перед прагмою "use strict" зроблять прагму марною; помилок не виникає, оскільки дійсний JS має строковий літеральний вираз у позиції оператора, але він також безшумно *не* увімкне суворий режим! |
 
-Strict mode can alternatively be turned on per-function scope, with exactly the same rules about its surroundings:
+Суворий режим також можна ввімкнути для кожної функції з точно однаковими правилами щодо оточення:
 
 ```js
 function someOperations() {
@@ -445,28 +447,30 @@ function someOperations() {
 }
 ```
 
-Interestingly, if a file has strict mode turned on, the function-level strict mode pragmas are disallowed. So you have to pick one or the other.
+Цікаво, що якщо у файлі ввімкнено суворий режим, прагми суворого режиму на рівні функції заборонені. Отже, доведеться вибрати щось одне.
 
-The **only** valid reason to use a per-function approach to strict mode is when you are converting an existing non-strict mode program file and need to make the changes little by little over time. Otherwise, it's vastly better to simply turn strict mode on for the entire file/program.
+**Єдиною** вагомою причиною використання суворого режиму для окремої функції є випадок, коли ви перетворюєте існуючий файл програми з несуворого режиму і зміни доводиться вносити поетапно. В іншому випадку набагато краще просто увімкнути суворий режим для всього файлу чи програми.
 
-Many have wondered if there would ever be a time when JS made strict mode the default? The answer is, almost certainly not. As we discussed earlier around backwards compatibility, if a JS engine update started assuming code was strict mode even if it's not marked as such, it's possible that this code would break as a result of strict mode's controls.
+Багато хто питає, чи коли-небудь у JS строгий режим буде ввімкнено за замовчуванням. Відповідь - майже напевно, що ні. Як ми вже обговорювали щодо зворотної сумісності, якщо оновлення рушія JS почало припускати, що код був у строгому режимі, навіть якщо він не позначений як такий, цілком можливо, що цей код зламається в результаті увімкннея суворого режиму.
 
-However, there are a few factors that reduce the future impact of this non-default "obscurity" of strict mode.
+Однак є кілька факторів, які зменшують майбутній вплив невідосоті.
 
-For one, virtually all transpiled code ends up in strict mode even if the original source code isn't written as such. Most JS code in production has been transpiled, so that means most JS is already adhering to strict mode. It's possible to undo that assumption, but you really have to go out of your way to do so, so it's highly unlikely.
+У сукупності суворий режим - це фактично режим за замовчуванням, хоча технічно він не є дефолтним.
 
-Moreover, a wide shift is happening toward more/most new JS code being written using the ES6 module format. ES6 modules assume strict mode, so all code in such files is automatically defaulted to strict mode.
+З одного боку, практично весь транспільований код потрапляє в строгий режим, навіть якщо оригінальний вихідний код не написаний як такий. Більшість JS-коду у реальниз умовах використання транспілюється, тож це означає, що більшість JS вже дотримуються суворого режиму. Це припущення можна скасувати, але для цього вам дійсно докласти сили, тому це малоймовірно.
 
-Taken together, strict mode is largely the de facto default even though technically it's not actually the default.
+Більше того, відбувається великий зсув у бік створення більшості нового коду на JS із використанням формату  ES6-модулів.  ES6-модулі передбачають суворий режим, тому весь код у таких файлах автоматично за замовчуванням встановлюється на суворий режим.
 
-## Defined
 
-JS is an implementation of the ECMAScript standard (version ES2019 as of this writing), which is guided by the TC39 committee and hosted by ECMA. It runs in browsers and other JS environments such as Node.js.
 
-JS is a multi-paradigm language, meaning the syntax and capabilities allow a developer to mix and match (and bend and reshape!) concepts from various major paradigms, such as procedural, object-oriented (OO/classes), and functional (FP).
+## Визначено
 
-JS is a compiled language, meaning the tools (including the JS engine) process and verify a program (reporting any errors!) before it executes.
+JS - це реалізація стандарту ECMAScript (версія ES2019 станом на момент написання книги), який керується комітетом TC39 та приймається ECMA. Він працює у браузерах та інших середовищах JS, таких як Node.js.
 
-With our language now *defined*, let's start getting to know its ins and outs.
+JS - мультипарадигменна мова, тобто синтаксис та можливості дозволяють розробнику поєднувати концепції з різних основних парадигм, таких як процедурна, об’єктно-орієнтована (OO / класи) та функційна (FP), а також і відхилятися від них та модифікувати за потребою та переробляти.
+
+JS - це компільована мова, тобто інструменти (включаючи рушій JS) обробляють і перевіряють програму до її запуску та повідомляють про будь-які помилки.
+
+Нарешті ми визначилися з тим, що таке мова JS, тож давайте почнемо знайомитися з її тонкощами.
 
 [^specApB]: ECMAScript 2019 Language Specification, Appendix B: Additional ECMAScript Features for Web Browsers, https://www.ecma-international.org/ecma-262/10.0/#sec-additional-ecmascript-features-for-web-browsers (latest as of time of this writing in January 2020)
