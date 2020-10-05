@@ -1,4 +1,4 @@
-# You Don't Know JS Yet: Get Started - 2nd Edition
+# Ти ще не знаєш JS: Початок. Друге видання
 # Chapter 2: Surveying JS
 
 Найкращий спосіб вивчити JS - почати на ньому писати.
