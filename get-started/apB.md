@@ -1,13 +1,13 @@
-# You Don't Know JS Yet: Get Started - 2nd Edition
-# Appendix B: Practice, Practice, Practice!
+# Ти ще не знаєш JS: Початок. Друге видання
+# Додаток B: Практика, практика, практика!
 
-In this appendix, we'll explore some exercises and their suggested solutions. These are just to *get you started* with practice over the concepts from the book.
+У цьому додатку ми розглянемо деякі вправи та запропоновані нами рішення. Ці вправи лише допоможуть вам *розпочати* застосовувати ідеє з цієї книги на практиці.
 
-## Practicing Comparisons
+## Вправа на порівняння
 
-Let's practice working with value types and comparisons (Chapter 4, Pillar 3) where coercion will need to be involved.
+Давайте потренуємось працювати з типами значень та порівняннями (Глава 4, Опора 3), де потрібно буде залучити приведення типів.
 
-`scheduleMeeting(..)` should take a start time (in 24-hour format as a string "hh:mm") and a meeting duration (number of minutes). It should return `true` if the meeting falls entirely within the work day (according to the times specified in `dayStart` and `dayEnd`); return `false` if the meeting violates the work day bounds.
+Функція `scheduleMeeting(..)` очікує час початку роботи (у 24-годинному форматі у вигляді рядка "hh:mm") та тривалість зустрічі (кількість хвилин). Вона повинна повернути `true`, якщо зустріч повністю потрапляє в рамки робочого дня (відповідно до часу, зазначеного в `dayStart` і `dayEnd`); повернути `false`, якщо зустріч виходить за межі робочого дня.
 
 ```js
 const dayStart = "07:30";
@@ -26,13 +26,14 @@ scheduleMeeting("17:30",30);    // false
 scheduleMeeting("18:00",15);    // false
 ```
 
-Try to solve this yourself first. Consider the usage of equality and relational comparison operators, and how coercion impacts this code. Once you have code that works, *compare* your solution(s) to the code in "Suggested Solutions" at the end of this appendix.
+Спробуйте спочатку вирішити це завдання самостійно. Рекомендуємо згадати про оператори рівності та оператори відносного порівняння та як приведення типів впливає на цей код. Отримавши працюючий код, *порівняйте* свої рішення з кодом у "Пропонованих рішеннях" в кінці цього додатка.
 
-## Practicing Closure
+## Вправа з використання замикань
 
-Now let's practice with closure (Chapter 4, Pillar 1).
+Тепер давайте потренуємось із замиканнями (Глава 4, Опора 1).
 
-The `range(..)` function takes a number as its first argument, representing the first number in a desired range of numbers. The second argument is also a number representing the end of the desired range (inclusive). If the second argument is omitted, then another function should be returned that expects that argument.
+Функція `range(..)` приймає число як перший аргумент, представляючи перше число у бажаному діапазоні чисел. Другий аргумент – це також число, що представляє кінець бажаного діапазону (включно). Якщо другий аргумент опущено, слід повернути іншу функцію, яка очікує цей аргумент.
+
 
 ```js
 function range(start,end) {
@@ -53,19 +54,19 @@ start3(0);     // []
 start4(6);     // [4,5,6]
 ```
 
-Try to solve this yourself first.
+Спробуйте спочатку вирішити це завдання самостійно.
 
-Once you have code that works, *compare* your solution(s) to the code in "Suggested Solutions" at the end of this appendix.
+Отримавши працюючий код, *порівняйте* свої рішення з кодом у "Пропонованих рішеннях" в кінці цього додатка.
 
-## Practicing Prototypes
+## Вправа з використання прототипів
 
-Finally, let's work on `this` and objects linked via prototype (Chapter 4, Pillar 2).
+Насамкінець, давайте попрацюємо над `this` та об'єктами, пов'язаними через прототип (Глава 4, Опора 2).
 
-Define a slot machine with three reels that can individually `spin()`, and then `display()` the current contents of all the reels.
+Визначте ігровий автомат з трьома барабанами, які можуть окремо крутитися (метод `spin()`), а потім показати поточний вміст усіх барабанів (`display()`).
 
-The basic behavior of a single reel is defined in the `reel` object below. But the slot machine needs individual reels—objects that delegate to `reel`, and which each have a `position` property.
+Основна поведінка одного барабана визначена в об'єкті `reel` нижче. Але ігровому автомату потрібні окремі барабани - об'єкти, які делегують до `reel` і кожна з яких має властивість "position".
 
-A reel only *knows how* to `display()` its current slot symbol, but a slot machine typically shows three symbols per reel: the current slot (`position`), one slot above (`position - 1`), and one slot below (`position + 1`). So displaying the slot machine should end up displaying a 3 x 3 grid of slot symbols.
+Барабан вміє *тільки* відображати (`display()`) свій поточний символ слота, але ігровий автомат зазвичай показує три символи на барабані: поточний слот (`позиція`), один слот зверху (`позиція - 1`) і один слот внизу (`позиція + 1`). Отже, відображення ігрового автомата повинно закінчитися відображенням сітки символів ігрових автоматів 3 x 3.
 
 ```js
 function randMax(max) {
@@ -98,8 +99,8 @@ var reel = {
 
 var slotMachine = {
     reels: [
-        // this slot machine needs 3 separate reels
-        // hint: Object.create(..)
+        // цей автомат потребує трьох окремих барабанів
+        // підказка: Object.create(..)
     ],
     spin() {
         this.reels.forEach(function spinReel(reel){
@@ -124,23 +125,23 @@ slotMachine.display();
 // ☺ | ♦ | ★
 ```
 
-Try to solve this yourself first.
+Спробуйте спочатку вирішити це завдання самостійно.
 
-Hints:
+Підказки:
 
-* Use the `%` modulo operator for wrapping `position` as you access symbols circularly around a reel.
+* Використовуйте оператор ділення з остачею `%` для обертання `position`, коли ви посилаєтеся на символи  навколо барабана.
 
-* Use `Object.create(..)` to create an object and prototype-link it to another object. Once linked, delegation allows the objects to share `this` context during method invocation.
+* Використовуйте ʻObject.create(..) `, щоб створити об'єкт і зв'язати його прототипом з іншим об'єктом. Після зв’язку делегування дозволяє об’єктам обмінюватися контекстом `this` під час виклику методу.
 
-* Instead of modifying the reel object directly to show each of the three positions, you can use another temporary object (`Object.create(..)` again) with its own `position`, to delegate from.
+* Замість того, щоб безпосередньо модифікувати об'єкт барабану, щоб показати кожну з трьох позицій, ви можете використовувати інший тимчасовий об'єкт (`Object.create(..)` знову стане в пригоді) зі своїм `position` для делегування.
 
-Once you have code that works, *compare* your solution(s) to the code in "Suggested Solutions" at the end of this appendix.
+Отримавши код, який працює, *порівняйте* свої рішення з кодом у "Пропонованих рішеннях" в кінці цього додатка.
 
-## Suggested Solutions
+## Пропоновані рішення
 
-Keep in mind that these suggested solutions are just that: suggestions. There's many different ways to solve these practice exercises. Compare your approach to what you see here, and consider the pros and cons of each.
+Майте на увазі, що ці запропоновані рішення - це просто пропозиції. Існує багато різних способів вирішити ці практичні вправи. Порівняйте свій підхід з тим, що ви бачите тут, і розгляньте плюси і мінуси кожного.
 
-Suggested solution for "Comparisons" (Pillar 3) practice:
+Запропоноване рішення для практики "Порівняння" (Опора 3):
 
 ```js
 const dayStart = "07:30";
@@ -172,8 +173,8 @@ function scheduleMeeting(startTime,durationMinutes) {
                 meetingEndMinutes - 60;
         }
 
-        // re-compose fully-qualified time strings
-        // (to make comparison easier)
+        // збираємо повні рядкові представлення часу
+        // (щоб спростити порівняння)
         let meetingStart = `${
             meetingStartHour.padStart(2,"0")
         }:${
@@ -185,10 +186,10 @@ function scheduleMeeting(startTime,durationMinutes) {
             String(meetingEndMinutes).padStart(2,"0")
         }`;
 
-        // NOTE: since expressions are all strings,
-        // comparisons here are alphabetic, but it's
-        // safe here since they're fully qualified
-        // time strings (ie, "07:15" < "07:30")
+        // ПРИМІТКА: через те, що усі вирази це рядки,
+        // порівняння проходить за алфавітом, але в цьому but it's
+        // випадку це безпечно, бо це повні значення часу
+        // (тобто, "07:15" < "07:30")
         return (
             meetingStart >= dayStart &&
             meetingEnd <= dayEnd
@@ -209,7 +210,7 @@ scheduleMeeting("18:00",15);    // false
 
 ----
 
-Suggested solution for "Closure" (Pillar 1) practice:
+Пропоноване рішення для практики "Замикання" (Опора 1):
 
 ```js
 function range(start,end) {
@@ -253,7 +254,7 @@ start4(6);     // [4,5,6]
 
 ----
 
-Suggested solution for "Prototypes" (Pillar 2) practice:
+Пропоноване рішення для практики "Прототипи" (Опора 2):
 
 ```js
 function randMax(max) {
@@ -298,7 +299,7 @@ var slotMachine = {
     display() {
         var lines = [];
 
-        // display all 3 lines on the slot machine
+        // показати усі 3 лінії ігнового автомата
         for (
             let linePos = -1; linePos <= 1; linePos++
         ) {
@@ -333,4 +334,4 @@ slotMachine.display();
 // ☺ | ♦ | ★
 ```
 
-That's it for this book. But now it's time to look for real projects to practice these ideas on. Just keep coding, because that's the best way to learn!
+Ця книга дійшла кінця. А зараз настав час шукати реальні проекти, на яких можна практикувати ідеї з неї. Просто продовжуйте писати код, бо це найкращий спосіб вчитися!
