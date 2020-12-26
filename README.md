@@ -1,13 +1,13 @@
 Translation is in progress.
 
-### Book 1: Get Started
+### Книга 1: Перші кроки
 * [Передмова](get-started/foreword.md)
-* Chapter 1: What Is JavaScript?
-* Chapter 2: Surveying JS
-* Chapter 3: Digging to the Roots of JS
-* Chapter 4: The Bigger Picture
-* Appendix A: Exploring Further
-* Appendix B: Practice, Practice, Practice!
+* [Глава 1: Що таке JavaScript?](get-started/ch1.md)
+* [Глава 2: Surveying JS](get-started/ch2.md)
+* [Глава 3: Digging to the Roots of JS](get-started/ch3.md)
+* [Глава 4: The Bigger Picture](get-started/ch4.md)
+* [Додаток A: Exploring Further](get-started/apA.md)
+* [Додаток B: Practice, Practice, Practice!](get-started/apB.md)
 
 ### Book 2: Scopes and Closures
 

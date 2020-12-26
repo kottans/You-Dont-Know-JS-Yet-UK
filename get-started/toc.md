@@ -1,4 +1,4 @@
-# You Don't Know JS Yet: Get Started - 2nd Edition
+# Серія "Ти поки що не знаєш JS". Книга 1: "Перші кроки". Друге видання
 
 ## Table of Contents
 
