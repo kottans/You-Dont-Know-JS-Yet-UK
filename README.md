@@ -3,7 +3,7 @@ Translation is in progress.
 ### Книга 1: Перші кроки
 * [Передмова](get-started/foreword.md)
 * [Глава 1: Що таке JavaScript?](get-started/ch1.md)
-* [Глава 2: Surveying JS](get-started/ch2.md)
+* [Глава 2: Огляд JS](get-started/ch2.md)
 * [Глава 3: Digging to the Roots of JS](get-started/ch3.md)
 * [Глава 4: The Bigger Picture](get-started/ch4.md)
 * [Додаток A: Exploring Further](get-started/apA.md)
