@@ -1,5 +1,5 @@
 # Серія "Ти поки що не знаєш JS". Книга 1: "Перші кроки". Друге видання
-# Глава 3: У пошуках коріння JS
+# Глава 3: Шлях до самого коріння JS
 
 Сподіваюся, що після прочитання та засвоєння глав 1 і 2 ви починаєте *розуміти* JS трохи краще. Якщо ви пропустили їх або прочитали неуважно, особливо главу 2, я рекомендую повернутися та приділити більше уваги цьому матеріалу.
 
@@ -384,8 +384,8 @@ otherHomework.topic;   // "JS"
 На малюнку 4 показано, як три об'єкти (`otherHomework`,`homework` та `Object.prototype`) пов'язані ланцюжком прототипів:
 
 <figure>
-    <img src="images/fig4.svg" width="200" alt="Prototype chain with 3 objects" align="center">
-    <figcaption><em>Fig. 4: Objects in a prototype chain</em></figcaption>
+    <img src="images/fig4.svg" width="200" alt="Прототивний ланцюжок з 3 об'єктами" align="center">
+    <figcaption><em>Рис. 4: Об'єкти в прототипному ланцюжку</em></figcaption>
     <br><br>
 </figure>
 
@@ -417,8 +417,8 @@ homework.topic;
 На рисунку 5 показані об'єкти та властивості після призначення, яке створює властивість `otherHomework.topic`:
 
 <figure>
-    <img src="images/fig5.svg" width="200" alt="3 objects linked, with shadowed property" align="center">
-    <figcaption><em>Fig. 5: Shadowed property 'topic'</em></figcaption>
+    <img src="images/fig5.svg" width="200" alt="Поєдано 3 об'єкти, з перекриттям однієї з властивотсей" align="center">
+    <figcaption><em>Рис. 5: Перекрита властивість 'topic'</em></figcaption>
     <br><br>
 </figure>
 
@@ -455,8 +455,8 @@ mathHomework.study();
 Прототипи двох об'єктів `jsHomework` і `mathHomework` пов'язані з єдиним об'єктом `homework`, який має функцію `study()`. `jsHomework` і `mathHomework` отримують власні властивості `topic` (див. малюнок 6).
 
 <figure>
-    <img src="images/fig6.svg" width="495" alt="4 objects prototype linked" align="center">
-    <figcaption><em>Fig. 6: Two objects linked to a common parent</em></figcaption>
+    <img src="images/fig6.svg" width="495" alt="4 об'єкти поєднані прототипами" align="center">
+    <figcaption><em>Рис. 6: Два об'єкти поєднано зі спільним батьківським об'єктом</em></figcaption>
     <br><br>
 </figure>
 
