@@ -1,17 +1,17 @@
-# You Don't Know JS Yet: Scope & Closures - 2nd Edition
-# Chapter 5: The (Not So) Secret Lifecycle of Variables
+# Серія "Ти поки що не знаєш JS". Книга 2: Області видимості та замикання - Друге видання
+# Глава 5: (Не такий вже і) таємний життєвий цикл змінних
 
-By now you should have a decent grasp of the nesting of scopes, from the global scope downward—called a program's scope chain.
+Сподіваюся, на даний момент ви вже маєте хороше розуміння вкладеності областей видимості, від глобальної області видимості вниз: так званий ланцюжок областей видимості програми.
 
-But just knowing which scope a variable comes from is only part of the story. If a variable declaration appears past the first statement of a scope, how will any references to that identifier *before* the declaration behave? What happens if you try to declare the same variable twice in a scope?
+Але знання про те, з якої області видимості походить змінна - це лише частина історії. Якщо оголошення змінної з’являється після першої інструкції в області видимості, як поводитимуться посилання на цей ідентифікатор, що знаходяться *до* його оголошення? Що станеться, якщо ви спробуєте оголосити ту саму змінну в одній області видимості двічі?
 
-JS's particular flavor of lexical scope is rich with nuance in how and when variables come into existence and become available to the program.
+Особливий підхід JS до лексичної організації області відімості має багато нюансів щодо того, як і коли змінні з’являються та стають доступними для коду програми.
 
-## When Can I Use a Variable?
+## Коли можна використовувати змінну?
 
-At what point does a variable become available to use within its scope? There may seem to be an obvious answer: *after* the variable has been declared/created. Right? Not quite.
+З якого моменту змінна стає доступною для використання в своїй області видимості? Відповідь може здатися очевидною: *після* оголошення чи створення. Хіба не так? Не зовсім.
 
-Consider:
+Розглянемо приклад:
 
 ```js
 greeting();
@@ -22,25 +22,25 @@ function greeting() {
 }
 ```
 
-This code works fine. You may have seen or even written code like it before. But did you ever wonder how or why it works? Specifically, why can you access the identifier `greeting` from line 1 (to retrieve and execute a function reference), even though the `greeting()` function declaration doesn't occur until line 4?
+Цей код працює. Можливо, ви вже бачили або навіть самі писали щось подібне. Але чи задумувались ви колись над тим, як і чому він працює? Зокрема, чому ідентифікатор `greeting` доступний на рядку 1 (через нього ми отримуємо посилання на функцію та викликаємо її), хоча оголошення `greeting` відбувається лише на рядку 4?
 
-Recall Chapter 1 points out that all identifiers are registered to their respective scopes during compile time. Moreover, every identifier is *created* at the beginning of the scope it belongs to, **every time that scope is entered**.
+Нагадаємо, в главі 1 зазначається, що всі ідентифікатори реєструються у відповідних областях видимості під час компіляції. Більше того, кожен ідентифікатор *створюється* на початку області видимості, до якої він належить, **щоразу, коли ми заходимо у цю область видимості**.
 
-The term most commonly used for a variable being visible from the beginning of its enclosing scope, even though its declaration may appear further down in the scope, is called **hoisting**.
+Термін, який найчастіше використовується для змінної, яка є видимою з самого початку навколишньої області видимості, хоча її оголошення може з'являтися нижче в області видимості, називається **підняттям**.
 
-But hoisting alone doesn't fully answer the question. We can see an identifier called `greeting` from the beginning of the scope, but why can we **call** the `greeting()` function before it's been declared?
+Але одне лише підняття не пояснює ситуацію остаточно. Нехай ідентифікатор `greeting` видимий на початку своєї області видимості, але як ми можемо **викликати** функцію `greeting` ще до того, як її оголошено?
 
-In other words, how does the variable `greeting` have any value (the function reference) assigned to it, from the moment the scope starts running? The answer is a special characteristic of formal `function` declarations, called *function hoisting*. When a `function` declaration's name identifier is registered at the top of its scope, it's additionally auto-initialized to that function's reference. That's why the function can be called throughout the entire scope!
+Іншими словами, як змінна `greeting` на момент запуску області видимості вже містить якесь значення (посилання на функцію)? Відповідь в особливій характеристиці формальних оголошень `function`, яка називається **підняття функцій**. Коли ідентифікатор декларації `function` зареєстрований у верхній частині області видимості, він додатково автоматично ініціалізується посиланням на цю функцію. Ось чому функцію можна викликати будь-де в області видимості!
 
-One key detail is that both *function hoisting* and `var`-flavored *variable hoisting* attach their name identifiers to the nearest enclosing **function scope** (or, if none, the global scope), not a block scope.
+Однією з ключових деталей є те, що як **підняття функцій**, так і **підняття змінних**, оголошених з ключовим словом `var`, прикріплюють свої ідентифікатори імен до найближчої навколишньої **функційної області видимості**, (або глобальної, якщо функційну не знайдено), а не до блочної області.
 
-| NOTE: |
+| ПРИМІТКА: |
 | :--- |
-| Declarations with `let` and `const` still hoist (see the TDZ discussion later in this chapter). But these two declaration forms attach to their enclosing block rather than just an enclosing function as with `var` and `function` declarations. See "Scoping with Blocks" in Chapter 6 for more information. |
+| Декларації з `let` і `const` також піднімаються (див. обговорення TDZ далі в цьому розділі). Але ці дві форми оголошень приєднуються до навколишнього блоку, а не просто до навколишньої функції, як у оголошеннях `var` та `function`. Докладнішу інформацію див. У розділі "Блочна область видимості" у розділі 6. |
 
-### Hoisting: Declaration vs. Expression
+### Підняття: в чому різниця між оголошенням та виразом
 
-*Function hoisting* only applies to formal `function` declarations (specifically those which appear outside of blocks—see "FiB" in Chapter 6), not to `function` expression assignments. Consider:
+*Підняття функції* відбувається лише з формальними оголошеннями з ключовим словом `function` (зокрема тих, що з'являються поза блоками - див. "FiB" у розділі 6), а не до присвоєння виразів `function`. Розглянемо приклад:
 
 ```js
 greeting();
@@ -51,23 +51,23 @@ var greeting = function greeting() {
 };
 ```
 
-Line 1 (`greeting();`) throws an error. But the *kind* of error thrown is very important to notice. A `TypeError` means we're trying to do something with a value that is not allowed. Depending on your JS environment, the error message would say something like, "'undefined' is not a function," or more helpfully, "'greeting' is not a function."
+Рядок 1 (`greeting();`) видає помилку. Проте особливу увагу слід приділити *виду* помилки. `TypeError` означає, що ми намагаємось зробити щось із недозволеним значенням. Залежно від вашого середовища JS, повідомлення про помилку міститиме щось на зразок "'undefined' is not a function,", або корисніше "'greeting' is not a function."
 
-Notice that the error is **not** a `ReferenceError`. JS isn't telling us that it couldn't find `greeting` as an identifier in the scope. It's telling us that `greeting` was found but doesn't hold a function reference at that moment. Only functions can be invoked, so attempting to invoke some non-function value results in an error.
+Зверніть увагу, що помилка **не** `ReferenceError`. JS не каже, що не зміг знайти ідентифікатор `greeting` в області видимості. Натомість він каже, що `greeting` знайдено, але на потрібний момент ідентифікатор не містить посилання на функцію. Можна викликати лише функції, тому спроба викликати якесь нефункційне значення призводить до помилки.
 
-But what does `greeting` hold, if not the function reference?
+Але яке значення містить `greeting`, якщо не посилання на функцію?
 
-In addition to being hoisted, variables declared with `var` are also automatically initialized to `undefined` at the beginning of their scope—again, the nearest enclosing function, or the global. Once initialized, they're available to be used (assigned to, retrieved from, etc.) throughout the whole scope.
+На додачу до сплиття змінні, оголошені за допомогою `var`, також автоматично ініціалізуються значеннм `undefined` на початку своєї області видимості - а саме найближчої навколишньої функції або глобальної області видимості. Одназу після ініціалізації вони доступні для використання (присвоєння, отримання значення тощо) у всій області видимості.
 
-So on that first line, `greeting` exists, but it holds only the default `undefined` value. It's not until line 4 that `greeting` gets assigned the function reference.
+Отже, у цьому першому рядку `greeting` існує, але містить лише значення за замовчуванням `undefined`. Посилання на функцію буде призначене лише на рядку 4.
 
-Pay close attention to the distinction here. A `function` declaration is hoisted **and initialized to its function value** (again, called *function hoisting*). A `var` variable is also hoisted, and then auto-initialized to `undefined`. Any subsequent `function` expression assignments to that variable don't happen until that assignment is processed during runtime execution.
+Зверніть пильну увагу на цю відмінність. Декларація функції з `function` піднімається **та ініціалізується її значенням** (повторю, що ця поведінка називається *підняття функції*). Змінна, оголошена з `var`, також піднімається, а потім автоматично ініціалізується значенням `undefined`. Будь-яке подальше присвоєння виразу `function` цій змінній не відбувається, поки це призначення не буде оброблено під час виконання.
 
-In both cases, the name of the identifier is hoisted. But the function reference association isn't handled at initialization time (beginning of the scope) unless the identifier was created in a formal `function` declaration.
+В обох випадках ім'я ідентифікатора піднімається. Але посилання на функцію не обробляється під час ініціалізації (на початку області видимості), окрім випадків, коли ідентифікатор створений у формальному оголошенні з `function`.
 
-### Variable Hoisting
+### Підняття змінних
 
-Let's look at another example of *variable hoisting*:
+Розглянемо інший приклад *підняття змінної*:
 
 ```js
 greeting = "Hello!";
@@ -77,22 +77,24 @@ console.log(greeting);
 var greeting = "Howdy!";
 ```
 
-Though `greeting` isn't declared until line 5, it's available to be assigned to as early as line 1. Why?
+`greeting` оголошено лише на рядку 5, але присвоєння можна виконувати вже на першому рядку. Чому так?
 
-There's two necessary parts to the explanation:
+Хоча `привітання` оголошується лише на рядку 5, його можна призначити вже в рядку 1. Чому?
 
-* the identifier is hoisted,
-* **and** it's automatically initialized to the value `undefined` from the top of the scope.
+Пояснення складається з двох частин:
 
-| NOTE: |
+* ідентифікатор піднімається,
+* **а також** автоматично ініціалізується до значенням `undefined` у верхній частині області видимості.
+
+| ПРИМІТКА: |
 | :--- |
-| Using *variable hoisting* of this sort probably feels unnatural, and many readers might rightly want to avoid relying on it in their programs. But should all hoisting (including *function hoisting*) be avoided? We'll explore these different perspectives on hoisting in more detail in Appendix A. |
+| Використання *підняття змінних* такого роду, мабуть, здається неприродним, і багато читачів справедливо захочуть уникнути покладання на це у своїх програмах. Але чи слід уникати всякого підняття (включаючи *підняття функцій*)? Ми розглянемо різні точки зору на підняття більш детально в Додатку А. |
 
-## Hoisting: Yet Another Metaphor
+## Інша метафора підняття
 
-Chapter 2 was full of metaphors (to illustrate scope), but here we are faced with yet another: hoisting itself. Rather than hoisting being a concrete execution step the JS engine performs, it's more useful to think of hoisting as a visualization of various actions JS takes in setting up the program **before execution**.
+Розділ 2 був досить насичений метафорами для ілюстрації областей видимості, але ось ще одна: підняття як таке. Замість того, щоб думати про підняття як про конкретний крок виконання, який виконує рушій JS, корисніше думати про підняття як про візуалізацію різних дій, які виконує JS під час налаштування програми **перед виконанням**.
 
-The typical assertion of what hoisting means: *lifting*—like lifting a heavy weight upward—any identifiers all the way to the top of a scope. The explanation often asserted is that the JS engine will actually *rewrite* that program before execution, so that it looks more like this:
+Типове твердження про те, що означає підняття: щось подібне до підняття ваги *підйом* - як підняття важкої ваги вгору - будь-які ідентифікатори аж до вершини області видимості. Пояснення, яке часто наводять, полягає в тому, що рушій JS фактично *переписує* програму перед виконанням, так що вона буде виглядати приблизно так:
 
 ```js
 var greeting;           // hoisted declaration
@@ -101,7 +103,7 @@ console.log(greeting);  // Hello!
 greeting = "Howdy!";    // `var` is gone!
 ```
 
-The hoisting (metaphor) proposes that JS pre-processes the original program and re-arranges it a bit, so that all the declarations have been moved to the top of their respective scopes, before execution. Moreover, the hoisting metaphor asserts that `function` declarations are, in their entirety, hoisted to the top of each scope. Consider:
+Англійське слово hoisitng описує підняття чогось за допомогою пристроїв, наприклад, лебідки. Таким чином запропонована метафора піднімання ваги передбачає, що JS якимось чином обробляє оригінальну програму і дещо перевпорядковує її так, що перед виконанням всі оголошення опиняються у верхній частині відповідних областей видимості. Більше того, метафора підняття ваги стверджує, що функції, оголошені з `function`, цілком розміщуються у верхній частині кожної області видимості. Розглянемо приклад:
 
 ```js
 studentName = "Suzy";
@@ -114,7 +116,7 @@ function greeting() {
 var studentName;
 ```
 
-The "rule" of the hoisting metaphor is that function declarations are hoisted first, then variables are hoisted immediately after all the functions. Thus, the hoisting story suggests that program is *re-arranged* by the JS engine to look like this:
+Далі метафора підняття передбачає певний порядок: спочатку піднімаються оголошення функцій, а одразу після цього піднімаються змінні. Отже, історія з підняттям говорить про те, що програма *реорганізується* рушієм JS, щоб виглядати приблизно так:
 
 ```js
 function greeting() {
@@ -127,27 +129,27 @@ greeting();
 // Hello Suzy!
 ```
 
-This hoisting metaphor is convenient. Its benefit is allowing us to hand wave over the magical look-ahead pre-processing necessary to find all these declarations buried deep in scopes and somehow move (hoist) them to the top; we can just think about the program as if it's executed by the JS engine in a **single pass**, top-down.
+Метафора підняття зручна. Її перевага в тому, що вона дозволяє прикрити очі на магічну природу попередньої обробки, яка потрібна для того, щоб знайти всі ці декларації, закопані глибоко в області видимості, і якось перемістити (тобто, підняти) на верх області видимості; ми можемо і далі думати, ніби програма виконується рушієм JS за **один прохід**, зверху вниз.
 
-Single-pass definitely seems more straightforward than Chapter 1's assertion of a two-phase processing.
+Виконання за один прохід, безумовно, здається простішим, ніж твердження про двофазну обробку з глави 1 .
 
-Hoisting as a mechanism for re-ordering code may be an attractive simplification, but it's not accurate. The JS engine doesn't actually re-arrange the code. It can't magically look ahead and find declarations; the only way to accurately find them, as well as all the scope boundaries in the program, would be to fully parse the code.
+Підняття як механізм повторного впорядкування коду здається привабливим спрощенням, але ця метафора не є точною. Рушій JS ніяк не переупорядковує код. Він не вміє чарівним чином заглядати вперед і знаходити декларації; єдиним способом їх надійного знаходження всіх декларацій, а також усіх меж областей видимості в програмі – це повний парсинг коду.
 
-Guess what parsing is? The first phase of the two-phase processing! There's no magical mental gymnastics that gets around that fact.
+А що таке парсинг? Так це ж і є перша фаза двофазної обробки! Тож, ніякі розумові трюки не дозволяють обійти цей факт.
 
-So if the hoisting metaphor is (at best) inaccurate, what should we do with the term? I think it's still useful—indeed, even members of TC39 regularly use it!—but I don't think we should claim it's an actual re-arrangement of source code.
+Але якщо метафора підняття у кращому випадку просто неточна, що нам робити з цим терміном? Я вважаю, що він лишається корисним. Справді, навіть члени TC39 регулярно ним користуються! Але я не думаю, що нам слід наполягати на тому, що йдеться про справжню реорганізацію вихідного коду.
 
-| WARNING: |
+| ПОПЕРЕДЖЕННЯ: |
 | :--- |
-| Incorrect or incomplete mental models often still seem sufficient because they can occasionally lead to accidental right answers. But in the long run it's harder to accurately analyze and predict outcomes if your thinking isn't particularly aligned with how the JS engine works. |
+| Неправильні або неповні ментальні моделі часто здаються достатніми, оскільки можуть випадково давати правильні відповіді. Але якщо ваше мислення не зовсім узгоджується з тим, як працює рушій JS, в довгостроковій перспективі стає важче точно аналізувати та прогнозувати результати  |
 
-I assert that hoisting *should* be used to refer to the **compile-time operation** of generating runtime instructions for the automatic registration of a variable at the beginning of its scope, each time that scope is entered.
+Я наполягаю на тому, що слово "підняття" *слід* використовувати для посилання на **операцію часу компіляції**, а саме на формування інструкцій з автоматичної реєстрації змінної на початку відповідної області видимості при кожному вході у цю область видимості під час виконання.
 
-That's a subtle but important shift, from hoisting as a runtime behavior to its proper place among compile-time tasks.
+Це тонкий, але важливий зсув у розумінні: від уявлення про підняття як про поведінку часу виконання до підняття як одного з завдань часу компіляції, де його справжнє місце.
 
-## Re-declaration?
+## Повторне декларування?
 
-What do you think happens when a variable is declared more than once in the same scope? Consider:
+Як ви думаєте, що відбувається, коли змінна оголошується більше одного разу в одній області видимості? Розглянемо приклад:
 
 ```js
 var studentName = "Frank";
@@ -158,15 +160,15 @@ var studentName;
 console.log(studentName);   // ???
 ```
 
-What do you expect to be printed for that second message? Many believe the second `var studentName` has re-declared the variable (and thus "reset" it), so they expect `undefined` to be printed.
+Як думаєте, що буде виведене у другому випадку? Багато хто вважає, що `var studentName` повторно оголосило змінну (і, таким чином, "скинуло" її значення), тому очікують, що буде виведено `undefined`.
 
-But is there such a thing as a variable being "re-declared" in the same scope? No.
+Але чи є такий процес, що дозволяє  "повторно оголошення" змінної в тій самій області видимості? Ні.
 
-If you consider this program from the perspective of the hoisting metaphor, the code would be re-arranged like this for execution purposes:
+Якщо розглядати цю програму з точки зору метафори підняття, код буде реорганізований наступним чином перед виконанням:
 
 ```js
 var studentName;
-var studentName;    // clearly a pointless no-op!
+var studentName;    // очевидно марна операція, яка нічого не робить!
 
 studentName = "Frank";
 console.log(studentName);
@@ -178,27 +180,29 @@ console.log(studentName);
 
 Since hoisting is actually about registering a variable at the beginning of a scope, there's nothing to be done in the middle of the scope where the original program actually had the second `var studentName` statement. It's just a no-op(eration), a pointless statement.
 
-| TIP: |
-| :--- |
-| In the style of the conversation narrative from Chapter 2, *Compiler* would find the second `var` declaration statement and ask the *Scope Manager* if it had already seen a `studentName` identifier; since it had, there wouldn't be anything else to do. |
+Оскільки підняття насправді стосується реєстрації змінної на початку області видимості, то в середині області видимості, де оригінальна програма містить другий оператор `var studentName`, робити вже нічого. Це безглузда інструкція, яка нічного не робить.
 
-It's also important to point out that `var studentName;` doesn't mean `var studentName = undefined;`, as most assume. Let's prove they're different by considering this variation of the program:
+| ПОРАДА: |
+| :--- |
+| У контексті уявної розмови між компілятором та менеджером області видимості з глави 2 *Компілятор* знайшов би друге твердження декларації `var` і запитав *Менеджера області видимості*, чи він вже бачив ідентифікатор `studentName`; оскільки він вже бачив, більше нема чого більше робити. |
+
+Важливо також зазначити, що `var studentName;` не те саме що `var studentName = undefined;`, як вважають більшість. Доведемо, що вони різні, розглянувши такий варіант програми:
 
 ```js
 var studentName = "Frank";
 console.log(studentName);   // Frank
 
 var studentName;
-console.log(studentName);   // Frank <--- still!
+console.log(studentName);   // Frank <--- так, нічного не змінилося!
 
-// let's add the initialization explicitly
+// додамо явну ініціалізацію
 var studentName = undefined;
-console.log(studentName);   // undefined <--- see!?
+console.log(studentName);   // undefined <--- як вам таке!?
 ```
 
-See how the explicit `= undefined` initialization produces a different outcome than assuming it happens implicitly when omitted? In the next section, we'll revisit this topic of initialization of variables from their declarations.
+Подивіться, як явна ініціалізація `= undefined` дає інший результат, ніж ми то, що ми мали отримати, якщо припускаємо, що ініціалізація відбувається неявно, коли не вказано? У наступному розділі ми знову повернемося до теми ініціалізації змінних з їх оголошень.
 
-A repeated `var` declaration of the same identifier name in a scope is effectively a do-nothing operation. Here's another illustration, this time across a function of the same name:
+Повторне оголошення `var` з тим самим іменем ідентифікатора в області видимості є фактично непрацюючою операцією. Ось ще одна ілюстрація, цього разу для функції з однойменною назвою:
 
 ```js
 var greeting;
@@ -207,7 +211,7 @@ function greeting() {
     console.log("Hello!");
 }
 
-// basically, a no-op
+// нічого не робить
 var greeting;
 
 typeof greeting;        // "function"
@@ -217,11 +221,11 @@ var greeting = "Hello!";
 typeof greeting;        // "string"
 ```
 
-The first `greeting` declaration registers the identifier to the scope, and because it's a `var` the auto-initialization will be `undefined`. The `function` declaration doesn't need to re-register the identifier, but because of *function hoisting* it overrides the auto-initialization to use the function reference. The second `var greeting` by itself doesn't do anything since `greeting` is already an identifier and *function hoisting* already took precedence for the auto-initialization.
+Перше оголошення `greeting` реєструє ідентифікатор в області видимості, і оскільки це `var`, автоматично ініціалізацію значенням `undefined`. Оголошення `function` не потребує повторної реєстрації ідентифікатора, але через *підняття функції* воно замінює значення, присвоєне під час автоматичної ініціалізації, на посилання на функцію. Друге `var greeting` саме по собі нічого не робить, оскільки `greeting` вже є ідентифікатором і *підняття функції* вже взяла пріоритет для автоматичної ініціалізації.
 
-Actually assigning `"Hello!"` to `greeting` changes its value from the initial function `greeting()` to the string; `var` itself doesn't have any effect.
+Фактично присвоєння значення `"Hello!"` змінній `greeting` змінює його значення з початкової функції `greeting()` на рядок; `var` сам по собі не має жодного ефекту.
 
-What about repeating a declaration within a scope using `let` or `const`?
+А як щодо повторної декларації в одній області видимості з `let` або` const`?
 
 ```js
 let studentName = "Frank";
@@ -231,9 +235,9 @@ console.log(studentName);
 let studentName = "Suzy";
 ```
 
-This program will not execute, but instead immediately throw a `SyntaxError`. Depending on your JS environment, the error message will indicate something like: "studentName has already been declared." In other words, this is a case where attempted "re-declaration" is explicitly not allowed!
+Ця програма не буде виконуватися, натомість негайно видасть `SyntaxError`. Залежно від вашого середовища JS, повідомлення про помилку звучатиме приблизно так: "studentName has already been declared.", тобто, "studentName вже оголошено." Іншими словами, це випадок, коли спроба "повторного декларування" явно не дозволяється!
 
-It's not just that two declarations involving `let` will throw this error. If either declaration uses `let`, the other can be either `let` or `var`, and the error will still occur, as illustrated with these two variations:
+Справа не лише в тому, що дві декларації, що включають `let`, викинуть цю помилку. Якщо в будь-якій декларації використовується `let`, інша може бути `let` або `var`, і помилка все одно буде виникати, як доводять нам ці дві варіації:
 
 ```js
 var studentName = "Frank";
@@ -249,29 +253,29 @@ let studentName = "Frank";
 var studentName = "Suzy";
 ```
 
-In both cases, a `SyntaxError` is thrown on the *second* declaration. In other words, the only way to "re-declare" a variable is to use `var` for all (two or more) of its declarations.
+В обох випадках `SyntaxError` з'являється після другої декларації. Іншими словами, єдиним способом "повторного оголошення" змінної є використання `var` для всіх (двох або більше) її оголошень.
 
-But why disallow it? The reason for the error is not technical per se, as `var` "re-declaration" has always been allowed; clearly, the same allowance could have been made for `let`.
+Але навіщо було забороняти повторне оголошення? Причина очевидно не в технічних обмеженнях, оскільки "повторне декларування" змінних, оголошених з `var`, завжди дозволялося; очевидно, що такий саме допущення можна було зробити і для `let`.
 
-It's really more of a "social engineering" issue. "Re-declaration" of variables is seen by some, including many on the TC39 body, as a bad habit that can lead to program bugs. So when ES6 introduced `let`, they decided to prevent "re-declaration" with an error.
+Це насправді питання "соціальної інженерії". Деякі, в тому числі багато хто з комітету TC39, сприймають "повторне оголошення" змінних як шкідливу звичку, яка може призвести до помилок у програмі. Тож коли ES6 представив `let`, вони вирішили запобігти "повторному декларуванню" за допомогою помилки.
 
-| NOTE: |
+| ПРИМІТКА: |
 | :--- |
-| This is of course a stylistic opinion, not really a technical argument. Many developers agree with the position, and that's probably in part why TC39 included the error (as well as `let` conforming to `const`). But a reasonable case could have been made that staying consistent with `var`'s precedent was more prudent, and that such opinion-enforcement was best left to opt-in tooling like linters. In Appendix A, we'll explore whether `var` (and its associated behavior, like "re-declaration") can still be useful in modern JS. |
+| Звичайно, йдеться про стилістичний переваги, а не технічні. Багато розробників погоджуються з позицією, і це, мабуть, частково, чому TC39 включив помилку (а також `let` відповідати `const`). Але міг бути обґрунтований випадок, що дотримуватися прецеденту `var` було більш розсудливим, і що таке примушення до думки краще залишити на виборі таких інструментів, як лінери. У Додатку А ми дослідимо, чи може `var` (та пов'язана з нею поведінка, як-от "повторне оголошення") бути корисним у сучасному JS. |
 
-When *Compiler* asks *Scope Manager* about a declaration, if that identifier has already been declared, and if either/both declarations were made with `let`, an error is thrown. The intended signal to the developer is "Stop relying on sloppy re-declaration!"
+Коли *Компілятор* питає *Менеджера області видимості* щодо декларації, якщо цей ідентифікатор вже оголошений, і якщо будь-яка чи обидві декларації були зроблені з `let`, виникає помилка. Призначений сигнал розробнику: "Перестань покладатися на недбале повторне оголошення!"
 
-### Constants?
+### А що з константами?
 
-The `const` keyword is more constrained than `let`. Like `let`, `const` cannot be repeated with the same identifier in the same scope. But there's actually an overriding technical reason why that sort of "re-declaration" is disallowed, unlike `let` which disallows "re-declaration" mostly for stylistic reasons.
+Ключове слово `const` має більше обмежень, ніж `let`. Як і `let`, в одній області видимості не можна використати `const` більше одного разу з однаковим ідентифікатором. Але насправді є важлива технічна причина, через яку такий вид "повторного декларування" заборонений, на відміну від `let`, який забороняє "повторне декларування" переважно зі стилістичних причин.
 
-The `const` keyword requires a variable to be initialized, so omitting an assignment from the declaration results in a `SyntaxError`:
+Ключове слово `const` вимагає ініціалізації змінної, тому якщо ви оголошуєте змінну з `const`, але не присвоюєте їй значення, виникає` SyntaxError`:
 
 ```js
 const empty;   // SyntaxError
 ```
 
-`const` declarations create variables that cannot be re-assigned:
+Оголошення змінної з `const` створює змінну, значення якої не можна призначити повторно:
 
 ```js
 const studentName = "Frank";
@@ -281,13 +285,13 @@ console.log(studentName);
 studentName = "Suzy";   // TypeError
 ```
 
-The `studentName` variable cannot be re-assigned because it's declared with a `const`.
+Змінна `studentName` не може отримати інше значення, бо оголошена за допомогою `const`.
 
-| WARNING: |
+| ПОПЕРЕДЖЕННЯ: |
 | :--- |
-| The error thrown when re-assigning `studentName` is a `TypeError`, not a `SyntaxError`. The subtle distinction here is actually pretty important, but unfortunately far too easy to miss. Syntax errors represent faults in the program that stop it from even starting execution. Type errors represent faults that arise during program execution. In the preceding snippet, `"Frank"` is printed out before we process the re-assignment of `studentName`, which then throws the error. |
+| Помилка, що виникає при повторному призначенні `studentName`, є `TypeError`, а не `SyntaxError`. Відмінність тонка, проте досить важлива, але, на жаль, її легко пропустити. Синтаксичні помилки являють собою помилки в програмі, які зупиняють її навіть у початковому виконанні. `TypeError` стосуються помилок, які виникають під час виконання програми. У попередньому фрагменті, `"Frank"` буде виведено до того, як відбудеться обробка повторного призначення `studentName`, яке призводить до помилки |
 
-So if `const` declarations cannot be re-assigned, and `const` declarations always require assignments, then we have a clear technical reason why `const` must disallow any "re-declarations": any `const` "re-declaration" would also necessarily be a `const` re-assignment, which can't be allowed!
+Отже, якщо декларації через `const` не можуть бути перепризначені, а декларації через `const` завжди вимагають призначення, тоді у нас є чітка технічна причина, чому `const` не дозволяє  "повторні декларації": будь-яке `const` "повторне оголошення" водночас означає повторне призначення, що не можна допускати!
 
 ```js
 const studentName = "Frank";
@@ -296,11 +300,11 @@ const studentName = "Frank";
 const studentName = "Suzy";
 ```
 
-Since `const` "re-declaration" must be disallowed (on those technical grounds), TC39 essentially felt that `let` "re-declaration" should be disallowed as well, for consistency. It's debatable if this was the best choice, but at least we have the reasoning behind the decision.
+Оскільки "повторне декларування" змінних, оголошених з `const`, має бути заборонено (з означених технічних підстав), TC39 по суті вважав, що для несуперечливості також слід заборонити "повторне декларування" змінних, оголошених з `let`. Можна посперечатися щодо того, чи це найкращий вибір, але принаймні ми знаємо аргументи, що стоять за цим рішенням.
 
-### Loops
+### Цикли
 
-So it's clear from our previous discussion that JS doesn't really want us to "re-declare" our variables within the same scope. That probably seems like a straightforward admonition, until you consider what it means for repeated execution of declaration statements in loops. Consider:
+Тож з попереднього обговорення ясно, що JS насправді не хоче, щоб ми «повторно оголошували» наші змінні в тій самій області видимості. Це, мабуть, здається простим застереженням, поки ви не задумаєтесь, що це означає для повторного виконання операторів декларації у циклах. Розглянемо приклад:
 
 ```js
 var keepGoing = true;
@@ -312,11 +316,11 @@ while (keepGoing) {
 }
 ```
 
-Is `value` being "re-declared" repeatedly in this program? Will we get errors thrown? No.
+Чи "оголошується" змінна `value` кілька разів у цій програмі? Чи ми отримаємо помилки? Ні.
 
-All the rules of scope (including "re-declaration" of `let`-created variables) are applied *per scope instance*. In other words, each time a scope is entered during execution, everything resets.
+Усі правила області видимості (зокрема, заборона на "повторне оголошення" змінних, оголошених з `let`) застосовуються *для кожного окремого екземпляра області видимості*. Іншими словами, щоразу при вході в область видимості попередні оголошення скидаються.
 
-Each loop iteration is its own new scope instance, and within each scope instance, `value` is only being declared once. So there's no attempted "re-declaration," and thus no error. Before we consider other loop forms, what if the `value` declaration in the previous snippet were changed to a `var`?
+Кожна ітерація циклу створює окремий екземпляр області видимості, і в кожному екземплярі області видимості  `value` оголошується лише один раз. Отже, немає спроб "повторного декларування", а отже, і помилок. Перш ніж ми розглянемо інші форми циклу, припустимо, що, декларацію `value` у попередньому фрагменті змінено на `var`:
 
 ```js
 var keepGoing = true;
@@ -328,13 +332,13 @@ while (keepGoing) {
 }
 ```
 
-Is `value` being "re-declared" here, especially since we know `var` allows it? No. Because `var` is not treated as a block-scoping declaration (see Chapter 6), it attaches itself to the global scope. So there's just one `value` variable, in the same scope as `keepGoing` (global scope, in this case). No "re-declaration" here, either!
+Чи змінна `value` «повторно оголошується», тим більше, що ми знаємо, що `var` це дозволяє? Ні. Оскільки `var` не трактується як декларація блочної області видимості (див. Главу 6), вона приєднується до глобальної області видимості. Отже, є лише одна змінна `value`, яка знаходиться в тій же області видимості, що і `keepGoing`  (у цьому випадку глобальна область аидимості). Тут також немає жодної "повторної декларації"!
 
-One way to keep this all straight is to remember that `var`, `let`, and `const` keywords are effectively *removed* from the code by the time it starts to execute. They're handled entirely by the compiler.
+Один із способів все це зрозуміти - пам’ятати, що ключові слова `var`, `let`, та `const` насправді *видаляються* з коду до того моменту, коли він починає виконуватися. Вони повністю обробляються компілятором.
 
-If you mentally erase the declarator keywords and then try to process the code, it should help you decide if and when (re-)declarations might occur.
+Спробуйте подумки стерти ключові слова оголошення, а потім спробуйте обробити код, це повинно допомогти вам вирішити, чи можуть відбуватися (повторні) оголошення і в яких випадках.
 
-What about "re-declaration" with other loop forms, like `for`-loops?
+А як щодо "повторного оголошення" з іншими видами циклів, наприклад `for`?
 
 ```js
 for (let i = 0; i < 3; i++) {
@@ -346,17 +350,17 @@ for (let i = 0; i < 3; i++) {
 // 2: 20
 ```
 
-It should be clear that there's only one `value` declared per scope instance. But what about `i`? Is it being "re-declared"?
+Повинно бути зрозуміло, що для кожного екземпляра області видимості оголошується лише одна `value`. Але як щодо `i`? Її оголошують повторно?
 
-To answer that, consider what scope `i` is in. It might seem like it would be in the outer (in this case, global) scope, but it's not. It's in the scope of `for`-loop body, just like `value` is. In fact, you could sorta think about that loop in this more verbose equivalent form:
+Щоб відповісти на це питання, розгляньте, в якій області видимості знаходиться `i`. Може здатися, що вона буде у зовнішній (у даному випадку глобальній) області, але це не так. Це в межах тіла циклу `for`, як і `value`. Насправді ви могли б уявити цей цикл так:
 
 ```js
 {
-    // a fictional variable for illustration
+    // видумална зміння для демонстраційних цілей
     let $$i = 0;
 
-    for ( /* nothing */; $$i < 3; $$i++) {
-        // here's our actual loop `i`!
+    for ( /* тут порожно */; $$i < 3; $$i++) {
+        // а ось тут справжня `i` з циклу!
         let i = $$i;
 
         let value = i * 10;
@@ -368,23 +372,23 @@ To answer that, consider what scope `i` is in. It might seem like it would be in
 }
 ```
 
-Now it should be clear: the `i` and `value` variables are both declared exactly once **per scope instance**. No "re-declaration" here.
+Тепер повинно бути зрозуміло: змінні `i` та `value` оголошуються рівно один раз **для кожного екземпляру області видимості**. Ніякого "повторного декларування" тут немає.
 
-What about other `for`-loop forms?
+А як щодо інших форм циклу `for`?
 
 ```js
 for (let index in students) {
-    // this is fine
+    // тут все добре
 }
 
 for (let student of students) {
-    // so is this
+    // як і тут
 }
 ```
 
-Same thing with `for..in` and `for..of` loops: the declared variable is treated as *inside* the loop body, and thus is handled per iteration (aka, per scope instance). No "re-declaration."
+З циклами `for..in` та` for..of` те саме: оголошена змінна обробляється наче вона *всередині* тіла циклу, і таким чином обробляється за ітерацію (тобто, в межах окремого екземпляру області). Ніякого "повторного декларування".
 
-OK, I know you're thinking that I sound like a broken record at this point. But let's explore how `const` impacts these looping constructs. Consider:
+Добре, я знаю, ви думаєте, що у мене платівку заїло. Але давайте дослідимо, як `const` впливає на ці цикли. Розглянемо код:
 
 ```js
 var keepGoing = true;
@@ -397,55 +401,55 @@ while (keepGoing) {
 }
 ```
 
-Just like the `let` variant of this program we saw earlier, `const` is being run exactly once within each loop iteration, so it's safe from "re-declaration" troubles. But things get more complicated when we talk about `for`-loops.
+Подібно до варіанту цієї програми з `let`, який ми бачили раніше, декларація з `const` виконується рівно один раз в межах окремої ітерації циклу, тому ми захищені від проблем із "повторним оголошенням". Але все ускладнюється, коли ми говоримо про цикл `for`.
 
-`for..in` and `for..of` are fine to use with `const`:
+`for..in` і `for..of` добре використовувати з `const`:
 
 ```js
 for (const index in students) {
-    // this is fine
+    // все добре
 }
 
 for (const student of students) {
-    // this is also fine
+    // і тут також
 }
 ```
 
-But not the general `for`-loop:
+Проте зі звичайним циклом `for` справі гірші:
 
 ```js
 for (const i = 0; i < 3; i++) {
-    // oops, this is going to fail with
-    // a Type Error after the first iteration
+    // ой, це код викине помилку
+    // Type Error після першої ітерації
 }
 ```
 
-What's wrong here? We could use `let` just fine in this construct, and we asserted that it creates a new `i` for each loop iteration scope, so it doesn't even seem to be a "re-declaration."
+Що тут не так? Ми могли б використати `let` просто чудово в цій конструкції, і ми стверджували, що він нова `i` створюється для області видимості кожної ітерацій циклу, тому це навіть не здається "повторним оголошенням".
 
-Let's mentally "expand" that loop like we did earlier:
+Давайте подумки «розширимо» цей цикл, як робили раніше:
 
 ```js
 {
-    // a fictional variable for illustration
+    // видумална зміння для демонстраційних цілей
     const $$i = 0;
 
     for ( ; $$i < 3; $$i++) {
-        // here's our actual loop `i`!
+        // а ось тут справжня `i` з циклу!
         const i = $$i;
         // ..
     }
 }
 ```
 
-Do you spot the problem? Our `i` is indeed just created once inside the loop. That's not the problem. The problem is the conceptual `$$i` that must be incremented each time with the `$$i++` expression. That's **re-assignment** (not "re-declaration"), which isn't allowed for constants.
+Вже помітили проблему? Наша `i` справді створена один раз у циклі. Не в цьому проблема. Проблема полягає в концептуальному `$$i`, яку потрібно щоразу збільшувати за допомогою виразу `$$i++`. Це **пере-призначення** (а не «повторне декларування»), що не допускається для констант.
 
-Remember, this "expanded" form is only a conceptual model to help you intuit the source of the problem. You might wonder if JS could have effectively made the `const $$i = 0` instead into `let $ii = 0`, which would then allow `const` to work with our classic `for`-loop? It's possible, but then it could have introduced potentially surprising exceptions to `for`-loop semantics.
+Пам’ятайте, що ця «розширена» форма - це лише концептуальна модель, яка допоможе вам зрозуміти джерело проблеми. Ви можете спитати себе, чи міг JS сам перетворити `const $$ i = 0` на `let $ ii = 0`, що дозволило б тоді `const` працювати з нашим класичним циклом `for`? Це можливо, але тоді це могло ввести потенційно дивовижні винятки з семантики циклу `for`.
 
-For example, it would have been a rather arbitrary (and likely confusing) nuanced exception to allow `i++` in the `for`-loop header to skirt strictness of the `const` assignment, but not allow other re-assignments of `i` inside the loop iteration, as is sometimes useful.
+Наприклад, було б досить довільним (і заплутаним) винятком, якщо дозволити `i++` у заголовку циклу `for` зменшити строгість призначення `const`, але не дозволити інші перепризначення `i` всередині ітерації циклу, що іноді корисно.
 
-The straightforward answer is: `const` can't be used with the classic `for`-loop form because of the required re-assignment.
+Пряма відповідь така: `const` не може використовуватися з класичною формою циклу `for` через необхідність перепризначення.
 
-Interestingly, if you don't do re-assignment, then it's valid:
+Цікаво, що якщо ви не зробите повторне призначення, то код працює:
 
 ```js
 var keepGoing = true;
@@ -456,15 +460,15 @@ for (const i = 0; keepGoing; /* nothing here */ ) {
 }
 ```
 
-That works, but it's pointless. There's no reason to declare `i` in that position with a `const`, since the whole point of such a variable in that position is **to be used for counting iterations**. Just use a different loop form, like a `while` loop, or use a `let`!
+Це працює, але це код не має сенсу. Немає жодної причини оголошувати `i` у цій позиції з `const`, оскільки увесь сенс такої змінної в цій позиції **бути використаним для підрахунку ітерацій**. Просто використовуйте іншу форму циклу, як цикл `while`, або візьміть `let`!
 
-## Uninitialized Variables (aka, TDZ)
+## Неініціалізовані змінні (змінні, розташовані у тимчасовій мертвій зоні)
 
-With `var` declarations, the variable is "hoisted" to the top of its scope. But it's also automatically initialized to the `undefined` value, so that the variable can be used throughout the entire scope.
+Коли змінна оголошується через `var`, вона "піднімається" на самий верх своєї області видимості. Але також вона автоматично ініціалізується значенням `undefined`, так що змінну можна використовувати у всій області видимості.
 
-However, `let` and `const` declarations are not quite the same in this respect.
+Однак декларації з `let` і `const` поводяться по-іншому.
 
-Consider:
+Розглянемо приклад:
 
 ```js
 console.log(studentName);
@@ -473,16 +477,16 @@ console.log(studentName);
 let studentName = "Suzy";
 ```
 
-The result of this program is that a `ReferenceError` is thrown on the first line. Depending on your JS environment, the error message may say something like: "Cannot access studentName before initialization."
+Результатом запуску цієї програми є те, що перший рядок викличе `ReferenceError`. Залежно від середовища JS, повідомлення про помилку може містити щось на зразок: "Не вдається отримати доступ до studentName перед ініціалізацією."
 
-| NOTE: |
+| ПРИМІТКА: |
 | :--- |
-| The error message as seen here used to be much more vague or misleading. Thankfully, several of us in the community were successfully able to lobby for JS engines to improve this error message so it more accurately tells you what's wrong! |
+| Раніше повідомлення про помилку, як видно з прикладу, було набагато більш розмитим або навіть оманливим. На щастя, кілька з нас у спільноті успішно змогли пролобіювати дозвіл рушіям JS покращити це повідомлення про помилку, щоб воно точніше повідомляло, що не так! |
 
-That error message is quite indicative of what's wrong: `studentName` exists on line 1, but it's not been initialized, so it cannot be used yet. Let's try this:
+Це повідомлення про помилку досить ясно вказує на те, що саме не так: `studentName` існує в рядку 1, але воно не було ініціалізоване, тому його ще не можна використовувати. Спробуємо так:
 
 ```js
-studentName = "Suzy";   // let's try to initialize it!
+studentName = "Suzy";   // спробуємо ініціалізувати studentName!
 // ReferenceError
 
 console.log(studentName);
@@ -490,24 +494,24 @@ console.log(studentName);
 let studentName;
 ```
 
-Oops. We still get the `ReferenceError`, but now on the first line where we're trying to assign to (aka, initialize!) this so-called "uninitialized" variable `studentName`. What's the deal!?
+На жаль, ми все ще бачимо `ReferenceError`, але тепер помилка у першому рядку, де ми намагаємося призначити (тобто, ініціалізувати!) цю так звану "неініціалізовану" змінну `studentName`. Та що ж таке?
 
-The real question is, how do we initialize an uninitialized variable? For `let`/`const`, the **only way** to do so is with an assignment attached to a declaration statement. An assignment by itself is insufficient! Consider:
+Справжнє питання полягає в тому, як ініціалізувати неініціалізовану змінну? Для `let` або `const` **єдиний спосіб** ініціалізації – це призначення, поєднане з оголошенням. Саме по собі призначення недостатнє! Розглянемо код:
 
 ```js
 let studentName = "Suzy";
 console.log(studentName);   // Suzy
 ```
 
-Here, we are initializing the `studentName` (in this case, to `"Suzy"` instead of `undefined`) by way of the `let` declaration statement form that's coupled with an assignment.
+Ми ініціалізуємо `studentName` (у даному випадку значенням "Suzy" замість `undefined`) за допомогою форми оголошення `let`, яка поєднана з присвоєнням.
 
-Alternatively:
+Можливий інший підхід:
 
 ```js
 // ..
 
 let studentName;
-// or:
+// або:
 // let studentName = undefined;
 
 // ..
@@ -518,21 +522,22 @@ console.log(studentName);
 // Suzy
 ```
 
-| NOTE: |
+
+| ПРИМІТКА: |
 | :--- |
-| That's interesting! Recall from earlier, we said that `var studentName;` is *not* the same as `var studentName = undefined;`, but here with `let`, they behave the same. The difference comes down to the fact that `var studentName` automatically initializes at the top of the scope, where `let studentName` does not. |
+| А це цікаво! Нагадаємо, що раніше ми говорили, що `var studentName;` це *не те саме*, що `var studentName = undefined;`, але тут вони з `let` поводяться однаково. Різниця зводиться до того, що `var studentName` автоматично ініціалізується у верхній частині області видимості, а `let studentName` ні. |
 
-Remember that we've asserted a few times so far that *Compiler* ends up removing any `var`/`let`/`const` declarators, replacing them with the instructions at the top of each scope to register the appropriate identifiers.
+Згадайте, що ми вже кілька разів стверджували, що *Компілятор* видаляє будь-яких декларатори `var`/`let`/ `const`, замінюючи їх інструкціями у верхній частині кожної області видимості для реєстрації відповідних ідентифікаторів.
 
-So if we analyze what's going on here, we see that an additional nuance is that *Compiler* is also adding an instruction in the middle of the program, at the point where the variable `studentName` was declared, to handle that declaration's auto-initialization. We cannot use the variable at any point prior to that initialization occuring. The same goes for `const` as it does for `let`.
+Отже, якщо ми проаналізуємо, що тут відбувається, то побачимо нюанс:  *Компілятор* також додає інструкцію в середині програми, в точці, де оголошена змінна `studentName`, для обробки автоматичної ініціалізації. Ми не можемо використовувати змінну в будь-який момент до цієї ініціалізації. Те ж саме стосується як `const`, так і `let`.
 
-The term coined by TC39 to refer to this *period of time* from the entering of a scope to where the auto-initialization of the variable occurs is: Temporal Dead Zone (TDZ).
+Термін, введений TC39 для позначення цього *періоду часу* від входу в область видимості до місця, де відбувається автоматична ініціалізація змінної – "тимчасова мертва зона" (Temporal Dead Zone, TDZ).
 
-The TDZ is the time window where a variable exists but is still uninitialized, and therefore cannot be accessed in any way. Only the execution of the instructions left by *Compiler* at the point of the original declaration can do that initialization. After that moment, the TDZ is done, and the variable is free to be used for the rest of the scope.
+TDZ - це проміжок часу, де змінна існує, але все ще неініціалізована, і тому не може бути доступна жодним способом. Тільки виконання інструкцій, залишених *Компілятором* у точці вихідної декларації, може виконати таку ініціалізацію. Після цього TDZ закінчується, і змінну можна використовувати у решті області видимості.
 
-A `var` also has technically has a TDZ, but it's zero in length and thus unobservable to our programs! Only `let` and `const` have an observable TDZ.
+У `var` також суворо кажучі є TDZ, але вона нульової довжини і, отже, непомітна для наших програм! Лише `let` і `const` мають видиму TDZ.
 
-By the way, "temporal" in TDZ does indeed refer to *time* not *position in code*. Consider:
+До речі, слово "тимчасова" у назві "тимчасова мертва зона", тобто, TDZ, справді стосується *часу*, а не *місця розташування в коді*. Розглянемо приклад:
 
 ```js
 askQuestion();
@@ -545,13 +550,13 @@ function askQuestion() {
 }
 ```
 
-Even though positionally the `console.log(..)` referencing `studentName` comes *after* the `let studentName` declaration, timing wise the `askQuestion()` function is invoked *before* the `let` statement is encountered, while `studentName` is still in its TDZ! Hence the error.
+Навіть попри те, що `console.log(..)`, який посилається на `studentName`, розташований у коді *після* оголошення `let studentName`, з точки зору часу виклик функції `askQuestion()` відбувається *до того, як* зустрічається оператор `let`, поки `studentName` все ще у TDZ! Звідси і помилка.
 
-There's a common misconception that TDZ means `let` and `const` do not hoist. This is an inaccurate, or at least slightly misleading, claim. They definitely hoist.
+Існує поширена помилкова думка, що TDZ означаєЮ щр `let` та `const` не піднімаються. Це неточне або принаймні трохи оманливе твердження. Вони точно піднімаються.
 
-The actual difference is that `let`/`const` declarations do not automatically initialize at the beginning of the scope, the way `var` does. The *debate* then is if the auto-initialization is *part of* hoisting, or not? I think auto-registration of a variable at the top of the scope (i.e., what I call "hoisting") and auto-initialization at the top of the scope (to `undefined`) are distinct operations and shouldn't be lumped together under the single term "hoisting."
+Фактична різниця полягає в тому, що декларації з `let` або `const` не ініціалізуються автоматично на початку області видимості, як це відбувається з `var`. Тоді питання  у тому, чи є автоініціалізація *частиною* підняття, чи ні? Я думаю, що автоматична реєстрація змінної у верхній частині області видимості (тобто те, що я називаю "підняттям") та автоматична ініціалізація у верхній частині області видимості (значенням  `undefined`) - це різні операції, і їх не слід поєднувати під єдиним терміном "підняття".
 
-We've already seen that `let` and `const` don't auto-initialize at the top of the scope. But let's prove that `let` and `const` *do* hoist (auto-register at the top of the scope), courtesy of our friend shadowing (see "Shadowing" in Chapter 3):
+Ми вже бачили, що `let` та `const` не ініціалізуються автоматично на початку області видимості. Але слід довести, що `let` і` const` *насправді підіймаються* (автоматично реєструються на початку своєї області видимості), з люб'язною допомогою нашого друга перекриттям (див. розділ "Shadowing" в главі 3):
 
 ```js
 var studentName = "Kyle";
@@ -569,26 +574,26 @@ var studentName = "Kyle";
 }
 ```
 
-What's going to happen with the first `console.log(..)` statement? If `let studentName` didn't hoist to the top of the scope, then the first `console.log(..)` *should* print `"Kyle"`, right? At that moment, it would seem, only the outer `studentName` exists, so that's the variable `console.log(..)` should access and print.
+Що станеться з першою інструкцією `console.log(..)`? Якщо `let studentName` не підіймається на верх області видимості, тоді перший `console.log(..) `*має* вивести `"Kyle"`, чи не так? На той момент, здавалося б, існує лише зовнішня змінна `studentName`, тому  `console.log(..)` має мати до неї доступ та вивести в консоль.
 
-But instead, the first `console.log(..)` throws a TDZ error, because in fact, the inner scope's `studentName` **was** hoisted (auto-registered at the top of the scope). What **didn't** happen (yet!) was the auto-initialization of that inner `studentName`; it's still uninitialized at that moment, hence the TDZ violation!
+Але натомість перший `console.log(..)` видає помилку TDZ, оскільки насправді `studentName` внутрішньої області видимості **було** підняте (автоматично зареєстроване у верхній частині області видимості). Що **ще** не сталося (ще!), так це автоматична ініціалізація цього внутрішнього `studentName`; на той момент це все ще неініціалізована змінна, отже, порушення TDZ!
 
-So to summarize, TDZ errors occur because `let`/`const` declarations *do* hoist their declarations to the top of their scopes, but unlike `var`, they defer the auto-initialization of their variables until the moment in the code's sequencing where the original declaration appeared. This window of time (hint: temporal), whatever its length, is the TDZ.
+Отже, підсумовуючи, помилки TDZ трапляються, оскільки декларації `let` чи `const` *піднімають* свої декларації на початок своїх областей видимості, але на відміну від `var`, вони відкладають автоматичну ініціалізацію своїх змінних до моменту в коді, де з’явилася оригінальна декларація. Це вікно часу (підказка: тимчасове), незалежно від його довжини, є TDZ.
 
-How can you avoid TDZ errors?
+Як можна уникнути помилок TDZ?
 
-My advice: always put your `let` and `const` declarations at the top of any scope. Shrink the TDZ window to zero (or near zero) length, and then it'll be moot.
+Моя порада така: завжди розміщуйте свої декларації `let` та `const` зверху області видимості. Зменшіть вікно TDZ до нульової (або близько до нульової) довжини, тоді і питання не буде.
 
-But why is TDZ even a thing? Why didn't TC39 dictate that `let`/`const` auto-initialize the way `var` does? Just be patient, we'll come back to explore the *why* of TDZ in Appendix A.
+Але чому взагалі існує TDZ? Чому комітет TC39 не вирішив, що `let` та `const` автоматично ініціалізується так, як це робить `var`? Наберіться терпіння, ми повернемось до питання, *чому* TDZ існує, у Додатку А.
 
-## Finally Initialized
+## Нарешті ініціалізовано
 
-Working with variables has much more nuance than it seems at first glance. *Hoisting*, *(re)declaration*, and the *TDZ* are common sources of confusion for developers, especially those who have worked in other languages before coming to JS. Before moving on, make sure your mental model is fully grounded on these aspects of JS scope and variables.
+Робота зі змінними має набагато більше нюансів, ніж здається на перший погляд. *Підняття*, *(пере) декларація* та *TDZ* є загальновідомим джерелами заплутаності для розробників, особливо тих, хто до JS працював з іншими мовами. Перш ніж рухатися далі, переконайтеся, що ваша ментальна модель відносно областей видимості та змінних у JS цілком достатньо стабільна.
 
-Hoisting is generally cited as an explicit mechanism of the JS engine, but it's really more a metaphor to describe the various ways JS handles variable declarations during compilation. But even as a metaphor, hoisting offers useful structure for thinking about the life-cycle of a variable—when it's created, when it's available to use, when it goes away.
+Зазвичай підняття називається явним механізмом рушія JS, але насправді це більше метафора для опису різних способів обробки оголошень змінних під час компіляції. Але навіть як метафора підняття пропонує корисну структуру для роздумів про життєвий цикл змінної - коли вона створюється, коли вона доступна для використання, коли вона зникає.
 
-Declaration and re-declaration of variables tend to cause confusion when thought of as runtime operations. But if you shift to compile-time thinking for these operations, the quirks and *shadows* diminish.
+Оголошення та повторне оголошення змінних, як правило, викликають плутанину, коли їх розглядають як операції часу виконання. Але якщо думати про них як про операції часу компіляції, химерності та *тіньові аспекти* зменшуються.
 
-The TDZ (temporal dead zone) error is strange and frustrating when encountered. Fortunately, TDZ is relatively straightforward to avoid if you're always careful to place `let`/`const` declarations at the top of any scope.
+Помилка TDZ (тимчасової мертвої зони) є дивною і неприємною при зустрічі. На щастя, TDZ є відносно просто уникати, якщо ви завжди обережно розміщуєте декларації `let` / `const` зверху будь-якої області видимості.
 
-As you successfully navigate these twists and turns of variable scope, the next chapter will lay out the factors that guide our decisions to place our declarations in various scopes, especially nested blocks.
+Коли ви успішно розберетеся у цих хитрощах змінних та областей видимотсі, переходьте до наступного розділу, де будуть викладені фактори, що керують нашими рішеннями щодо розміщення наших декларацій у різних областях видимості, особливо у вкладених блоках.
