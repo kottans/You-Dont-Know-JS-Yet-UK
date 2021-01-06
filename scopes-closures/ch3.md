@@ -1,69 +1,70 @@
-# You Don't Know JS Yet: Scope & Closures - 2nd Edition
-# Chapter 3: The Scope Chain
+# You Don't Know JS Yet: області видимості та замикання - Друге видання
 
-Chapters 1 and 2 laid down a concrete definition of *lexical scope* (and its parts) and illustrated helpful metaphors for its conceptual foundation. Before proceeding with this chapter, find someone else to explain (written or aloud), in your own words, what lexical scope is and why it's useful to understand.
+# Розділ 3: Ланцюжок область видимості
 
-That seems like a step you might skip, but I've found it really does help to take the time to reformulate these ideas as explanations to others. That helps our brains digest what we're learning!
+У 1-ому та 2-ому розділах було закладено визначення _лексичної області видимості_ (та її частин) та проілюстровано корисні метафори для її концептуального підґрунтя. Перш ніж продовжити рухатись далі, знайдіть когось, щоб пояснити своїми словами (письмово чи вголос): що таке лексична область і чому це корисно розуміти.
 
-Now it's time to dig into the nuts and bolts, so expect that things will get a lot more detailed from here forward. Stick with it, though, because these discussions really hammer home just how much we all *don't know* about scope, yet. Make sure to take your time with the text and all the code snippets provided.
+Це здається кроком, який можна пропустити, але я переконався, що це дійсно ефективний спосіб витратити час для переформулювання цих ідей при поясненні іншим. Це допомагає нашому мозку переварити те, що ми вивчаємо!
 
-To refresh the context of our running example, let's recall the color-coded illustration of the nested scope bubbles, from Chapter 2, Figure 2:
+Тепер настав час копатись у гайках та болтах, тож очікуйте, що з цього моменту все стане набагато детальнішим. Однак дотримуйтесь думки, що всі ці розмови насправді вбивають у голову те, наскільки ми всі поки що _не знаємо_ про область видимості. Обов’язково дайте собі час на осмислення тексту та всіх наведених фрагментів коду.
+
+Щоб оновити контекст нашого активного прикладу, давайте згадаємо кольорову ілюстрацію вкладених бульбашок області видимості, з Глави 2, Рисунок 2:
 
 <figure>
     <img src="images/fig2.png" width="500" alt="Colored Scope Bubbles" align="center">
     <figcaption><em>Fig. 2 (Ch. 2): Colored Scope Bubbles</em></figcaption>
 </figure>
 
-The connections between scopes that are nested within other scopes is called the scope chain, which determines the path along which variables can be accessed. The chain is directed, meaning the lookup moves upward/outward only.
+Зв'язки між областями видимості, які вкладені в інші області видимості, називаються ланцюжком область видимості, який визначає шлях, по якому можна отримати доступ до змінних. Ланцюг є орієнтованим, тобто пошук шукається тільки вгору / назовні.
 
-## "Lookup" Is (Mostly) Conceptual
+## "Пошук" є (переважно) концептуальним
 
-In Figure 2, notice the color of the `students` variable reference in the `for`-loop. How exactly did we determine that it's a RED(1) marble?
+На Рисунку 2, зверніть увагу на колір посилання змінної `студентів` у циклі` for`. Як саме ми визначили, що це ЧЕРВОНА (1) кулька?
 
-In Chapter 2, we described the runtime access of a variable as a "lookup," where the *Engine* has to start by asking the current scope's *Scope Manager* if it knows about an identifier/variable, and proceeding upward/outward back through the chain of nested scopes (toward the global scope) until found, if ever. The lookup stops as soon as the first matching named declaration in a scope bucket is found.
+У 2-гій главі ми описали доступ до змінної під час виконання "пошуку", де _Рушій_ повинен розпочати роботу, запитавши _Менеджера області видимості_ поточної області видимості, чи знає він про ідентифікатор / змінну, після чого рухатися вгору/назовні назад через ланцюжок вкладених областей (у напрямку до глобального масштабу), поки не буде знайдено (якщо взагалі знайдеться). Пошук зупиняється, як тільки знайдено першу відповідну іменовану декларацію у сегменті області видимості.
 
-The lookup process thus determined that `students` is a RED(1) marble, because we had not yet found a matching variable name as we traversed the scope chain, until we arrived at the final RED(1) global scope.
+Таким чином, під час пошуку було визначено, що "студент" - це ЧЕРВОНА (1) кулька, оскільки ми ще не знайшли відповідного імені змінної, коли обходили ланцюжок областей видимості, поки не дійшли до остаточної ЧЕРВОНОЇ (1) глобальної області видимості.
 
-Similarly, `studentID` in the `if`-statement is determined to be a BLUE(2) marble.
+Подібним чином, `studentID` в операторі `if` визначається як СИНЯ (2) кулька.
 
-This suggestion of a runtime lookup process works well for conceptual understanding, but it's not actually how things usually work in practice.
+Ця пропозиція щодо процесу пошуку під час роботи добре працює для концептуального розуміння, але зазвичай на практиці так не відбувається.
 
-The color of a marble's bucket (aka, meta information of what scope a variable originates from) is *usually determined* during the initial compilation processing. Because lexical scope is pretty much finalized at that point, a marble's color will not change based on anything that can happen later during runtime.
+Колір відра кульки (він же мета-інформація про те, з якої області видимості походить змінна) _зазвичай визначається_ під час початкової обробки компіляції. Оскільки лексична область видимості на той момент майже доопрацьована, колір кульки не зміниться незалежно від того, що може статися пізніше під час виконання.
 
-Since the marble's color is known from compilation, and it's immutable, this information would likely be stored with (or at least accessible from) each variable's entry in the AST; that information is then used explicitly by the executable instructions that constitute the program's runtime.
+Оскільки колір кульки відомий із компіляції, і він незмінний, ця інформація, швидше за все, буде зберігатися разом з (або принаймні буде доступною разом із) записом кожної змінної в Абстрактному Синтаксичному Дереві (AST); ця інформація потім буде використовуватися при виконанні інструкцій, що становлять час роботи програми.
 
-In other words, *Engine* (from Chapter 2) doesn't need to lookup through a bunch of scopes to figure out which scope bucket a variable comes from. That information is already known! Avoiding the need for a runtime lookup is a key optimization benefit of lexical scope. The runtime operates more performantly without spending time on all these lookups.
+Іншими словами, _Рушію_ (з 2-гої глави) не потрібно шукати безліч зон, щоб з'ясувати, з якого сегмента області видимості походить змінна. Ця інформація вже відома! Уникнення необхідності пошуку під час виконання є ключовою перевагою оптимізації лексичної області видимості. Час роботи використовується ефективніше без втрати часу на всі ці пошуки.
 
-But I said "...usually determined..." just a moment ago, with respect to figuring out a marble's color during compilation. So in what case would it ever *not* be known during compilation?
+Але як я говорив: "... зазвичай визначається ...", - лише хвилину тому, щоб з'ясувати колір кульки під час складання. Тож у якому випадку це _не_ буде відомо під час компіляції?
 
-Consider a reference to a variable that isn't declared in any lexically available scopes in the current file—see *Get Started*, Chapter 1, which asserts that each file is its own separate program from the perspective of JS compilation. If no declaration is found, that's not *necessarily* an error. Another file (program) in the runtime may indeed declare that variable in the shared global scope.
+Розглянемо посилання на змінну, яка не оголошена в жодній лексично доступній області видимості у поточному файлі - див. _Початок роботи_, 1-ший розділ, де стверджується, що кожен файл є власною окремою програмою з точки зору компіляції JS. Якщо декларації не знайдено, це _не обов'язково_ помилка. Інший файл (програма) в середовищі виконання може дійсно оголосити цю змінну у спільній глобальній області видимості.
 
-So the ultimate determination of whether the variable was ever appropriately declared in some accessible bucket may need to be deferred to the runtime.
+Тож остаточне визначення, чи була змінна колись належним чином оголошена в якомусь доступному сегменті, доведеться, можливо, відкласти на час виконання.
 
-Any reference to a variable that's initially *undeclared* is left as an uncolored marble during that file's compilation; this color cannot be determined until other relevant file(s) have been compiled and the application runtime commences. That deferred lookup will eventually resolve the color to whichever scope the variable is found in (likely the global scope).
+Будь-яке посилання на змінну, яка спочатку _не оголошена_, залишається у вигляді незафарбованої кульки під час компіляції цього файлу; цей колір неможливо визначити, поки не буде скомпільовано інші відповідні файли та не почнеться час виконання програми. Цей відкладений пошук врешті-решт надасть колір області видимості, у якій знаходиться змінна (ймовірніше, глобальної області видимості).
 
-However, this lookup would only be needed once per variable at most, since nothing else during runtime could later change that marble's color.
+Однак цей пошук знадобиться лише один раз для кожної змінної, оскільки згодом буде не можливо під час виконання змінити колір цієї кульки.
 
-The "Lookup Failures" section in Chapter 2 covers what happens if a marble is ultimately still uncolored at the moment its reference is runtime executed.
+Розділ "Помилки пошуку" в 2-гій главі висвітлює те, що відбувається, якщо кулька в кінцевому підсумку все ще не забарвлена на момент виконання посилання.
 
-## Shadowing
+## Затінення
 
-"Shadowing" might sound mysterious and a little bit sketchy. But don't worry, it's completely legit!
+"Затінення" може звучати таємничим та трохи схематичним. Але не хвилюйтеся, це цілком законно!
 
-Our running example for these chapters uses different variable names across the scope boundaries. Since they all have unique names, in a way it wouldn't matter if all of them were just stored in one bucket (like RED(1)).
+Наші активні приклади розділів використовують різні імена для змінних, що знаходится за межами області видимості. Оскільки всі вони мають унікальні імена, певним чином не буде значення, якщо всі вони просто зберігатимуться в одному сегменті (наприклад, ЧЕРВОНОМУ (1)).
 
-Where having different lexical scope buckets starts to matter more is when you have two or more variables, each in different scopes, with the same lexical names. A single scope cannot have two or more variables with the same name; such multiple references would be assumed as just one variable.
+Наявність різної лексичної області видимості починає більше значити тоді, коли у вас є дві або більше змінних, кожна з них у різних областях видимості та з однаковими лексичними назвами. У одній області видимості не може бути двох або більше змінних з однаковою назвою; такі множинні посилання можна вважати лише однією змінною.
 
-So if you need to maintain two or more variables of the same name, you must use separate (often nested) scopes. And in that case, it's very relevant how the different scope buckets are laid out.
+Отже, якщо вам потрібно підтримувати дві або більше однакових змінних, ви повинні використовувати окремі (часто вкладені) області видимості. І в цьому випадку буде доречно різні розкласти області визначення як різні сегменти.
 
-Consider:
+Розглянемо:
 
 ```js
 var studentName = "Suzy";
 
 function printStudent(studentName) {
-    studentName = studentName.toUpperCase();
-    console.log(studentName);
+  studentName = studentName.toUpperCase();
+  console.log(studentName);
 }
 
 printStudent("Frank");
@@ -76,38 +77,38 @@ console.log(studentName);
 // Suzy
 ```
 
-| TIP: |
-| :--- |
-| Before you move on, take some time to analyze this code using the various techniques/metaphors we've covered in the book. In particular, make sure to identify the marble/bubble colors in this snippet. It's good practice! |
+|ПОРАДА: |
 
-The `studentName` variable on line 1 (the `var studentName = ..` statement) creates a RED(1) marble. The same named variable is declared as a BLUE(2) marble on line 3, the parameter in the `printStudent(..)` function definition.
+Перед тим, як піти далі, знайдіть трохи часу, щоб проаналізувати цей код, використавши різні техніки / метафори, які ми згадували в цій книзі. Зокрема, обов’язково визначте кольори кульок / оболонок у цьому фрагменті. Це хороша практика! |
 
-What color marble will `studentName` be in the `studentName = studentName.toUpperCase()` assignment statement and the `console.log(studentName)` statement? All three `studentName` references will be BLUE(2).
+Змінна `studentName` у рядку 1 (оператор` var studentName = ..`) створює ЧЕРВОНУ (1) кульку. Ця сама названа змінна оголошена як СИНЯ (2) кулька у рядку 3, параметр у визначенні функції `printStudent (..)`.
 
-With the conceptual notion of the "lookup," we asserted that it starts with the current scope and works its way outward/upward, stopping as soon as a matching variable is found. The BLUE(2) `studentName` is found right away. The RED(1) `studentName` is never even considered.
+Яким кольором кульки буде `studentName` в операторі призначення`studentName = studentName.toUpperCase ()`та в операторі `console.log(studentName)`? Усі три посилання `studentName` будуть СИНІМИ (2).
 
-This is a key aspect of lexical scope behavior, called *shadowing*. The BLUE(2) `studentName` variable (parameter) shadows the RED(1) `studentName`. So, the parameter is shadowing the (shadowed) global variable. Repeat that sentence to yourself a few times to make sure you have the terminology straight!
+З концептуальним поняттям "пошук" ми стверджували, що він починається з поточного обсягу і працює назовні/вгору і зупиняється, як тільки знайдена відповідна змінна. СИНЯ (2) `studentName` знайдена одразу. ЧЕРВОНА (1) `studentName` навіть не розглядається.
 
-That's why the re-assignment of `studentName` affects only the inner (parameter) variable: the BLUE(2) `studentName`, not the global RED(1) `studentName`.
+Це ключовий аспект поведінки лексичної області видимості, який називається _затінення_. СИНЯ (2) змінна `studentName` (параметр) затінює ЧЕРВОНУ (1)` studentName`. Отже, параметр затінює (затінену) глобальну змінну. Повторіть це речення кілька разів для себе, щоб переконатися, що у вас є чітка термінологія!
 
-When you choose to shadow a variable from an outer scope, one direct impact is that from that scope inward/downward (through any nested scopes) it's now impossible for any marble to be colored as the shadowed variable—(RED(1), in this case). In other words, any `studentName` identifier reference will correspond to that parameter variable, never the global `studentName` variable. It's lexically impossible to reference the global `studentName` anywhere inside of the `printStudent(..)` function (or from any nested scopes).
+Ось чому повторне призначення `studentName` впливає лише на внутрішню змінну (параметр): СИНЮ (2)` studentName`, а не на глобальну ЧЕРВОНУ (1) `studentName`.
 
-### Global Unshadowing Trick
+Коли ви вирішили затінити змінну із зовнішньої області видимості, прямим впливом буде те, що з цієї області видимості всередину/вниз (через будь-які вкладені області видимості) тепер неможливо жодну кульку забарвити як тіньову змінну - (ЧЕРВОНА (1) у нашому випадку). Іншими словами, будь-яке посилання на ідентифікатор `studentName` відповідатиме цій змінній параметра, і ніколи не - глобальній змінній `studentName`. Лексично неможливо посилатися на глобальне `studentName` де-небудь усередині функції `printStudent (..) `(або з будь-яких інших вкладених областей видимостей).
 
-Please beware: leveraging the technique I'm about to describe is not very good practice, as it's limited in utility, confusing for readers of your code, and likely to invite bugs to your program. I'm covering it only because you may run across this behavior in existing programs, and understanding what's happening is critical to not getting tripped up.
+### Глобальний трюк без тіні
 
-It *is* possible to access a global variable from a scope where that variable has been shadowed, but not through a typical lexical identifier reference.
+Будьте обережні: використовувати техніку, яку я збираюся описати, не дуже вдала ідея, оскільки вона має малу користь, може заплутати читачів вашого коду і, ймовірно, виникнуть помилки у вашій програмі. Я висвітлюю це лише тому, що ви можете натрапити на цю поведінку в інших програмах, і розуміння того, що відбувається,є критично важливим, щоб не спіткнутися.
 
-In the global scope (RED(1)), `var` declarations and `function` declarations also expose themselves as properties (of the same name as the identifier) on the *global object*—essentially an object representation of the global scope. If you've written JS for a browser environment, you probably recognize the global object as `window`. That's not *entirely* accurate, but it's good enough for our discussion. In the next chapter, we'll explore the global scope/object topic more.
+Доступ до глобальної змінної можливий із області видимості, де ця змінна була затінена, але не через типове посилання на лексичний ідентифікатор.
 
-Consider this program, specifically executed as a standalone .js file in a browser environment:
+У глобальній області видимості (ЧЕРВОНА (1)) декларація `var` та декларація `function` також представляють собою як властивості (з тим самим іменем, що і ідентифікатор) _global object_ - що, по суті, є представленням глобальної області видимості. Якщо ви написали JS для середовища браузера, ви, ймовірно, розпізнаєте глобальний об'єкт як `window`. Це не _цілком_ точно, але цілком достатньо для нашої дискусії. У наступному розділі ми докладніше розглянемо глобальну область видимості / об'єкт.
+
+Розглянемо цю програму, що спеціально виконана як окремий файл .js у середовищі браузера:
 
 ```js
 var studentName = "Suzy";
 
 function printStudent(studentName) {
-    console.log(studentName);
-    console.log(window.studentName);
+  console.log(studentName);
+  console.log(window.studentName);
 }
 
 printStudent("Frank");
@@ -115,17 +116,17 @@ printStudent("Frank");
 // "Suzy"
 ```
 
-Notice the `window.studentName` reference? This expression is accessing the global variable `studentName` as a property on `window` (which we're pretending for now is synonymous with the global object). That's the only way to access a shadowed variable from inside a scope where the shadowing variable is present.
+Помітили посилання `window.studentName`? Цей вираз отримує доступ до глобальної змінної `studentName` як властивість у `window` (яке, на даний час будемо вважати синонімом глобального об'єкта). Це єдиний спосіб отримати доступ до тіньової змінної всередині області видимості, де присутня тінізація змінної.
 
-The `window.studentName` is a mirror of the global `studentName` variable, not a separate snapshot copy. Changes to one are still seen from the other, in either direction. You can think of `window.studentName` as a getter/setter that accesses the actual `studentName` variable. As a matter of fact, you can even *add* a variable to the global scope by creating/setting a property on the global object.
+`Window.studentName` є дзеркалом глобальної змінної `studentName`, а не окремою копією знімка стану системи. Зміни в одному будуть спостерігатися з іншого в двох напрямках. Ви можете уявити `window.studentName` методом читання/модифікації, який отримує доступ до фактичної змінної `studentName`. Насправді ви можете _добати_ змінну до глобальної області видимості, створивши/встановивши властивість для глобального об'єкта.
 
-| WARNING: |
-| :--- |
-| Remember: just because you *can* doesn't mean you *should*. Don't shadow a global variable that you need to access, and conversely, avoid using this trick to access a global variable that you've shadowed. And definitely don't confuse readers of your code by creating global variables as `window` properties instead of with formal declarations! |
+| ПОПЕРЕДЖЕННЯ: |
 
-This little "trick" only works for accessing a global scope variable (not a shadowed variable from a nested scope), and even then, only one that was declared with `var` or `function`.
+Пам'ятайте: те, що ви _можете_, не означає, що ви _повинні_. Не затінюйте глобальну змінну, до якої вам потрібно отримати доступ, і навпаки, уникайте використання цього трюку для доступу до глобальної змінної, яку ви затінили. І, безумовно, не плутайте читачів вашого коду, створивши глобальні змінні такі як властивості `window`, замість зовнішніх оголошень! |
 
-Other forms of global scope declarations do not create mirrored global object properties:
+Цей маленький "трюк" працює лише для доступу до глобальної змінної області видимості (не тіньової змінної від вкладеної області видимості), і тільки тоді, коли була оголошена з `var` або `function`.
+
+Інші форми оголошення глобальної області видимості не створюють дзеркальних властивостей глобального об'єкта:
 
 ```js
 var one = 1;
@@ -133,29 +134,34 @@ let notOne = 2;
 const notTwo = 3;
 class notThree {}
 
-console.log(window.one);       // 1
-console.log(window.notOne);    // undefined
-console.log(window.notTwo);    // undefined
-console.log(window.notThree);  // undefined
+console.log(window.one); // 1
+console.log(window.notOne); // undefined
+console.log(window.notTwo); // undefined
+console.log(window.notThree); // undefined
 ```
 
-Variables (no matter how they're declared!) that exist in any other scope than the global scope are completely inaccessible from a scope where they've been shadowed:
+Змінні (незалежно від того, як вони оголошені!), які існують в будь-якій іншій області видимості, крім глобального, є абсолютно недоступними з області вилимості,у якій вони були затінені:
 
 ```js
 var special = 42;
 
 function lookingFor(special) {
-    // The identifier `special` (parameter) in this
-    // scope is shadowed inside keepLooking(), and
-    // is thus inaccessible from that scope.
+  // The identifier `special` (parameter) in this
+  // scope is shadowed inside keepLooking(), and
+  // is thus inaccessible from that scope.
 
-    function keepLooking() {
-        var special = 3.141592;
-        console.log(special);
-        console.log(window.special);
-    }
+  // Ідентифікатор `special` (параметр) у цій
+  // області визначеності затінена всередині
+  // keepLooking () й т.ч., недоступна із цієї
+  // області визначеності.
 
-    keepLooking();
+  function keepLooking() {
+    var special = 3.141592;
+    console.log(special);
+    console.log(window.special);
+  }
+
+  keepLooking();
 }
 
 lookingFor(112358132134);
@@ -163,28 +169,29 @@ lookingFor(112358132134);
 // 42
 ```
 
-The global RED(1) `special` is shadowed by the BLUE(2) `special` (parameter), and the BLUE(2) `special` is itself shadowed by the GREEN(3) `special` inside `keepLooking()`. We can still access the RED(1) `special` using the indirect reference `window.special`. But there's no way for `keepLooking()` to access the BLUE(2) `special` that holds the number `112358132134`.
+Глобальний ЧЕРВОНИЙ (1) `special` затіняється СИНІМ (2) `special` (параметр), в той же час СИНІЙ (2) `special` сам затіняється ЗЕЛЕНИМ (3) `special` всередині `keepLooking ()`. Ми все ще можемо отримати доступ до ЧЕРВОНОГО (1) `special`, використваши непряме посилання `window.special`. Але `keepLooking ()` не має доступу до СИНОГО (2) `special`, що містить номер` 112358132134`.
 
-### Copying Is Not Accessing
+### Копіювання це не доступ
 
-I've been asked the following "But what about...?" question dozens of times. Consider:
+Мене запитували наступне запитання: "А як щодо ...?" - десятки разів.
+Розглянемо:
 
 ```js
 var special = 42;
 
 function lookingFor(special) {
-    var another = {
-        special: special
-    };
+  var another = {
+    special: special,
+  };
 
-    function keepLooking() {
-        var special = 3.141592;
-        console.log(special);
-        console.log(another.special);  // Ooo, tricky!
-        console.log(window.special);
-    }
+  function keepLooking() {
+    var special = 3.141592;
+    console.log(special);
+    console.log(another.special); // Ooo, tricky!
+    console.log(window.special);
+  }
 
-    keepLooking();
+  keepLooking();
 }
 
 lookingFor(112358132134);
@@ -193,107 +200,110 @@ lookingFor(112358132134);
 // 42
 ```
 
-Oh! So does this `another` object technique disprove my claim that the `special` parameter is "completely inaccessible" from inside `keepLooking()`? No, the claim is still correct.
+О! Чи спростовує моє твердження цей об'єкт `another` про те, що параметр `special` "повністю недоступний" зсередини `keepLooking()` ? Ні, претензія все ще існує.
 
-`special: special` is copying the value of the `special` parameter variable into another container (a property of the same name). Of course, if you put a value in another container, shadowing no longer applies (unless `another` was shadowed, too!). But that doesn't mean we're accessing the parameter `special`; it means we're accessing the copy of the value it had at that moment, by way of *another* container (object property). We cannot reassign the BLUE(2) `special` parameter to a different value from inside `keepLooking()`.
+`special: special` - це копіювання значення параметра змінної `special` в інший контейнер (властивість з такою ж назвою). Звісно, якщо ви покладете значення в інший контейнер, затінення більше не застосовується (якщо тільки `another` теж не був затінений!). Але це не означає, що ми отримуємо доступ до параметра `special`; це означає, що ми отримуємо доступ до копії значення, яке воно мало на той момент, за допомогою контейнера _another_ (властивість об'єкта). Ми не можемо перепризначити параметр СИНЬОГО(2) `special` у інше значення всередині `keepLooking()`.
 
-Another "But...!?" you may be about to raise: what if I'd used objects or arrays as the values instead of the numbers (`112358132134`, etc.)? Would us having references to objects instead of copies of primitive values "fix" the inaccessibility?
+Ще одне "Але ...!?",яке ви збираєтеся підняти: що, якби я використовував об'єкти або масиви як значення, замість цифр (`112358132134`, тощо)? Чи можна "виправити" цю недоступність, використавши посилання на об'єкти замість копій примітивних значень?
 
-No. Mutating the contents of the object value via a reference copy is **not** the same thing as lexically accessing the variable itself. We still can't reassign the BLUE(2) `special` parameter.
+Ні. Мутація вмісту значення об’єкта за допомогою копії - це **не** те саме, що лексичний доступ до самої змінної. Ми все ще не можемо перепризначити СИНІЙ(2) параметр `special`.
 
-### Illegal Shadowing
+### Незаконне затінення
 
-Not all combinations of declaration shadowing are allowed. `let` can shadow `var`, but `var` cannot shadow `let`:
+Не всі комбінації оголошень затінення дозволені: `let` може затінити `var`, але `var` не може затінити` let`:
 
 ```js
 function something() {
-    var special = "JavaScript";
+  var special = "JavaScript";
 
-    {
-        let special = 42;   // totally fine shadowing
+  {
+    let special = 42; // totally fine shadowing
+    // цілком срийнятно/нормальне затінення
 
-        // ..
-    }
+    // ..
+  }
 }
 
 function another() {
-    // ..
+  // ..
+
+  {
+    let special = "JavaScript";
 
     {
-        let special = "JavaScript";
+      var special = "JavaScript";
+      // ^^^ Syntax Error
 
-        {
-            var special = "JavaScript";
-            // ^^^ Syntax Error
-
-            // ..
-        }
+      // ..
     }
+  }
 }
 ```
 
-Notice in the `another()` function, the inner `var special` declaration is attempting to declare a function-wide `special`, which in and of itself is fine (as shown by the `something()` function).
+Зверніть увагу на функцію `another()`. Внутрішнє оголошення `var special` намагається оголосити загальнофункціональну `special`, що саме по собі є нормою (як показано функцією `something ()`).
 
-The syntax error description in this case indicates that `special` has already been defined, but that error message is a little misleading—again, no such error happens in `something()`, as shadowing is generally allowed just fine.
+Опис синтаксичної помилки в цьому випадку вказує на те, що `special` вже було визначено, але це повідомлення про помилку трохи вводить в оману. Загалом така помилка не трапляється в "something ()", оскільки затінення тут дозволяється.
 
-The real reason it's raised as a `SyntaxError` is because the `var` is basically trying to "cross the boundary" of (or hop over) the `let` declaration of the same name, which is not allowed.
+Справжньою причиною `SyntaxError` є те, що `var` в основному намагається "перейти межу" (або перестрибнути) однойменної декларації `let`, що є неможливим.
 
-That boundary-crossing prohibition effectively stops at each function boundary, so this variant raises no exception:
+Ця заборона перетину меж ефективно виконується на кожній межі функції, тому цей варіант є винятком:
 
 ```js
 function another() {
-    // ..
+  // ..
 
-    {
-        let special = "JavaScript";
+  {
+    let special = "JavaScript";
 
-        ajax("https://some.url",function callback(){
-            // totally fine shadowing
-            var special = "JavaScript";
+    ajax("https://some.url", function callback() {
+      // цілком нормальне затінення
+      var special = "JavaScript";
 
-            // ..
-        });
-    }
+      // ..
+    });
+  }
 }
 ```
 
-Summary: `let` (in an inner scope) can always shadow an outer scope's `var`. `var` (in an inner scope) can only shadow an outer scope's `let` if there is a function boundary in between.
+Підсумок: `let` (у внутрішній області видимості) завжди може затінити` var` зовнішньої області видимості. `var` (у внутрішній області видимості) може затінювати зовнішню область видимості `let`, лише якщо між ними є межа функції.
 
 ## Function Name Scope
 
-As you've seen by now, a `function` declaration looks like this:
+## Область видимості іменованої функції
+
+Як ви вже бачили, оголошення `function` виглядає так:
 
 ```js
 function askQuestion() {
-    // ..
+  // ..
 }
 ```
 
-And as discussed in Chapters 1 and 2, such a `function` declaration will create an identifier in the enclosing scope (in this case, the global scope) named `askQuestion`.
+І, як обговорювалося в 1-шому та 2-гому розділах, таке оголошення `function` створить ідентифікатор у обмеженій області видимості (у даному випадку глобальній області видимості) з назвою `askQuestion`.
 
-What about this program?
+А як щодо цієї програми?
 
 ```js
-var askQuestion = function(){
-    // ..
+var askQuestion = function () {
+  // ..
 };
 ```
 
-The same is true for the variable `askQuestion` being created. But since it's a `function` expression—a function definition used as value instead of a standalone declaration—the function itself will not "hoist" (see Chapter 5).
+Те саме стосується для змінної `askQuestion`. Але оскільки вираз `function` - визначення функції, яке використовується як значення, замість самостійного оголошення, то сама функція "підніматися" не буде (див. Розділ 5).
 
-One major difference between `function` declarations and `function` expressions is what happens to the name identifier of the function. Consider a named `function` expression:
-
-```js
-var askQuestion = function ofTheTeacher(){
-    // ..
-};
-```
-
-We know `askQuestion` ends up in the outer scope. But what about the `ofTheTeacher` identifier? For formal `function` declarations, the name identifier ends up in the outer/enclosing scope, so it may be reasonable to assume that's the case here. But `ofTheTeacher` is declared as an identifier **inside the function itself**:
+Однією з основних відмінностей між оголошеннми `function` та виразами `function` є те, що відбувається з ідентифікатором імені функції. Розглянемо іменований вираз `function`:
 
 ```js
 var askQuestion = function ofTheTeacher() {
-    console.log(ofTheTeacher);
+  // ..
+};
+```
+
+Ми знаємо, що `askQuestion` опиняється у зовнішній області видимості. Але як щодо ідентифікатора `ofTheTeacher`? Для формальних оголошень `function` ідентифікатор імені потрапляє у зовнішню/ обмежувальну область, тому є логічно припустити даний випадок. Але `ofTheTeacher` оголошується як ідентифікатор **всередині самої функції**:
+
+```js
+var askQuestion = function ofTheTeacher() {
+  console.log(ofTheTeacher);
 };
 
 askQuestion();
@@ -303,90 +313,93 @@ console.log(ofTheTeacher);
 // ReferenceError: ofTheTeacher is not defined
 ```
 
-| NOTE: |
-| :--- |
-| Actually, `ofTheTeacher` is not exactly *in the scope of the function*. Appendix A, "Implied Scopes" will explain further. |
+| ПРИМІТКА:                                                                                                                             |
+| ------------------------------------------------------------------------------------------------------------------------------------- |
+| Насправді, `ofTheTeacher` не є цілком _в області визначення функції._ У Додатку А, "Непрямі області видимості" буде надане пояснення. |
 
-Not only is `ofTheTeacher` declared inside the function rather than outside, but it's also defined as read-only:
+`OfTheTeacher` не тільки скоріше оголошується всередині функції, ніж зовні, але й також призначений лише для читання:
 
 ```js
 var askQuestion = function ofTheTeacher() {
-    "use strict";
-    ofTheTeacher = 42;   // TypeError
+  "use strict";
+  ofTheTeacher = 42; // TypeError
 
-    //..
+  //..
 };
 
 askQuestion();
 // TypeError
 ```
 
-Because we used strict-mode, the assignment failure is reported as a `TypeError`; in non-strict-mode, such an assignment fails silently with no exception.
+Оскільки ми використали суворий режим,помилка повідомляється як `TypeError`; у несуворому режимі таке призначення мовчки провалюється без винятку.
 
-What about when a `function` expression has no name identifier?
+Що відбувається, коли вираз `function` не має ідентифікатора імені?
 
 ```js
-var askQuestion = function(){
-   // ..
+var askQuestion = function () {
+  // ..
 };
 ```
 
-A `function` expression with a name identifier is referred to as a "named function expression," but one without a name identifier is referred to as an "anonymous function expression." Anonymous function expressions clearly have no name identifier that affects either scope.
+Вираз `function` з ідентифікатором імені називається "виразом іменованої функції". Відповідно той, що не має ідентифікатора імені, називається
+"анонімним виразом функції". Вирази анонімних функцій безсумнівно не мають ідентифікатора імені, який впливає на ту чи іншу область видимості.
 
-| NOTE: |
-| :--- |
-| We'll discuss named vs. anonymous `function` expressions in much more detail, including what factors affect the decision to use one or the other, in Appendix A. |
+| ПРИМІТКА:                                                                                                                                                                          |
+| ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Ми будемо обговорювати іменовані та анонімні вирази `функції` набагато детальніше, включивши фактори, що впливають на рішення про використання того чи іншого виразу, у Додатку А. |
 
-## Arrow Functions
+## Стрілочні функції
 
-ES6 added an additional `function` expression form to the language, called "arrow functions":
-
-```js
-var askQuestion = () => {
-    // ..
-};
-```
-
-The `=>` arrow function doesn't require the word `function` to define it. Also, the `( .. )` around the parameter list is optional in some simple cases. Likewise, the `{ .. }` around the function body is optional in some cases. And when the `{ .. }` are omitted, a return value is sent out without using a `return` keyword.
-
-| NOTE: |
-| :--- |
-| The attractiveness of `=>` arrow functions is often sold as "shorter syntax," and that's claimed to equate to objectively more readable code. This claim is dubious at best, and I believe outright misguided. We'll dig into the "readability" of various function forms in Appendix A. |
-
-Arrow functions are lexically anonymous, meaning they have no directly related identifier that references the function. The assignment to `askQuestion` creates an inferred name of "askQuestion", but that's **not the same thing as being non-anonymous**:
+ES6 додав до мови додаткову форму вираження `function`, яка називається "стрілочні функції":
 
 ```js
 var askQuestion = () => {
-    // ..
+  // ..
 };
-
-askQuestion.name;   // askQuestion
 ```
 
-Arrow functions achieve their syntactic brevity at the expense of having to mentally juggle a bunch of variations for different forms/conditions. Just a few, for example:
+Для визначення стрілочної функції `=>` не потрібно слово `function`. Крім того, `(..)` навколо списку параметрів є необов'язковим у простих випадках. Подібним чином, "{..}" навколо тіла функції в деяких випадках є необов'язковим. І коли "{..}" пропущено, повертається значення без використання ключового слова "return".
+
+| ПРИМІТКА:                                                                                                                                                                                                                                                                                 |
+| ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Привабливість функцій стрілки `=>` часто підкуповує "коротшим синтаксисом", і це, як стверджується, прирівнюється до об'єктивно більш читабельного коду. Ця заява є сумнівною, і я вважаю, що вона є абсолютно помилковою. Ми розглянемо "читабельність" різних форм функцій у Додатку А. |
+
+Стрілочні функції є лексично анонімні, тобто вони не мають безпосередньо пов’язаного ідентифікатора, який посилається на функцію. Призначення `askQuestion` створює виведене ім'я" askQuestion ", але це **не те саме, що бути неанонімним**:
+
+```js
+var askQuestion = () => {
+  // ..
+};
+
+askQuestion.name; // askQuestion
+```
+
+Стрілочні функції досягають своєї синтаксичної стислості за рахунок необхідності подумки перебирати безліч варіацій для різних форм/умов. Ось декілька, для прикладу:
 
 ```js
 () => 42;
 
-id => id.toUpperCase();
+(id) => id.toUpperCase();
 
-(id,name) => ({ id, name });
+(id, name) => ({ id, name });
 
 (...args) => {
-    return args[args.length - 1];
+  return args[args.length - 1];
 };
 ```
 
-The real reason I bring up arrow functions is because of the common but incorrect claim that arrow functions somehow behave differently with respect to lexical scope from standard `function` functions.
+Справжньою причиною того, чому я використовую стрілочні функції, є загальне, але неправильне твердження, що функції стрілок якимось чином поводяться інакше щодо лексичної області видимості на противагу стандартним функціям `function`.
 
-This is incorrect.
+Це неправильно.
 
 Other than being anonymous (and having no declarative form), `=>` arrow functions have the same lexical scope rules as `function` functions do. An arrow function, with or without `{ .. }` around its body, still creates a separate, inner nested bucket of scope. Variable declarations inside this nested scope bucket behave the same as in a `function` scope.
 
-## Backing Out
+За винятком того, що є анонімними (і не властиві форми оголошення), стрілочні функції `=>` мають ті самі правила лексичної області видимості, що і функції `function`. Стрілочні функції з "{..}" навколо свого тіла або без неї все одно створюють окремий внутрішній вкладений сегмент області видимості. Оголошення змінних всередині цього сегмента вкладеної області видимості поводяться так само, як і в області видимості "функції".
 
-When a function (declaration or expression) is defined, a new scope is created. The positioning of scopes nested inside one another creates a natural scope hierarchy throughout the program, called the scope chain. The scope chain controls variable access, directionally oriented upward and outward.
+## Резервне копіювання
 
-Each new scope offers a clean slate, a space to hold its own set of variables. When a variable name is repeated at different levels of the scope chain, shadowing occurs, which prevents access to the outer variable from that point inward.
+Коли функція (оголошення або вираз) визначена, створюється нова область видимості. Позиціонування областей видимості, вкладених одна в одну, створює природну ієрархію областей видимості у всій програмі, що й називається ланцюжком області видимості. Ланцюжок області видимості контролює змінний доступ, орієнтований вгору та назовні.
 
-As we step back out from these finer details, the next chapter shifts focus to the primary scope all JS programs include: the global scope.
+Кожна нова область видимості пропонує чистий аркуш, простір для зберігання власного набору змінних. Коли ім'я змінної повторюється на різних рівнях ланцюжка області видимості, відбувається затінення, яка перешкоджає доступу до зовнішньої змінної з внутрішньої частини цієї точки.
+
+Відійшовши від цих деталізацій, наступний розділ зміщує фокус на основну область видимості, до якої входять усі програми JS: глобальна область видимості.
