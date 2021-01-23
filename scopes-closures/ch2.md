@@ -34,7 +34,7 @@ function getStudentName(studentID) {
   // область видимості функції: СИНІЙ
 
   for (let student of students) {
-    // видимості функції циклу: ЗЕЛЕНИЙ
+    // область видимості циклу: ЗЕЛЕНИЙ
 
     if (student.id == studentID) {
       return student.name;
