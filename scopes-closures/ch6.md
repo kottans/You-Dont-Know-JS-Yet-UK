@@ -1,43 +1,43 @@
-# You Don't Know JS Yet: Scope & Closures - 2nd Edition
-# Chapter 6: Limiting Scope Exposure
+# Серія "Ти поки що не знаєш JS". Області видимості та замикання - Друге видання
+# Глава 6: Обмеження доступу до області видимості
 
-So far our focus has been explaining the mechanics of how scopes and variables work. With that foundation now firmly in place, our attention raises to a higher level of thinking: decisions and patterns we apply across the whole program.
+Поки що ми зосереджувались на поясненні механіки роботи областей видимості та змінних. Тепер, коли цей фундамент міцно встановлений, наша увага підіймається на вищий рівень мислення: рішення та патерни, які ми застосовуємо у всій програмі.
 
-To begin, we're going to look at how and why we should be using different levels of scope (functions and blocks) to organize our program's variables, specifically to reduce scope over-exposure.
+Для початку ми розглянемо, як і чому ми повинні використовувати різні рівні областей видимості (функції та блоки) для організації змінних нашої програми, зокрема для зменшення надмірного вільного доступу.
 
-## Least Exposure
+## Мінімізація доступу
 
-It makes sense that functions define their own scopes. But why do we need blocks to create scopes as well?
+Те, що функції визначають власні області видимості, має сенс. Але з якої причини блоки також створюються власні області видимості?
 
-Software engineering articulates a fundamental discipline, typically applied to software security, called "The Principle of Least Privilege" (POLP). [^POLP] And a variation of this principle that applies to our current discussion is typically labeled as "Least Exposure" (POLE).
+Інженерія програмного забезпечення формулює фундаментальну дисципліну, яка зазвичай застосовується до забезпечення програмного забезпечення, і називається "Принцип найменших привілеїв" (POLP). [^POLP] І варіант цього принципу, який має відношення до нашої поточної дискусії, зазвичай позначається як "Найменший вплив"("Least Exposure", POLE).
 
-POLP expresses a defensive posture to software architecture: components of the system should be designed to function with least privilege, least access, least exposure. If each piece is connected with minimum-necessary capabilities, the overall system is stronger from a security standpoint, because a compromise or failure of one piece has a minimized impact on the rest of the system.
+POLP виражає підхід до архітектури програмного забезпечення, що виходить з позиції захисту: компоненти системи повинні бути спроєктовані так, щоб вони функціонували з найменшими привілеями, найменшим доступом та мінімальним впливом. Якщо кожен фрагмент пов'язаний з мінімально необхідними можливостями, загальна система є сильнішою з точки зору безпеки, оскільки порушення безпеки або відмова однієї частини має мінімізований вплив на решту системи.
 
-If POLP focuses on system-level component design, the POLE *Exposure* variant focuses on a lower level; we'll apply it to how scopes interact with each other.
+Якщо POLP зосереджується на дизайні компонентів на системному рівні, варіант POLE * Exposure * фокусується на нижчому рівні; ми застосуємо це до того, як сфери взаємодіють між собою.
 
-In following POLE, what do we want to minimize the exposure of? Simply: the variables registered in each scope.
+До чого ми хочемо мінімізувати доступ, дотримуючись POLE? Просто: до змінних, зареєстровані в кожній області видимості.
 
-Think of it this way: why shouldn't you just place all the variables of your program out in the global scope? That probably immediately feels like a bad idea, but it's worth considering why that is. When variables used by one part of the program are exposed to another part of the program, via scope, there are three main hazards that often arise:
+Подумайте про це так: чому б вам просто не розмістити всі змінні вашої програми в глобальній області видимості? Можливо, ви одразу вирішите, що це погана ідея, але варто подумати, чому це так. Коли змінні, що використовуються однією частиною програми, через область видимості підпадають під дію іншої частини програми, часто це може створити три основні погрози:
 
-* **Naming Collisions**: if you use a common and useful variable/function name in two different parts of the program, but the identifier comes from one shared scope (like the global scope), then name collision occurs, and it's very likely that bugs will occur as one part uses the variable/function in a way the other part doesn't expect.
+* **Колізія імен**: якщо ви використовуєте спільну та корисну назву змінної чи функції у двох різних частинах програми, але ідентифікатор походить з однієї спільної області видимості (наприклад, глобальної), то виникає колізія імен, і дуже ймовірно призведе до помилок, оскільки одна частина використовує змінну чи функцію так, як інша частина не очікує.
 
-    For example, imagine if all your loops used a single global `i` index variable, and then it happens that one loop in a function is running during an iteration of a loop from another function, and now the shared `i` variable gets an unexpected value.
+     Наприклад, уявіть, що всі ваші цикли використовують одну глобальну змінну індексу `i`. Тоді трапляється, що один цикл у функції виконується під час ітерації циклу з іншої функції, і тепер спільна змінна `i` отримує несподіване значення.
 
-* **Unexpected Behavior**: if you expose variables/functions whose usage is otherwise *private* to a piece of the program, it allows other developers to use them in ways you didn't intend, which can violate expected behavior and cause bugs.
+* **Несподівана поведінка**: якщо ви даєте доступ до змінної або функції, використання яких інакше є *приватним*, частині програми, це дозволяє іншим розробникам використовувати їх у спосіб, який ви не передбачали, що може порушити очікувану поведінку та спричинити помилки.
 
-    For example, if your part of the program assumes an array contains all numbers, but someone else's code accesses and modifies the array to include booleans and strings, your code may then misbehave in unexpected ways.
+    Наприклад, якщо ваша частина програми передбачає, що масив містить лише цифри, але чужий код отримує доступ і модифікує масив та додає логічні значення та рядки, ваш код після цього може демонструвати дуже несподівану поведінку.
 
-    Worse, exposure of *private* details invites those with mal-intent to try to work around limitations you have imposed, to do things with your part of the software that shouldn't be allowed.
+    Гірше того, викриття *приватних* деталей запрошує тих, хто має зловмисні наміри, спробувати обійти обмеження, які ви наклали, і зробити з вашою частиною програмного забезпечення те, що не можна дозволяти.
 
-* **Unintended Dependency**: if you expose variables/functions unnecessarily, it invites other developers to use and depend on those otherwise *private* pieces. While that doesn't break your program today, it creates a refactoring hazard in the future, because now you cannot as easily refactor that variable or function without potentially breaking other parts of the software that you don't control.
+* **Ненавмисна залежність**: якщо ви надаєте доступ до змінної чи функції без потреби, це запрошує інших розробників використовувати їх та покладатися на те, що в іншому випадку було б *приватним* знанням. Хоча це не порушує роботи вашої програми сьогодні, воно створює небезпеку для рефакторингу в майбутньому, оскільки тепер ви не можете так легко відрефакторити цю змінну або функцію та бути певним, що не порушите інші частини програмного забезпечення, якими ви не керуєте.
 
-    For example, if your code relies on an array of numbers, and you later decide it's better to use some other data structure instead of an array, you now must take on the liability of adjusting other affected parts of the software.
+    Наприклад, якщо ваш код покладається на масив чисел, і згодом ви вирішите, що краще використовувати іншу структуру даних замість масиву, тепер ви повинні взяти на себе відповідальність за коригування інших частин програмного забезпечення, на які вплине ця зміна.
 
-POLE, as applied to variable/function scoping, essentially says, default to exposing the bare minimum necessary, keeping everything else as private as possible. Declare variables in as small and deeply nested of scopes as possible, rather than placing everything in the global (or even outer function) scope.
+Принцип POLE, як застосовується до обсягу області видимості змінної чи функції, по суті, говорить, що за замовчуванням виставляється мінімальний необхідний обсяг, зберігаючи все інше якомога приватнішим. Оголошуйте змінні в якомога менших і глибоко вкладених областях видимості, а не розміщуючи все в глобальній чи навіть зовнішній функційній області.
 
-If you design your software accordingly, you have a much greater chance of avoiding (or at least minimizing) these three hazards.
+Якщо ви розробляєте своє програмне забезпечення відповідно, у вас є набагато більше шансів уникнути (або, принаймні, мінімізувати) ці три загрози.
 
-Consider:
+Розглянемо приклад:
 
 ```js
 function diff(x,y) {
@@ -54,21 +54,21 @@ diff(3,7);      // 4
 diff(7,5);      // 2
 ```
 
-In this `diff(..)` function, we want to ensure that `y` is greater than or equal to `x`, so that when we subtract (`y - x`), the result is `0` or larger. If `x` is initially larger (the result would be negative!), we swap `x` and `y` using a `tmp` variable, to keep the result positive.
+У цій функції `diff(..)` ми хочемо переконатися, що `y` більше або дорівнює `x`, так що коли ми віднімаємо (`y - x`), результат буде число `0` або більше. Якщо `x` спочатку більше (результат буде від'ємним!), Ми міняємо місцями `x` та `y`, використовуючи змінну `tmp`, щоб результат залишався позитивним.
 
-In this simple example, it doesn't seem to matter whether `tmp` is inside the `if` block or whether it belongs at the function level—it certainly shouldn't be a global variable! However, following the POLE principle, `tmp` should be as hidden in scope as possible. So we block scope `tmp` (using `let`) to the `if` block.
+У цьому простому прикладі, схоже, не має значення, чи `tmp` знаходиться всередині блоку `if`, чи належить знаходиться на рівні функції. Глобальною ця змінна, безумовно, не повинна! Однак, дотримуючись принципу POLE, `tmp` має бути якомога краще прихованою в області видимості. Отже, ми обмежуємо її блоковою областю видимості `if` за `let`.
 
-## Hiding in Plain (Function) Scope
+## Як сховати змінну у звичайній (функційній) області видимості
 
-It should now be clear why it's important to hide our variable and function declarations in the lowest (most deeply nested) scopes possible. But how do we do so?
+На цей момент має зрозуміло, чому важливо приховувати наші оголошення змінних та функцій у найнижчій (найбільш глибоко вкладеній) області видимості. Але як це зробити?
 
-We've already seen the `let` and `const` keywords, which are block scoped declarators; we'll come back to them in more detail shortly. But first, what about hiding `var` or `function` declarations in scopes? That can easily be done by wrapping a `function` scope around a declaration.
+Ми вже бачили ключові слова `let` і `const`, які є деклараторами блокового рівня; ми повернемось до них найближчим часом. Але спочатку, як щодо приховування оголошень `var` або `function` в областях видимості? Це можна легко зробити, огорнувши оголошення функційною областю видимості.
 
-Let's consider an example where `function` scoping can be useful.
+Розглянемо приклад, коли функційна область видимості може бути корисною.
 
-The mathematical operation "factorial" (notated as "6!") is the multiplication of a given integer against all successively lower integers down to `1`—actually, you can stop at `2` since multiplying `1` does nothing. In other words, "6!" is the same as "6 * 5!", which is the same as "6 * 5 * 4!", and so on. Because of the nature of the math involved, once any given integer's factorial (like "4!") has been calculated, we shouldn't need to do that work again, as it'll always be the same answer.
+Математична операція "факторіал" (позначена як "6!") - це множення певного цілого числа на всі послідовно менші цілі числа до `1`. Насправді ви можете зупинитися вже на `2`, оскільки множення `1` нічого не робить. Іншими словами, "6!" те саме, що "6 * 5!", що те саме, що "6 * 5 * 4!" тощо. Зважаючи на характер розрахунків, маючи факторіал будь-якого цілого числа (наприклад, "4!"), нам не потрібно рахувати його ще раз, оскільки відповідь завжди буде однаковою.
 
-So if you naively calculate factorial for `6`, then later want to calculate factorial for `7`, you might unnecessarily re-calculate the factorials of all the integers from 2 up to 6. If you're willing to trade memory for speed, you can solve that wasted computation by caching each integer's factorial as it's calculated:
+Отже, якщо ви обчислюєте факторіал для `6` з наївним підходом, то пізніше, коли захочете розрахувати факторіал для `7`, ви можете марно перерахувати факторіали всіх цілих чисел від 2 до 6. Якщо ви бажаєте обміняти пам'ять на швидкість, ви можете позбутися цього марного обчислення, кешуючи факторіал кожного цілого числа під час його обчислення:
 
 ```js
 var cache = {};
@@ -97,21 +97,21 @@ factorial(7);
 // 5040
 ```
 
-We're storing all the computed factorials in `cache` so that across multiple calls to `factorial(..)`, the previous computations remain. But the `cache` variable is pretty obviously a *private* detail of how `factorial(..)` works, not something that should be exposed in an outer scope—especially not the global scope.
+Ми зберігаємо всі обчислювані факторіали в `cache` так, щоб у кількох викликах `factorial(..)` залишаються попередні обчислення. Але змінна `cache` є цілком очевидно *приватною* деталлю того, як працює `factorial(..)`, а не чимось, що слід виставляти у зовнішній області видимості - особливо якщо йдеться про глобальну область.
 
-| NOTE: |
+| ПРИМІТКА: |
 | :--- |
-| `factorial(..)` here is recursive—a call to itself is made from inside—but that's just for brevity of code sake; a non-recursive implementation would yield the same scoping analysis with respect to `cache`. |
+| `factorial(..)` тут рекурсивний - функція сама себе викликає зсередини, - але це лише для стислості коду. Нерекурсивна реалізація дасть той самий аналіз областей видимості щодо змінної `cache`. |
 
-However, fixing this over-exposure issue is not as simple as hiding the `cache` variable inside `factorial(..)`, as it might seem. Since we need `cache` to survive multiple calls, it must be located in a scope outside that function. So what can we do?
+Однак щоб виправити цю проблему надмірної відкритості, недостатньо сховати змінну `cache` всередині `factorial(..)`. Оскільки змінна `cache` має лишатися між викликами функції, вона має знаходитися в області поза цією функцією. То що ми можемо зробити?
 
-Define another middle scope (between the outer/global scope and the inside of `factorial(..)`) for `cache` to be located:
+Визначте ще одну середню область (між зовнішньою чи глобальною областю видимості та внутрішньою частиною `factorial(..)`) для розміщення `cache`:
 
 ```js
-// outer/global scope
+// зовнішня або глобальна область видимості
 
 function hideTheCache() {
-    // "middle scope", where we hide `cache`
+    // "середня область видимості", де ми ховаємо `cache`
     var cache = {};
 
     return factorial;
@@ -119,7 +119,7 @@ function hideTheCache() {
     // **********************
 
     function factorial(x) {
-        // inner scope
+        // внутрішня область видимості
         if (x < 2) return 1;
         if (!(x in cache)) {
             cache[x] = x * factorial(x - 1);
@@ -137,15 +137,15 @@ factorial(7);
 // 5040
 ```
 
-The `hideTheCache()` function serves no other purpose than to create a scope for `cache` to persist in across multiple calls to `factorial(..)`. But for `factorial(..)` to have access to `cache`, we have to define `factorial(..)` inside that same scope. Then we return the function reference, as a value from `hideTheCache()`, and store it in an outer scope variable, also named `factorial`. Now as we call `factorial(..)` (multiple times!), its persistent `cache` stays hidden yet accessible only to `factorial(..)`!
+Функція `hideTheCache()` не має жодної іншої мети, як створити область видимості для `cache`, яка зберігатиметься під час декількох викликів до `factorial(..)`. Але для того, щоб `factorial(..)` мав доступ до `cache`, нам потрібно визначити `factorial(..)` всередині тієї самої області видимості. Потім ми повертаємо посилання на функцію як значення з `hideTheCache()` і зберігаємо його у зовнішній змінній області, також названій `factorial`. Тепер, коли ми називаємо `factorial(..)` (кілька разів!), Його постійний `cache` залишається прихованим, але доступним лише для `factorial(..)`!
 
-OK, but... it's going to be tedious to define (and name!) a `hideTheCache(..)` function scope each time such a need for variable/function hiding occurs, especially since we'll likely want to avoid name collisions with this function by giving each occurrence a unique name. Ugh.
+Гаразд, але... буде незручно визначати (і називати!) Область функції `hideTheCache(..)` кожного разу, коли виникає така потреба у приховуванні змінної / функції, тим більше, що ми, швидше за все, хочемо уникати колізії імен з цією функцією, надаючи кожному випадку унікальну назву. Тьфу.
 
-| NOTE: |
+| ПРИМІТКА: |
 | :--- |
-| The illustrated technique—caching a function's computed output to optimize performance when repeated calls of the same inputs are expected—is quite common in the Functional Programming (FP) world, canonically referred to as "memoization"; this caching relies on closure (see Chapter 7). Also, there are memory usage concerns (addressed in "A Word About Memory" in Appendix B). FP libraries will usually provide an optimized and vetted utility for memoization of functions, which would take the place of `hideTheCache(..)` here. Memoization is beyond the *scope* (pun intended!) of our discussion, but see my *Functional-Light JavaScript* book for more information. |
+| Показана техніка - кешування обчислюваного виводу функції для оптимізації продуктивності, коли очікуються повторні виклики з тими самими вхідними даними - досить поширена у світі функційного програмування (FP), що може канонічно називатися "мемоізацією"; це кешування ґрунтується на замиканнях (див. розділ 7). Крім того, існують проблеми з використанням пам'яті (розглянуті в розділі "Кілька слів про пам'ять" у Додатку Б). Бібліотеки FP зазвичай пропонують оптимізовану та перевірену утиліту для мемоізації функцій, яка тут замінить `hideTheCache(..)`. Мемоізація виходить за рамки нашого обговорення, але для отримання додаткової інформації дивіться мою книгу *Функційний легкий JavaScript*(Functional-Light JavaScript). |
 
-Rather than defining a new and uniquely named function each time one of those scope-only-for-the-purpose-of-hiding-a-variable situations occurs, a perhaps better solution is to use a function expression:
+Замість того, щоб визначати щоразу нову функцію з унікальним ім'ям, коли виникає одна з тих ситуацій, що стосуються лише області видимості приховування змінної, можливо кращим рішенням є використання функційного виразу:
 
 ```js
 var factorial = (function hideTheCache() {
@@ -169,72 +169,72 @@ factorial(7);
 // 5040
 ```
 
-Wait! This is still using a function to create the scope for hiding `cache`, and in this case, the function is still named `hideTheCache`, so how does that solve anything?
+Зачекайте! Це все ще використовує функцію для створення області для приховування `cache`, і в цьому випадку функція все ще називається `hideTheCache`, то як це може щось вирішити?
 
-Recall from "Function Name Scope" (in Chapter 3), what happens to the name identifier from a `function` expression. Since `hideTheCache(..)` is defined as a `function` expression instead of a `function` declaration, its name is in its own scope—essentially the same scope as `cache`—rather than in the outer/global scope.
+Згадайте з "Функційна область видимості імен" (у розділі 3), що відбувається з ідентифікатором імені з виразу `function`. Оскільки `hideTheCache(..)` визначається як  функційний вираз замість оголошення функцій, його ім'я знаходиться у власній області видимості - по суті, тій самій області, що і `cache`, а не у зовнішній чи глобальній області.
 
-That means we can name every single occurrence of such a function expression the exact same name, and never have any collision. More appropriately, we can name each occurrence semantically based on whatever it is we're trying to hide, and not worry that whatever name we choose is going to collide with any other `function` expression scope in the program.
+Це означає, що ми можемо присвоювати кожному окремому випадку такого виразу функції однакові імена і ніколи не мати колізій. Проте краще називати кожне входження семантично, виходячи з того, що саме ми намагаємось приховати, і не хвилюватися, що будь-яке вибране нами ім’я співпаде з будь-якою іншою областю видимості функційного виразу.
 
-In fact, we *could* just leave off the name entirely—thus defining an "anonymous `function` expression" instead. But Appendix A will discuss the importance of names even for such scope-only functions.
+Насправді ми *могли* просто залишити це ім'я - таким чином, замість цього визначивши "анонімний функційний вираз". Але Додаток А обговорить важливість імен навіть для таких функцій, що існує лише заради створення області видимості.
 
-### Invoking Function Expressions Immediately
+### Негайний виклик функційного виразу
 
-There's another important bit in the previous factorial recursive program that's easy to miss: the line at the end of the `function` expression that contains `})();`.
+У попередній рекурсивній програмі для обрахунку факторіалу є ще один важливий нюанс, який легко пропустити: рядок у кінці функційного виразу, що містить`})();`.
 
-Notice that we surrounded the entire `function` expression in a set of `( .. )`, and then on the end, we added that second `()` parentheses set; that's actually calling the `function` expression we just defined. Moreover, in this case, the first set of surrounding `( .. )` around the function expression is not strictly necessary (more on that in a moment), but we used them for readability sake anyway.
+Зверніть увагу, що ми оточили весь функційний вираз круглими дужками `(..)`, а потім, наприкінці, ми додали другий набір дужок `()`; це виклик функційного виразу, який ми щойно визначили. Щобільше, у цьому випадку перший набір дужок `(..)` навколо функційного виразу не є суворо необхідним (про це трохи пізніше), але ми все одно додали їх для простоти читання.
 
-So, in other words, we're defining a `function` expression that's then immediately invoked. This common pattern has a (very creative!) name: Immediately Invoked Function Expression (IIFE).
+Отже, іншими словами, ми визначаємо функційний вираз, який одразу викликається. Цей загальний шаблон має (дуже креативне!) назву: функційний вираз, що викликається негайно (Immediately Invoked Function Expression, IIFE).
 
-An IIFE is useful when we want to create a scope to hide variables/functions. Since it's an expression, it can be used in **any** place in a JS program where an expression is allowed. An IIFE can be named, as with `hideTheCache()`, or (much more commonly!) unnamed/anonymous. And it can be standalone or, as before, part of another statement—`hideTheCache()` returns the `factorial()` function reference which is then `=` assigned to the variable `factorial`.
+IIFE корисний, коли ми хочемо створити область видимості для приховування змінних чи функцій. Оскільки це вираз, його можна використовувати в **будь-якому** місці JS-програми, де може бути вираз. IIFE може бути іменованим, як з `hideTheCache ()`, або (набагато частіше!) нейменованим, тобто анонімним. І він може бути автономним або, як і раніше, частиною іншого оператора - `hideTheCache()` повертає посилання на функцію `factorial()`, яке потім призначається за допомогою оператора `=` змінній `factorial`.
 
-For comparison, here's an example of a standalone IIFE:
+Для порівняння, ось приклад автономного IIFE:
 
 ```js
-// outer scope
+// зовнішня область видимості
 
 (function(){
-    // inner hidden scope
+    // прихована внутрішня область видимості
 })();
 
-// more outer scope
+// зовнішня область видимості продовжується
 ```
 
-Unlike earlier with `hideTheCache()`, where the outer surrounding `(..)` were noted as being an optional stylistic choice, for a standalone IIFE they're **required**; they distinguish the `function` as an expression, not a statement. For consistency, however, always surround an IIFE `function` with `( .. )`.
+На відміну від `hideTheCache()`, яку ми бачили раніше, де зовнішні дужки `(..)` було зазначено як необов’язковий стилістичний вибір, для автономного IIFE вони **необхідні**; вони розрізняють функцію вираз від інструкції. Однак для послідовності завжди оточуйте IIFE символом `(..)`.
 
-| NOTE: |
+| ПРИМІТКА: |
 | :--- |
-| Technically, the surrounding `( .. )` aren't the only syntactic way to ensure the `function` in an IIFE is treated by the JS parser as a function expression. We'll look at some other options in Appendix A. |
+| Технічно дужки `(..)` не є єдиним синтаксичним способом забезпечити, щоб функція в IIFE оброблялася парсером JS як функційний вираз. Ми розглянемо деякі інші варіанти в Додатку А. |
 
-#### Function Boundaries
+#### Межі функцій
 
-Beware that using an IIFE to define a scope can have some unintended consequences, depending on the code around it. Because an IIFE is a full function, the function boundary alters the behavior of certain statements/constructs.
+Пам'ятайте, що використання IIFE для визначення області видимості може мати деякі ненавмисні наслідки, залежно від коду навколо нього. Оскільки IIFE є повноцінною функцією, межі функції змінюють поведінку певних операторів та конструкцій.
 
-For example, a `return` statement in some piece of code would change its meaning if an IIFE is wrapped around it, because now the `return` would refer to the IIFE's function. Non-arrow function IIFEs also change the binding of a `this` keyword—more on that in the *Objects & Classes* book. And statements like `break` and `continue` won't operate across an IIFE function boundary to control an outer loop or block.
+Наприклад, оператор `return` у якомусь фрагменті коду змінює своє значення, якщо навколо нього з'являється IIFE, оскільки тепер `return` буде посилатися на функцію IIFE. Функції IIFE, що не є стрілковими, також змінюють прив’язку ключового слова `this` - про це докладніше в книзі *Об'єкти та класи*. І такі оператори, як `break` та `continue`, не працюватимуть через межі функції IIFE для управління зовнішнім циклом або блоком.
 
-So, if the code you need to wrap a scope around has `return`, `this`, `break`, or `continue` in it, an IIFE is probably not the best approach. In that case, you might look to create the scope with a block instead of a function.
+Отже, якщо код, який вам потрібно обернути область, містить `return`, `this`, `break`, або `return`, `this`, `break`, IIFE, мабуть, не найкращий підхід. У цьому випадку ви можете спробувати виокремити область видимості за допомогою блоку.
 
-## Scoping with Blocks
+## Виокремлення області видимості за допомогою блоків
 
-You should by this point feel fairly comfortable with the merits of creating scopes to limit identifier exposure.
+До цього моменту ви повинні відчувати себе досить комфортно з перевагами створення областей  видимості для обмеження доступу до ідентифікаторів.
 
-So far, we looked at doing this via `function` (i.e., IIFE) scope. But let's now consider using `let` declarations with nested blocks. In general, any `{ .. }` curly-brace pair which is a statement will act as a block, but **not necessarily** as a scope.
+Поки що ми розглядали можливість робити це за допомогою функційної області видимості (тобто, IIFE). Але давайте тепер розглянемо використання оголошень з `let` із вкладеними блоками. Загалом, будь-яка пара фігурних дужок `{ .. }`, яка є інструкцією, буде діяти як блок, проте **не обов'язково** як область видимості.
 
-A block only becomes a scope if necessary, to contain its block-scoped declarations (i.e., `let` or `const`). Consider:
+Блок стає областю дії лише тоді, коли це необхідно, щоб містити його декларації блокової області видимості (тобто `let` або `const`). Розглянемо:
 
 ```js
 {
-    // not necessarily a scope (yet)
+    // не обов'язково область видимості (пока що)
 
     // ..
 
-    // now we know the block needs to be a scope
+    // тепер вже зрозуміло, що блок має створити область видимості
     let thisIsNowAScope = true;
 
     for (let i = 0; i < 5; i++) {
-        // this is also a scope, activated each
-        // iteration
+        // це також область видимості, що активується
+        // ітерацією
         if (i % 2 == 0) {
-            // this is just a block, not a scope
+            // це просто блок, що не створює область видимості
             console.log(i);
         }
     }
@@ -242,33 +242,32 @@ A block only becomes a scope if necessary, to contain its block-scoped declarati
 // 0 2 4
 ```
 
-Not all `{ .. }` curly-brace pairs create blocks (and thus are eligible to become scopes):
+Не всі пари фігурних дужок `{ .. }` створюють блоки (і, отже, можуть створити області видимості):
 
-* Object literals use `{ .. }` curly-brace pairs to delimit their key-value lists, but such object values are **not** scopes.
+* Літерали об'єктів використовують фігурні дужки `{ .. }`, щоб розмежувати списки ключ-значення, але такі значення об’єктів є **не** областями видимості.
 
-* `class` uses `{ .. }` curly-braces around its body definition, but this is not a block or scope.
+* `class` використовує фігурні дужки `{ .. }` навколо визначення тіла класу, але це не блок чи область видимості.
 
-* A `function` uses `{ .. } ` around its body, but this is not technically a block—it's a single statement for the function body. It *is*, however, a (function) scope.
+* Функції використовують фігурні дужки `{ .. }` навколо свого тіла, але технічно це не блок - це тіло функції, що складається з однієї інструкції. Проте, це функційна область видимості.
 
-* The `{ .. }` curly-brace pair on a `switch` statement (around the set of `case` clauses) does not define a block/scope.
+* Пара фігурних дужок `{..}` після оператора `switch` (навколо набору інструкцій `case`) не визначає блок / область видимості.
 
-Other than such non-block examples, a `{ .. }` curly-brace pair can define a block attached to a statement (like an `if` or `for`), or stand alone by itself—see the outermost `{ .. }` curly brace pair in the previous snippet. An explicit block of this sort—if it has no declarations, it's not actually a scope—serves no operational purpose, though it can still be useful as a semantic signal.
+За винятком таких позаблокових прикладів, пара фігурних дужок `{ .. }` може визначити блок, приєднаний до інструкції (наприклад, "якщо" або "для"), або самостійно - див. ..} `фігурні дужки в попередньому фрагменті. Явний блок такого роду - якщо він не має оголошень, він насправді не є сферою дії - не служить жодній оперативній меті, хоча все ще може бути корисним як семантичний сигнал.
 
-Explicit standalone `{ .. }` blocks have always been valid JS syntax, but since they couldn't be a scope prior to ES6's `let`/`const`, they are quite rare. However, post ES6, they're starting to catch on a little bit.
+Явні автономні блоки `{ .. }` завжди були валідним синтаксисом JS, але оскільки вони не могли створювати область видимості до появи `let` та `const` в ES6, вони досить рідкісні. Однак після ES6 вони починають з'являтись частіше.
 
-In most languages that support block scoping, an explicit block scope is an extremely common pattern for creating a narrow slice of scope for one or a few variables. So following the POLE principle, we should embrace this pattern more widespread in JS as well; use (explicit) block scoping to narrow the exposure of identifiers to the minimum practical.
+У більшості мов, що підтримують блокову область видимості, явна блокова область видимості є надзвичайно поширеним шаблоном для створення вузької області видимості для однієї або кількох змінних. Тож, дотримуючись принципу POLE, ми повинні прийняти цей шаблон та зробити більш поширеною в JS; використовувати (явний) блокову область видимості, щоб звузити вплив ідентифікаторів до мінімально можливого.
 
-An explicit block scope can be useful even inside of another block (whether the outer block is a scope or not).
+Явні блокові області видимості можуть бути корисні навіть усередині іншого блоку (незалежно від того, чи є зовнішній блок областю видимості чи ні).
 
-For example:
+Наприклад:
 
 ```js
 if (somethingHappened) {
-    // this is a block, but not a scope
+    // це блок, проте не область видимості
 
     {
-        // this is both a block and an
-        // explicit scope
+        // це і блок, і явна область видимості
         let msg = somethingHappened.message();
         notifyOthers(msg);
     }
@@ -279,15 +278,15 @@ if (somethingHappened) {
 }
 ```
 
-Here, the `{ .. }` curly-brace pair **inside** the `if` statement is an even smaller inner explicit block scope for `msg`, since that variable is not needed for the entire `if` block. Most developers would just block-scope `msg` to the `if` block and move on. And to be fair, when there's only a few lines to consider, it's a toss-up judgement call. But as code grows, these over-exposure issues become more pronounced.
+У цьому коді пара фігурних дужок `{ .. }`  **всередині** `if` створює ще меншу внутрішню блокову область видимості для `msg`, оскільки ця змінна не потрібна для всього блоку `if`. Більшість розробників просто обмежать `msg` блоковою областю видимості, що створена `if`, і підуть далі. І заради справедливості, коли є лише кілька рядків, які слід брати до уваги, це суворий виклик. Але в міру зростання коду ці проблеми з надмірним доступом стають все більш вираженими.
 
-So does it matter enough to add the extra `{ .. }` pair and indentation level? I think you should follow POLE and always (within reason!) define the smallest block for each variable. So I recommend using the extra explicit block scope as shown.
+Тож чи має значення додавання зайвої пари `{ .. }` та додаткового рівня відступу? Я думаю, вам слід слідувати POLE і завжди (в межах розумного!) визначати найменший блок для кожної змінної. Тому я рекомендую використовувати додаткову явну блокову область видимості, як показано.
 
-Recall the discussion of TDZ errors from "Uninitialized Variables (TDZ)" (Chapter 5). My suggestion there was: to minimize the risk of TDZ errors with `let`/`const` declarations, always put those declarations at the top of their scope.
+Згадайте обговорення помилок TDZ із розділу "Неініціалізовані змінні (TDZ)" (Глава 5). Там я запропонував таке: щоб мінімізувати ризик помилок TDZ за допомогою декларацій `let` та `const`, завжди розміщуйте ці декларації на початку відповідної області видимості.
 
-If you find yourself placing a `let` declaration in the middle of a scope, first think, "Oh, no! TDZ alert!" If this `let` declaration isn't needed in the first half of that block, you should use an inner explicit block scope to further narrow its exposure!
+Якщо ви помітили, що розміщуєте декларацію `let` в середині області видимості, спочатку подумайте: "О, ні! Небезпека TDZ!" Якщо ця декларація `let` не потрібна в першій половині цього блоку, вам слід використовувати внутрішню явну блокову область видимості, щоб ще більше звузити доступ до змінної!
 
-Another example with an explicit block scope:
+Інший приклад з явною блоковою областю видимості:
 
 ```js
 function getNextMonthStart(dateStr) {
@@ -312,19 +311,19 @@ function getNextMonthStart(dateStr) {
 getNextMonthStart("2019-12-25");   // 2020-01-01
 ```
 
-Let's first identify the scopes and their identifiers:
+Спершу визначимо області видимості та ідентифікатори, що до них належать:
 
-1. The outer/global scope has one identifier, the function `getNextMonthStart(..)`.
+1. Зовнішня або глобальна область має один ідентифікатор, функцію `getNextMonthStart(..)`.
 
-2. The function scope for `getNextMonthStart(..)` has three: `dateStr` (parameter), `nextMonth`, and `year`.
+2. Функційна область видимості `getNextMonthStart(..)` містить три: `dateStr`(параметр функції), `nextMonth` і `year`.
 
-3. The `{ .. }` curly-brace pair defines an inner block scope that includes one variable: `curMonth`.
+3. Пара фігурних дужок `{ .. }` визначає внутрішню блокову область видимості, що містить єдину змінну: `curMonth`.
 
-So why put `curMonth` in an explicit block scope instead of just alongside `nextMonth` and `year` in the top-level function scope? Because `curMonth` is only needed for those first two statements; at the function scope level it's over-exposed.
+То навіщо ставити `curMonth` у явну блокову область видимості, а не лишити разом з `nextMonth` та `year` у функційній області верхнього рівня? Оскільки `curMonth` потрібна лише для перших двох інструкцій; доступ до неї з функційної області видимості не виправданий.
 
-This example is small, so the hazards of over-exposing `curMonth` are pretty limited. But the benefits of the POLE principle are best achieved when you adopt the mindset of minimizing scope exposure by default, as a habit. If you follow the principle consistently even in the small cases, it will serve you more as your programs grow.
+Цей приклад невеликий, тому небезпека надмірного викриття `curMonth` досить обмежена. Але переваги принципу POLE найкраще помітні, коли мінімізація доступу стане вашою звичкою. Якщо ви послідовно дотримуватиметеся цього принципу навіть у незначних випадках, він буде служити вам більше у міру зростання ваших програм.
 
-Let's now look at an even more substantial example:
+Розглянемо ще більш вагомий приклад:
 
 ```js
 function sortNamesByLength(names) {
@@ -337,17 +336,17 @@ function sortNamesByLength(names) {
         buckets[firstName.length].push(firstName);
     }
 
-    // a block to narrow the scope
+    // блок для обмеження області видимості
     {
         let sortedNames = [];
 
         for (let bucket of buckets) {
             if (bucket) {
-                // sort each bucket alphanumerically
+                // відсортуємо кожне відерце у буквено-цифровому порядку
                 bucket.sort();
 
-                // append the sorted names to our
-                // running list
+                // додамо відсортовані імена до
+                // списку
                 sortedNames = [
                     ...sortedNames,
                     ...bucket
@@ -371,28 +370,28 @@ sortNamesByLength([
 //   "Scott", "Jennifer" ]
 ```
 
-There are six identifiers declared across five different scopes. Could all of these variables have existed in the single outer/global scope? Technically, yes, since they're all uniquely named and thus have no name collisions. But this would be really poor code organization, and would likely lead to both confusion and future bugs.
+Існує шість ідентифікаторів, оголошених у п’яти різних областях видимості. Чи всі ці змінні могли існувати в єдиній зовнішній чи глобальній області видимості? Теоретично могли, оскільки всі вони мають унікальні імена і, отже, не спричинять колізію. Та насправді це була б погана організація коду, і, ймовірно, це призвело б до плутанини та майбутніх помилок.
 
-We split them out into each inner nested scope as appropriate. Each variable is defined at the innermost scope possible for the program to operate as desired.
+Ми розподіляємо їх на кожну внутрішню вкладену область видимості, за необхідністю. Кожна змінна визначається в якнайглибшій області видимості, щоб програма могла працювати так, як ми хочемо.
 
-`sortedNames` could have been defined in the top-level function scope, but it's only needed for the second half of this function. To avoid over-exposing that variable in a higher level scope, we again follow POLE and block-scope it in the inner explicit block scope.
+`sortedNames` можна було б визначити в функційній області видимості верхнього рівня, але це потрібно лише для другої половини цієї функції. Щоб уникнути надмірного доступу до цієї змінної з області вищого рівня, ми знову дотримуємося POLE і блокуємо її у внутрішній явній блоковій області видимості.
 
-### `var` *and* `let`
+### `var` * і *` let`
 
-Next, let's talk about the declaration `var buckets`. That variable is used across the entire function (except the final `return` statement). Any variable that is needed across all (or even most) of a function should be declared so that such usage is obvious.
+Далі поговоримо про декларацію `var buckets`. Ця змінна використовується у всій функції (за винятком остаточної інструкції `return`). Будь-яка змінна, яка потрібна для всієї функції (або більшої її частини), повинна бути оголошена так, щоб таке використання було очевидним.
 
-| NOTE: |
+| ПРИМІТКА: |
 | :--- |
-| The parameter `names` isn't used across the whole function, but there's no way limit the scope of a parameter, so it behaves as a function-wide declaration regardless. |
+| Параметр `names` не використовується у всій функції, але можливості обмеження області видимості параметра не існує, тому він поводиться як декларація на рівні функції. |
 
-So why did we use `var` instead of `let` to declare the `buckets` variable? There's both semantic and technical reasons to choose `var` here.
+То чому ми використали `var` замість `let`, для оголошення `buckets`? На те існують як семантичні, так і технічні причини.
 
-Stylistically, `var` has always, from the earliest days of JS, signaled "variable that belongs to a whole function." As we asserted in "Lexical Scope" (Chapter 1), `var` attaches to the nearest enclosing function scope, no matter where it appears. That's true even if `var` appears inside a block:
+З точки зору стилю, `var` завжди, з перших днів JS, сигналізував про "змінну, яка належить до усієї функції". Як ми стверджували в розділі "Лексична область видимості" (Глава 1), `var` приєднується до найближчої навколишньої функції, незалежно від того, де саме з'являється змінна. Це вірно, навіть якщо `var` з'являється всередині блоку:
 
 ```js
 function diff(x,y) {
     if (x > y) {
-        var tmp = x;    // `tmp` is function-scoped
+        var tmp = x;    // `tmp` має функційну область видимості
         x = y;
         y = tmp;
     }
@@ -401,31 +400,31 @@ function diff(x,y) {
 }
 ```
 
-Even though `var` is inside a block, its declaration is function-scoped (to `diff(..)`), not block-scoped.
+Навіть попри те, що `var` знаходиться всередині блоку, вона оголошена на рівні функції (до `diff (..)`), а не блоку.
 
-While you can declare `var` inside a block (and still have it be function-scoped), I would recommend against this approach except in a few specific cases (discussed in Appendix A). Otherwise, `var` should be reserved for use in the top-level scope of a function.
+Хоча ви можете оголосити `var` всередині блоку (і при цьому надати їй функційну область видимості), я не рекомендую вам цей підхід, за винятком кількох конкретних випадків (обговорених у Додатку А). В іншому випадку, `var` слід зарезервувати для використання на верхньому рівні в функційних областях видимості.
 
-Why not just use `let` in that same location? Because `var` is visually distinct from `let` and therefore signals clearly, "this variable is function-scoped." Using `let` in the top-level scope, especially if not in the first few lines of a function, and when all the other declarations in blocks use `let`, does not visually draw attention to the difference with the function-scoped declaration.
+Чому б натомість не використовувати `let` на тому самому місці? Оскільки `var` візуально відрізняється від `let` і тому наочно сигналізує: "ця змінна має функційну область видимості". Використання `let` в області видимості верхнього рівня, особливо, якщо не в перших кількох рядках функції, і коли всі інші оголошення в блоках використовують `let`, візуально не звертає уваги на різницю з оголошенням із функційною областю видимості.
 
-In other words, I feel `var` better communicates function-scoped than `let` does, and `let` both communicates (and achieves!) block-scoping where `var` is insufficient. As long as your programs are going to need both function-scoped and block-scoped variables, the most sensible and readable approach is to use both `var` *and* `let` together, each for their own best purpose.
+Іншими словами, я відчуваю, що `var` краще повідомляю про функційну область видимості, ніж` let`, і `let` одночасно повідомляє (і забезпечує!) блокову область видимості там, де `var` недостатній. Поки вашим програмам будуть потрібні як функційні, так і блокові змінні, найбільш розумним і зручнішим для читання підходом є використання як `var`, *так і* `let` разом, але для різних цілей.
 
-There are other semantic and operational reasons to choose `var` or `let` in different scenarios. We'll explore the case for `var` *and* `let` in more detail in Appendix A.
+Існують інші семантичні та операційні причини вибору `var` або `let` в різних сценаріях. Ми розглянемо обставини для `var` *та* `let` більш детально в Додатку А.
 
-| WARNING: |
+| ПОПЕРЕДЖЕННЯ: |
 | :--- |
-| My recommendation to use both `var` *and* `let` is clearly controversial and contradicts the majority. It's far more common to hear assertions like, "var is broken, let fixes it" and, "never use var, let is the replacement." Those opinions are valid, but they're merely opinions, just like mine. `var` is not factually broken or deprecated; it has worked since early JS and it will continue to work as long as JS is around. |
+| Моя рекомендація використовувати як `var` *, так і* `let` явно неоднозначна і суперечить думці більшості. Набагато частіше можна почути твердження на кшталт: "з var самі проблеми, які let виправляє" і, "ніколи не використовуй var, заміняй на let". Ці думки справедливі, але це просто думки, як і моя. `var` фактично не зламаний або не застаріло; він працював з самого початку JS, і він буде продовжувати працювати, поки JS існує. |
 
-### Where To `let`?
+### Коли обирати `let`?
 
-My advice to reserve `var` for (mostly) only a top-level function scope means that most other declarations should use `let`. But you may still be wondering how to decide where each declaration in your program belongs?
+Моя порада лишити `var` для (переважно) лише функційної області видимості верхнього рівня означає, що в більшості інших оголошень слід використовувати `let`. Але ви все ще можете поставити собі питання, як вирішити, куди належить кожна декларація у вашій програмі?
 
-POLE already guides you on those decisions, but let's make sure we explicitly state it. The way to decide is not based on which keyword you want to use. The way to decide is to ask, "What is the most minimal scope exposure that's sufficient for this variable?"
+POLE вже направляє вас до цих рішень, але давайте переконаймося, що чітко визначили правила. Спосіб прийняття рішення не залежить від того, яке ключове слово ви хочете використовувати. Спосіб вирішити - запитати себе: "Який найменший доступ буде достатнім для цієї змінної?"
 
-Once that is answered, you'll know if a variable belongs in a block scope or the function scope. If you decide initially that a variable should be block-scoped, and later realize it needs to be elevated to be function-scoped, then that dictates a change not only in the location of that variable's declaration, but also the declarator keyword used. The decision-making process really should proceed like that.
+Отримавши відповідь, ви дізнаєтесь, чи змінна належить до області видимості блоку або функцій. Якщо спочатку ви вирішили, що змінну слід обмежити блоком, а пізніше зрозумієте, що її потрібно підняти вище, у функцію, то це диктує зміну не лише розташування декларації цієї змінної, але й ключового слова декларатора, яке використовується. Процес прийняття рішень насправді повинен проходити так.
 
-If a declaration belongs in a block scope, use `let`. If it belongs in the function scope, use `var` (again, just my opinion).
+Якщо оголошення належить до блокової області видимості, використовуйте `let`. Якщо воно належить до області видимості всієї функції, використовуйте `var` (знову ж таки, це лише моя думка).
 
-But another way to sort of visualize this decision making is to consider the pre-ES6 version of a program. For example, let's recall `diff(..)` from earlier:
+Але іншим способом візуалізації цього рішення є розгляд версії програми до ES6. Наприклад, згадаймо `diff(..)` з минулого розділу:
 
 ```js
 function diff(x,y) {
@@ -441,16 +440,16 @@ function diff(x,y) {
 }
 ```
 
-In this version of `diff(..)`, `tmp` is clearly declared in the function scope. Is that appropriate for `tmp`? I would argue, no. `tmp` is only needed for those few statements. It's not needed for the `return` statement. It should therefore be block-scoped.
+У цій версії `diff(..)` змінну `tmp` очевидно оголошено у функційній області видимості. Це підходить для `tmp`? Я вважаю, що ні. `tmp` потрібна лише для тих кількох інструкцій. Для `return` вона не потрібна. Отже, слід обмежити її блоковою областю видимості.
 
-Prior to ES6, we didn't have `let` so we couldn't *actually* block-scope it. But we could do the next-best thing in signaling our intent:
+До ES6 у нас не було `let`, тому ми не могли *насправді* обмежити змінну блоком. Але ми могли б зробити наступну найкращу річ, щоб повідомити про свій намір:
 
 ```js
 function diff(x,y) {
     if (x > y) {
-        // `tmp` is still function-scoped, but
-        // the placement here semantically
-        // signals block-scoping
+        // `tmp` досі має функційну область видимості
+        // проте її розміщення семантично
+        // повідомляє про блокову область видимості
         var tmp = x;
         x = y;
         y = tmp;
@@ -460,27 +459,27 @@ function diff(x,y) {
 }
 ```
 
-Placing the `var` declaration for `tmp` inside the `if` statement signals to the reader of the code that `tmp` belongs to that block. Even though JS doesn't enforce that scoping, the semantic signal still has benefit for the reader of your code.
+Розміщення декларації змінної `tmp` з ключовим словом `var` для  всередині `if` сигналізує читачеві коду, що `tmp` належить до цього блоку. Попри те, що JS не забезпечую блокову область видимості у цьому випадку, семантичний сигнал все одно має користь для читача вашого коду.
 
-Following this perspective, you can find any `var` that's inside a block of this sort and switch it to `let` to enforce the semantic signal already being sent. That's proper usage of `let` in my opinion.
+Виходячи з такої точки зору, ви можете знайти будь-який `var`, що знаходиться всередині блоку такого роду, і змінити його на `let`, щоб посилити семантичний сигнал, який вже надсилається. На мою думку, це правильне використання `let`.
 
-Another example that was historically based on `var` but which should now pretty much always use `let` is the `for` loop:
+Іншим прикладом коду, який історично використовував `var`, але який тепер майже завжди повинен обирати натомість `let`, є цикл `for`:
 
 ```js
 for (var i = 0; i < 5; i++) {
-    // do something
+    // виконати якісь дії
 }
 ```
 
-No matter where such a loop is defined, the `i` should basically always be used only inside the loop, in which case POLE dictates it should be declared with `let` instead of `var`:
+Незалежно від того, де такий цикл визначений, `i` завжди повинен використовуватися тільки всередині циклу, і в цьому випадку принцип POLE диктує, що його слід оголосити з `let`, а не `var`:
 
 ```js
 for (let i = 0; i < 5; i++) {
-    // do something
+    // виконати якісь дії
 }
 ```
 
-Almost the only case where switching a `var` to a `let` in this way would "break" your code is if you were relying on accessing the loop's iterator (`i`) outside/after the loop, such as:
+Майже єдиний випадок, коли заміна `var` на` let` таким чином "зламає" ваш код, це якщо ви покладаєтесь на доступ до ітератора циклу (`i`) поза циклу чи після нього, наприклад:
 
 ```js
 for (var i = 0; i < 5; i++) {
@@ -494,7 +493,7 @@ if (i < 5) {
 }
 ```
 
-This usage pattern is not terribly uncommon, but most feel it smells like poor code structure. A preferable approach is to use another outer-scoped variable for that purpose:
+Цей спосіб використання не є надзвичайно рідкісним, але більшість відчуває, що це схоже на погану структуру коду. Кращим підходом є використання для цього іншої змінної з зовнішньої області видимості:
 
 ```js
 var lastI;
@@ -511,13 +510,13 @@ if (lastI < 5) {
 }
 ```
 
-`lastI` is needed across this whole scope, so it's declared with `var`. `i` is only needed in (each) loop iteration, so it's declared with `let`.
+`lastI` потрібен у всій цій області видимості, тому він оголошений з `var`. `i` потрібне лише у кожній окремій ітерації циклу, тому воно оголошується з `let`.
 
-### What's the Catch?
+### catch: особливий випадок
 
-So far we've asserted that `var` and parameters are function-scoped, and `let`/`const` signal block-scoped declarations. There's one little exception to call out: the `catch` clause.
+Наразі ми стверджували, що `var` та параметри мають функційну область видимості, а `let` та `const` сигналізують про блокові декларації. Є один невеликий виняток, який слід назвати: інструкція `catch`.
 
-Since the introduction of `try..catch` back in ES3 (in 1999), the `catch` clause has used an additional (little-known) block-scoping declaration capability:
+З моменту введення `try..catch` в ES3 (у 1999 р.), `catch` використовував додаткову та маловідому)можливість декларування блокової області видимості:
 
 ```js
 try {
@@ -526,7 +525,7 @@ try {
 catch (err) {
     console.log(err);
     // ReferenceError: 'doesntExist' is not defined
-    // ^^^^ message printed from the caught exception
+    // ^^^^ повідомлення помилки, яку впіймав catch
 
     let onlyHere = true;
     var outerVariable = true;
@@ -536,33 +535,33 @@ console.log(outerVariable);     // true
 
 console.log(err);
 // ReferenceError: 'err' is not defined
-// ^^^^ this is another thrown (uncaught) exception
+// ^^^^ це інша помилка, яку не було впіймано
 ```
 
-The `err` variable declared by the `catch` clause is block-scoped to that block. This `catch` clause block can hold other block-scoped declarations via `let`. But a `var` declaration inside this block still attaches to the outer function/global scope.
+Змінна `err`, оголошена `catch`, обмежена цим блоком. Блок, створений `catch`, може містити інші декларації з блоковою областю видимості, оголошені через `let`. Але декларація `var` всередині цього блоку все одно приєднується до зовнішньої функційної або глобальної області.
 
-ES2019 (recently, at the time of writing) changed `catch` clauses so their declaration is optional; if the declaration is omitted, the `catch` block is no longer (by default) a scope; it's still a block, though!
+ES2019 (незадовго до написання цього розділу) змінив `catch` таким чином, що оголошення є необов'язковим; якщо оголошення пропущено, блок `catch` більше не є (за замовчуванням) областю видимості; але це все-таки блок!
 
-So if you need to react to the condition *that an exception occurred* (so you can gracefully recover), but you don't care about the error value itself, you can omit the `catch` declaration:
+Отже, якщо вам потрібно відреагувати на *виняткову ситуацію*, але вас не хвилює точне значення помилки, декларацію в блоці `catch` можна опустити:
 
 ```js
 try {
     doOptionOne();
 }
-catch {   // catch-declaration omitted
+catch {   // catch не виконує декларацію
     doOptionTwoInstead();
 }
 ```
 
-This is a small but delightful simplification of syntax for a fairly common use case, and may also be slightly more performant in removing an unnecessary scope!
+Це невелике, але приємне спрощення синтаксису для досить поширеного випадку використання, а також воно допомагає коду бути трохи ефективнішим завдяки видаленню непотрібної області видимості!
 
-## Function Declarations in Blocks (FiB)
+## Оголошення функцій у блоках (FiB)
 
-We've seen now that declarations using `let` or `const` are block-scoped, and `var` declarations are function-scoped. So what about `function` declarations that appear directly inside blocks? As a feature, this is called "FiB."
+Ми переконалися, що декларації з використанням `let` або `const` мають блокову область видимості, а декларації `var` мають функційну. То як щодо оголошень функцій, які з'являються безпосередньо всередині блоків? Цей особливий випадок називається "FiB".
 
-We typically think of `function` declarations like they're the equivalent of a `var` declaration. So are they function-scoped like `var` is?
+Ми зазвичай думаємо про декларації функцій, як про такі, що еквівалентні декларації `var`. То чи вони також видні у всій функції навколо, як `var`?
 
-No and yes. I know... that's confusing. Let's dig in:
+І так, і ні. Я знаю, звучить складно. Спробуємо розібратись:
 
 ```js
 if (false) {
@@ -573,25 +572,25 @@ if (false) {
 ask();
 ```
 
-What do you expect for this program to do? Three reasonable outcomes:
+Що ви очікуєте від цієї програми? Можна уявити три результати:
 
-1. The `ask()` call might fail with a `ReferenceError` exception, because the `ask` identifier is block-scoped to the `if` block scope and thus isn't available in the outer/global scope.
+1. Виклик `ask()` може викинути помилку `ReferenceError`, оскільки ідентифікатор `ask` обмежений блоком `if` і, отже, недоступний з зовнішньої чи глобальної області видимості.
 
-2. The `ask()` call might fail with a `TypeError` exception, because the `ask` identifier exists, but it's `undefined` (since the `if` statement doesn't run) and thus not a callable function.
+2. Виклик `ask()` може викинути помилку `TypeError`, оскільки ідентифікатор `ask` існує, але має значення `undefined` (оскільки інструкція `if` не виконується) і, отже, не є функцією, придатною до виклику.
 
-3. The `ask()` call might run correctly, printing out the "Does it run?" message.
+3. Виклик `ask()` виконається правильно і виведе повідомлення "Does it run?".
 
-Here's the confusing part: depending on which JS environment you try that code snippet in, you may get different results! This is one of those few crazy areas where existing legacy behavior betrays a predictable outcome.
+А тепер найскладніше: залежно від того, в якому середовищі JS ви виконаєте цей фрагмент коду, ви можете отримати різні результати! Це одна з тих небагатьох шалених сфер, де наявна спадкова поведінка видає передбачуваний результат.
 
-The JS specification says that `function` declarations inside of blocks are block-scoped, so the answer should be (1). However, most browser-based JS engines (including v8, which comes from Chrome but is also used in Node) will behave as (2), meaning the identifier is scoped outside the `if` block but the function value is not automatically initialized, so it remains `undefined`.
+Специфікація JS говорить, що декларації функцій всередині блоків мають блокову область видимості, тому правильною відповіддю має бути варіант (1). Однак більшість рушіїв JS у браузерах (включаючи v8, який походить від Chrome, але також використовується в Node) буде поводитися згідно (2), тобто ідентифікатор виводиться за межі блоку `if`, але значення функції не ініціалізується автоматично, тому залишається `undefined`.
 
-Why are browser JS engines allowed to behave contrary to the specification? Because these engines already had certain behaviors around FiB before ES6 introduced block scoping, and there was concern that changing to adhere to the specification might break some existing website JS code. As such, an exception was made in Appendix B of the JS specification, which allows certain deviations for browser JS engines (only!).
+Чому JS-рушіям у браузерах дозволено поводитися всупереч специфікації? Оскільки ці рушії вже мали певну поведінку навколо FiB до того, як ES6 запровадив блокові області видимості, і існувала занепокоєність, що зміна на користь дотримання специфікації може порушити наявний код деяких вебсайтів. Таким чином, було зроблено виняток у Додатку B специфікації JS, який допускає певні відхилення для рушіїв JS у браузерах (і тільки для них!).
 
-| NOTE: |
+| ПРИМІТКА: |
 | :--- |
-| You wouldn't typically categorize Node as a browser JS environment, since it usually runs on a server. But Node's v8 engine is shared with Chrome (and Edge) browsers. Since v8 is first a browser JS engine, it adopts this Appendix B exception, which then means that the browser exceptions are extended to Node. |
+| Ви зазвичай не класифікуєте Node як браузерне середовище JS, оскільки він зазвичай працює на сервері. Але рушій Node використовується спільно з браузерами Chrome (і Edge). Оскільки v8 спочатку був рушієм JS браузера, він приймає цей виняток Додатка B, що означає, що винятки браузера поширюються на Node. |
 
-One of the most common use cases for placing a `function` declaration in a block is to conditionally define a function one way or another (like with an `if..else` statement) depending on some environment state. For example:
+Одним з найпоширеніших випадків розміщення декларації функції в блоці є умовне визначення функції(наприклад, з оператором `if..else`) залежно від стану оточення. Наприклад:
 
 ```js
 if (typeof Array.isArray != "undefined") {
@@ -607,13 +606,13 @@ else {
 }
 ```
 
-It's tempting to structure code this way for performance reasons, since the `typeof Array.isArray` check is only performed once, as opposed to defining just one `isArray(..)` and putting the `if` statement inside it—the check would then run unnecessarily on every call.
+Дуже спокусливою є ідея структурувати код таким чином з міркувань швидкодії, оскільки перевірка `typeof Array.isArray` виконується лише один раз, на відміну від визначення лише одного `isArray(..)` і розміщення в ньому оператора `if` - перевірки тоді буде зайвим чином запускатись при кожному виклику.
 
-| WARNING: |
+| ПОПЕРЕДЖЕННЯ: |
 | :--- |
-| In addition to the risks of FiB deviations, another problem with conditional-definition of functions is it's harder to debug such a program. If you end up with a bug in the `isArray(..)` function, you first have to figure out *which* `isArray(..)` implementation is actually running! Sometimes, the bug is that the wrong one was applied because the conditional check was incorrect! If you define multiple versions of a function, that program is always harder to reason about and maintain. |
+| На додаток до ризиків відхилень FiB, ще однією проблемою умовного визначення функцій є те, що таку програму складніше налагоджувати. Якщо у вас виникла помилка у функції `isArray(..)`, спочатку потрібно з'ясувати, *яка саме* реалізація  `isArray(..)` насправді запущена! Іноді помилка полягає в тому, що застосовано неправильну, оскільки умовна перевірка була неправильною! Якщо ви визначаєте декілька версій функції, цю програму завжди важче розуміти та підтримувати. |
 
-In addition to the previous snippets, several other FiB corner cases are lurking; such behaviors in various browsers and non-browser JS environments (JS engines that aren't browser based) will likely vary. For example:
+На додаток до попередніх фрагментів, існують ще кілька вийняткових випадків, що стосуються FiB; така поведінка в різних браузерах та не браузерних середовищах JS (рушії JS, які не засновані на браузері), ймовірно, буде відрізнятися. Наприклад:
 
 ```js
 if (true) {
@@ -641,15 +640,15 @@ function ask() {
 }
 ```
 
-Recall that function hoisting as described in "When Can I Use a Variable?" (in Chapter 5) might suggest that the final `ask()` in this snippet, with "Wait, maybe..." as its message, would hoist above the call to `ask()`. Since it's the last function declaration of that name, it should "win," right? Unfortunately, no.
+Згадайте, що підняття функції, як описано в розділі "Коли я можу використовувати змінну?" (у главі 5) може навести на думку, що останній виклик `ask()` у цьому фрагменті із повідомленням "Wait, maybe...", буде піднятий над викликом `ask()`. Оскільки це остання декларація функції за цим ім'ям, вона повинна "перемогти" попередні, так? На жаль, ні.
 
-It's not my intention to document all these weird corner cases, nor to try to explain why each of them behaves a certain way. That information is, in my opinion, arcane legacy trivia.
+Я не маю наміру документувати всі дивні виняткові випадки чи пояснювати, чому кожен з них поводиться певним чином. На мій погляд, ця інформація є загадковою спадщиною.
 
-My real concern with FiB is, what advice can I give to ensure your code behaves predictably in all circumstances?
+Моє справжнє занепокоєння щодо FiB полягає в тому, яку пораду я можу дати, щоб ваш код працював передбачувано за будь-яких обставин?
 
-As far as I'm concerned, the only practical answer to avoiding the vagaries of FiB is to simply avoid FiB entirely. In other words, never place a `function` declaration directly inside any block. Always place `function` declarations anywhere in the top-level scope of a function (or in the global scope).
+Щодо мене, то я вважаю, що єдиною можливістю уникнути проблем з FiB є просто повне уникнення FiB. Іншими словами, ніколи не розміщуйте оголошення функцій  безпосередньо всередині будь-якого блоку. Завжди розміщуйте декларації функцій де завгодно на верхньому рівні функційної області видимості(або в глобальній області).
 
-So for the earlier `if..else` example, my suggestion is to avoid conditionally defining functions if at all possible. Yes, it may be slightly less performant, but this is the better overall approach:
+Отже, для попереднього прикладу `if..else`, моя пропозиція полягає в тому, щоб уникати умовно визначення функцій, якщо це можливо. Так, це може бути трохи менш ефективним, але загалом це кращий підхід:
 
 ```js
 function isArray(a) {
@@ -663,7 +662,7 @@ function isArray(a) {
 }
 ```
 
-If that performance hit becomes a critical path issue for your application, I suggest you consider this approach:
+Якщо цей показник швидкодії стає важливою проблемою для вашої програми, я пропоную розглянути такий підхід:
 
 ```js
 var isArray = function isArray(a) {
@@ -679,18 +678,18 @@ if (typeof Array.isArray == "undefined") {
 }
 ```
 
-It's important to notice that here I'm placing a `function` **expression**, not a declaration, inside the `if` statement. That's perfectly fine and valid, for `function` expressions to appear inside blocks. Our discussion about FiB is about avoiding `function` **declarations** in blocks.
+Важливо зауважити, що тут я розміщую всередині блоку `if` **функційний вираз**, а не оголошення функції. Цілком нормально і припустимо, що функційні вирази з'являються всередині блоків. Наша дискусія щодо FiB стосується уникнення **оголошень функції** в блоках.
 
-Even if you test your program and it works correctly, the small benefit you may derive from using FiB style in your code is far outweighed by the potential risks in the future for confusion by other developers, or variances in how your code runs in other JS environments.
+Навіть якщо ви перевірите свою програму, і вона працюватиме коректно, незначна вигода, яку ви можете отримати від використання стилю FiB у своєму коді, не перевищує значні потенційні ризики неправильного розуміння вашого коду іншими розробниками або відхилення в тому, як код працює в інших JS середовищах.
 
-FiB is not worth it, and should be avoided.
+FiB цього не вартий, і його слід уникати.
 
-## Blocked Over
+## Заблоковано
 
-The point of lexical scoping rules in a programming language is so we can appropriately organize our program's variables, both for operational as well as semantic code communication purposes.
+Сенс правил лексичного обсягу в мові програмування полягає в тому, що ми можемо належним чином організувати змінні нашої програми як для цілей виконання коду, так і з точки зору семантики
 
-And one of the most important organizational techniques is to ensure that no variable is over-exposed to unnecessary scopes (POLE). Hopefully you now appreciate block scoping much more deeply than before.
+Одним з найважливіших організаційних методів є забезпечення того, щоб жодна змінна є доступною зайвим областям видимості (POLE). Сподіваюсь, що зараз ви цінуєте блокову область видимості більше, ніж раніше.
 
-Hopefully by now you feel like you're standing on much more solid ground with understanding lexical scope. From that base, the next chapter jumps into the weighty topic of closure.
+Також я сподіваюсь, що на цю мить у вас з'явилося міцніше розумінням лексичних областей видимості. Спираючись на цю основу, наступний розділ переходить до важливої теми замикання.
 
 [^POLP]: *Principle of Least Privilege*, https://en.wikipedia.org/wiki/Principle_of_least_privilege, 3 March 2020.
