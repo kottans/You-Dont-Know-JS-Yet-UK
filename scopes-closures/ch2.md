@@ -1,305 +1,314 @@
-# You Don't Know JS Yet: Scope & Closures - 2nd Edition
-# Chapter 2: Illustrating Lexical Scope
+# You Don't Know JS Yet: Області видимості та замикання - Друге видання
 
-In Chapter 1, we explored how scope is determined during code compilation, a model called "lexical scope." The term "lexical" refers to the first stage of compilation (lexing/parsing).
+# Розділ 2: Ілюстрація лексичної області видимості
 
-To properly *reason* about our programs, it's important to have a solid conceptual foundation of how scope works. If we rely on guesses and intuition, we may accidentally get the right answers some of the time, but many other times we're far off. This isn't a recipe for success.
+У розділі 1 ми розглянули, як область видимості була визначена під час компіляції: модель, що називається "лексичною областю видимості". Слово "лексичний" вказує на першу фазу компіляції (лексичний аналіз або парсинг).
 
-Like way back in grade school math class, getting the right answer isn't enough if we don't show the correct steps to get there! We need to build accurate and helpful mental models as foundation moving forward.
+Щоб _зрозуміти_ наші програми, важливо мати чітке уявлення того, як працює область видимості. Якщо ми покладатимемось тільки на здогадки та інтуїцію, ми можемо випадково отримати правильні відповіді, але зрештою так не відбувається. Це не наш рецепт успіху.
 
-This chapter will illustrate *scope* with several metaphors. The goal here is to *think* about how your program is handled by the JS engine in ways that more closely align with how the JS engine actually works.
+Згадаємо свій шкільний математичний клас: недостатньо отримати правильну відповідь без наявності ходу власних думок! У нашому випадку потрібно будувати точні та корисні розумові моделі,щоб рухатись вперед.
 
-## Marbles, and Buckets, and Bubbles... Oh My!
+Цей розділ проілюструє _області видимості_ кількома метафорами. Головна мета:_обдумати_ як обробляється ваша програма за допомогою рушія JS таким чином, щоб ближче відповідати тому, як насправді працює рушій JS.
 
-One metaphor I've found effective in understanding scope is sorting colored marbles into buckets of their matching color.
+## Кульки, і Відра, і Оболонки ... Ой, лишенько!
 
-Imagine you come across a pile of marbles, and notice that all the marbles are colored red, blue, or green. Let's sort all the marbles, dropping the red ones into a red bucket, green into a green bucket, and blue into a blue bucket. After sorting, when you later need a green marble, you already know the green bucket is where to go to get it.
+Однією з метафор, яку я визнав ефективною для розуміння області видимості є сортування кольорових кульок у відра відповідного кольору.
 
-In this metaphor, the marbles are the variables in our program. The buckets are scopes (functions and blocks), which we just conceptually assign individual colors for our discussion purposes. The color of each marble is thus determined by which *color* scope we find the marble originally created in.
+Уявіть, що ви натрапили на купу кульок і помічаєте, що всі кульки пофарбовані в червоний, синій або зелений кольори. Давайте відсортуємо всі кульки відповідно до кольорів: червоні у червоне відро, зелені у зелене відро, а сині у синє відро. Після сортування, коли вам знадобиться зелена кулька, ви знатимете про зелене відно й звідки потрібно дістати її.
 
-Let's annotate the running program example from Chapter 1 with scope color labels:
+У цій метафорі кульки - це змінні у нашій програмі. Відра - це області видимості (функції та блоки), які ми концептуально призначаємо окремими кольорами для подальших кроків. Таким чином, колір кожної кульки визначається тим, в якій _кольоровій_ області видимості ми знаходимо кульку.
+
+Давайте підсумуємо приклад запущеної програми з розділу 1 кольоровими позначками області видимості:
 
 ```js
-// outer/global scope: RED
+// зовнішня/глобальна область видимості: ЧЕРВОНИЙ
 
 var students = [
-    { id: 14, name: "Kyle" },
-    { id: 73, name: "Suzy" },
-    { id: 112, name: "Frank" },
-    { id: 6, name: "Sarah" }
+  { id: 14, name: "Кайл" },
+  { id: 73, name: "Сюзі" },
+  { id: 112, name: "Френк" },
+  { id: 6, name: "Сара" },
 ];
 
 function getStudentName(studentID) {
-    // function scope: BLUE
+  // область видимості функції: СИНІЙ
 
-    for (let student of students) {
-        // loop scope: GREEN
+  for (let student of students) {
+    // область видимості циклу: ЗЕЛЕНИЙ
 
-        if (student.id == studentID) {
-            return student.name;
-        }
+    if (student.id == studentID) {
+      return student.name;
     }
+  }
 }
 
 var nextStudent = getStudentName(73);
-console.log(nextStudent);   // Suzy
+console.log(nextStudent); // Сюзі
 ```
 
-We've designated three scope colors with code comments: RED (outermost global scope), BLUE (scope of function `getStudentName(..)`), and GREEN (scope of/inside the `for` loop). But it still may be difficult to recognize the boundaries of these scope buckets when looking at a code listing.
+Ми позначили три кольори області видимості помітками: ЧЕРВОНИЙ (крайня глобальна область видимості), СИНіЙ (область функції `getStudentName (..)`) та ЗЕЛЕНИЙ (область дії всередині циклу `for`). Але всеодно, під час перегляду коду, може бути складно розпізнати межі кожнонр відра області видимості.
 
-Figure 2 helps visualize the boundaries of the scopes by drawing colored bubbles (aka, buckets) around each:
+Рисунок 2 допоможе візуалізувати межі областей видимості, намалювавши кольорові оболонки (вони ж відра) навколо кожного:
 
 <figure>
     <img src="images/fig2.png" width="500" alt="Colored Scope Bubbles" align="center">
     <figcaption><em>Fig. 2: Colored Scope Bubbles</em></figcaption>
 </figure>
 
-1. **Bubble 1** (RED) encompasses the global scope, which holds three identifiers/variables: `students` (line 1), `getStudentName` (line 8), and `nextStudent` (line 16).
+1. **Оболонка 1** (ЧЕРВОНИЙ) містить глобальну область видимості, яка містить три ідентифікатори / змінні: `students` (рядок 1),` getStudentName` (рядок 8) та `nextStudent` (рядок 16).
 
-2. **Bubble 2** (BLUE) encompasses the scope of the function `getStudentName(..)` (line 8), which holds just one identifier/variable: the parameter `studentID` (line 8).
+2. **Оболонка 2** (СИНІЙ) містить область видимості функції `getStudentName (..)` (рядок 8), яка містить лише один ідентифікатор/змінну: параметр `studentID` (рядок 8).
 
-3. **Bubble 3** (GREEN) encompasses the scope of the `for`-loop (line 9), which holds just one identifier/variable: `student` (line 9).
+3. **Оболонка 3** (ЗЕЛЕНИЙ) містить область видимості циклу `for` (рядок 9), який містить лише один ідентифікатор / змінну: `student` (рядок 9).
 
-| NOTE: |
-| :--- |
+| Примітка:                                                                                                                                                                                                    |
+| :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Technically, the parameter `studentID` is not exactly in the BLUE(2) scope. We'll unwind that confusion in "Implied Scopes" in Appendix A. For now, it's close enough to label `studentID` a BLUE(2) marble. |
 
-Scope bubbles are determined during compilation based on where the functions/blocks of scope are written, the nesting inside each other, and so on. Each scope bubble is entirely contained within its parent scope bubble—a scope is never partially in two different outer scopes.
+Теоретично параметр `studentID` не зовсім в СИНІЙ (2) області видимості. Ми розберемо це непорозуміння в "Припущеннях області видимості" у Додатку А. Наразі припустимо позначити `studentID 'СИНЬОЮ (2) кулькою.
 
-Each marble (variable/identifier) is colored based on which bubble (bucket) it's declared in, not the color of the scope it may be accessed from (e.g., `students` on line 9 and `studentID` on line 10).
+Оболонки області видимості визначаються під час компіляції та залежать від того, де записані функції/блоки області видимості, вкладеності один в одного, тощо. Тобто кожна дочірня оболонка області видимості міститься в оболонці батьківської області видимості. Варто зауважити,що область видимості ніколи не є частково у двох різних зовнішніх областях видимості.
 
-| NOTE: |
-| :--- |
-| Remember we asserted in Chapter 1 that `id`, `name`, and `log` are all properties, not variables; in other words, they're not marbles in buckets, so they don't get colored based on any the rules we're discussing in this book. To understand how such property accesses are handled, see the third book in the series, *Objects & Classes*. |
+Кожна кулька (змінна/ідентифікатор) забарвлюється залежно від того, в якій оболонці (відрі) вона оголошена, а не за кольором області видимості, з якої можна отримати до неї доступ (наприклад, `students` у рядку 9 та` studentID` у рядку 10).
 
-As the JS engine processes a program (during compilation), and finds a declaration for a variable, it essentially asks, "Which *color* scope (bubble or bucket) am I currently in?" The variable is designated as that same *color*, meaning it belongs to that bucket/bubble.
+| Примітка:                                                                                                                                                                                                                                                                                                                                      |
+| :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Remember we asserted in Chapter 1 that `id`, `name`, and `log` are all properties, not variables; in other words, they're not marbles in buckets, so they don't get colored based on any the rules we're discussing in this book. To understand how such property accesses are handled, see the third book in the series, _Objects & Classes_. |
 
-The GREEN(3) bucket is wholly nested inside of the BLUE(2) bucket, and similarly the BLUE(2) bucket is wholly nested inside the RED(1) bucket. Scopes can nest inside each other as shown, to any depth of nesting as your program needs.
+| Згадаймо, як в главі 1 ми стверджували, що "id", "name" і "log" - це все властивості, а не змінні; іншими словами, це не кульки у відрах, тому вони не забарвлюються відповідно до тих правил, які ми обговорюємо в цій книзі. Щоб зрозуміти, як обробляються такі властивості, дивіться у третій книзі серії _Objects & Classes_. |
 
-References (non-declarations) to variables/identifiers are allowed if there's a matching declaration either in the current scope, or any scope above/outside the current scope, but not with declarations from lower/nested scopes.
+Коли рушій JS обробляє програму (під час компіляції) і знаходить оголошення для змінної, він по суті запитує: "Якого _кольору_ область видимості (оболонка чи відро), у якій я зараз перебуваю?" Змінна позначається того самого _кольору_, врахувавши, що вона належить цьому відру/оболонці.
 
-An expression in the RED(1) bucket only has access to RED(1) marbles, **not** BLUE(2) or GREEN(3). An expression in the BLUE(2) bucket can reference either BLUE(2) or RED(1) marbles, **not** GREEN(3). And an expression in the GREEN(3) bucket has access to RED(1), BLUE(2), and GREEN(3) marbles.
+ЗЕЛЕНЕ (3) відро вкладене всередину СИНЬОГО (2) відра, а також СИНЄ (2) відро повністю вкладене всередину ЧЕРВОНОГО (1) відра. Області видимості можуть бути вкладенні всередину один одного, як показано, на будь-яку глибину вкладеності, наскільки це потрібно вашій програмі.
 
-We can conceptualize the process of determining these non-declaration marble colors during runtime as a lookup. Since the `students` variable reference in the `for`-loop statement on line 9 is not a declaration, it has no color. So we ask the current BLUE(2) scope bucket if it has a marble matching that name. Since it doesn't, the lookup continues with the next outer/containing scope: RED(1). The RED(1) bucket has a marble of the name `students`, so the loop-statement's `students` variable reference is determined to be a RED(1) marble.
+Посилання (не-оголошені) на змінні/ідентифікатори дозволяються, якщо є відповідне оголошення або в поточній області видимості, або в будь-якій області видимості вище/поза поточною областю видимості, але не з оголошеними з нижчих/вкладених областей видимості.
 
-The `if (student.id == studentID)` statement on line 10 is similarly determined to reference a GREEN(3) marble named `student` and a BLUE(2) marble `studentID`.
+Вираз у ЧЕРВОНОМУ (1) відрі має доступ лише до ЧЕРВОНИХ (1) кульок, **не** до СИНІХ (2) чи ЗЕЛЕНИХ (3). Вираз у СИНЬОМУ (2) відрі може посилатися як на СИНІ (2) так і на ЧЕРВОНІ (1) кульки,але **не** до ЗЕЛЕНИХ (3). А вираз у ЗЕЛЕНОМУ (3) відрі має доступ до ЧЕРВОНИХ (1), СИНІХ (2) та ЗЕЛЕНИХ (3) кульок.
 
-| NOTE: |
-| :--- |
+Ми можемо представити процес визначення цих не оголошених кольорих кульок, під час роботи пошуком. Оскільки посилання на змінну `students` в інструкції циклу` for` у рядку 9 не є оголошеним, воно не має кольору. Тож ми запитуємо поточне СИНЄ (2) відро, чи є в ньому кулька, що відповідає цій назві. Оскільки вона не відповідає, пошук продовжується із наступним зовнішнім/що містить область видимості: ЧЕРВОНИЙ (1).ЧЕРВОНЕ відро (1) має кульку із назвою `students`, тому посилання на змінну `students` із інструкції циклу визначається як ЧЕРВОНА (1) кулька.
+
+Інструкція `if (student.id == studentID)` у рядку 10 аналогічно має доступ до ЗЕЛЕНОЇ (3) кульки з ім'ям `student` та СИНЬОЇ (2) кульки `studentID`.
+
+| Примітка:                                                                                                                                                                                                                                                                                                                                                                                                               |
+| :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | The JS engine doesn't generally determine these marble colors during runtime; the "lookup" here is a rhetorical device to help you understand the concepts. During compilation, most or all variable references will match already-known scope buckets, so their color is already determined, and stored with each marble reference to avoid unnecessary lookups as the program runs. More on this nuance in Chapter 3. |
 
-The key take-aways from marbles & buckets (and bubbles!):
+| Рушій JS зазвичай не визначає кольору кульок під час роботи; "пошук" - це риторичний засіб, який допомагає усвідомити концепцію. Під час компіляції більшість або всі посилання на змінні уже відомі областям видимості,тому мають відповідний колір та зберігають відповідене посилання кульки. Це робиться для того щоб уникнути зайвих пошуків під час роботи програми. Більш детальніше про це описується у Розділі 3. |
 
-* Variables are declared in specific scopes, which can be thought of as colored marbles from matching-color buckets.
+Підведемо підсумки з кульками,відрами (та оболонками!):
 
-* Any variable reference that appears in the scope where it was declared, or appears in any deeper nested scopes, will be labeled a marble of that same color—unless an intervening scope "shadows" the variable declaration; see "Shadowing" in Chapter 3.
+- Змінні,які оголошені в конкретних областях видимості, можна сприймати як кольорові кульки з відповідних кольорам відрів.
 
-* The determination of colored buckets, and the marbles they contain, happens during compilation. This information is used for variable (marble color) "lookups" during code execution.
+- Будь-яке посилання на змінну, яке з’являється в області видимості, де ця змінна буда оголошена, або у будь-якій більш глибоко вкладеній області видимості, буде помічено кулькою того самого кольору, якщо тільки проміжна область видимості не заміщує оголошену змінну; див. "Заміщення (shadowing)" у главі 3.
 
-## A Conversation Among Friends
+- Під час компіляції відбувається визначення кольорових відер та кульок, які знаходяться у перших. Ця інформація використовується для "пошуку" змінних (колір кульок) під час виконання коду.
 
-Another useful metaphor for the process of analyzing variables and the scopes they come from is to imagine various conversations that occur inside the engine as code is processed and then executed. We can "listen in" on these conversations to get a better conceptual foundation for how scopes work.
+## Розмова між друзями
 
-Let's now meet the members of the JS engine that will have conversations as they process our program:
+Іншою корисною метафорою процесу аналізу змінних та області видимості, з якої вони походять, є уявлення різних розмов, що відбуваються всередині рушія під час обробки та виконання коду. Ми можемо «підслухати» ці розмови, щоб отримати краще розуміння основ роботи області видимості.
 
-* *Engine*: responsible for start-to-finish compilation and execution of our JavaScript program.
+Давайте зараз познайомимось із членами рушія JS, які будуть вести бесіди під час обробки нашої програми:
 
-* *Compiler*: one of *Engine*'s friends; handles all the dirty work of parsing and code-generation (see previous section).
+- _Рушій_: відповідає за компіляцію від початку до кінця та виконання нашої JavaScript програми.
 
-* *Scope Manager*: another friend of *Engine*; collects and maintains a lookup list of all the declared variables/identifiers, and enforces a set of rules as to how these are accessible to currently executing code.
+- _Компілятор_: один із друзів _Рушія_; виконує всю брудну роботу аналізу та генерації коду (див. попередній розділ).
 
-For you to *fully understand* how JavaScript works, you need to begin to *think* like *Engine* (and friends) think, ask the questions they ask, and answer their questions likewise.
+- _Менеджер області видимості_: ще один друг _Рушія_; збирає та підтримує список пошуку всіх оголошених змінних/ідентифікаторів та забезпечує набір правил щодо того, коли вони доступні під час виконунання коду.
 
-To explore these conversations, recall again our running program example:
+Для _повного зрозуміння_, як працює JavaScript, вам слід почати _мислити_, як _Рушій_ (та його друзі),відповідно задавати запитання, як вони, та відповідати на їхні запитання таким же чином.
+
+Щоб дослідити ці розмови, знову згадайте наш приклад запущеної програми:
 
 ```js
 var students = [
-    { id: 14, name: "Kyle" },
-    { id: 73, name: "Suzy" },
-    { id: 112, name: "Frank" },
-    { id: 6, name: "Sarah" }
+  { id: 14, name: "Кайл" },
+  { id: 73, name: "Сюзі" },
+  { id: 112, name: "Френк" },
+  { id: 6, name: "Сара" },
 ];
 
 function getStudentName(studentID) {
-    for (let student of students) {
-        if (student.id == studentID) {
-            return student.name;
-        }
+  for (let student of students) {
+    if (student.id == studentID) {
+      return student.name;
     }
+  }
 }
 
 var nextStudent = getStudentName(73);
 
 console.log(nextStudent);
-// Suzy
+// Сюзі
 ```
 
-Let's examine how JS is going to process that program, specifically starting with the first statement. The array and its contents are just basic JS value literals (and thus unaffected by any scoping concerns), so our focus here will be on the `var students = [ .. ]` declaration and initialization-assignment parts.
+Давайте розберемо, як JS буде обробляти цю програму, зокрема, почавши з першого твердження. Масив та його вміст - це лише основні літерали значення JS (отже, на них не впливають будь-які проблеми, пов’язані з областю видимості), тому наша увага тут буде зосереджена на декларації `var students = [..]` та частинах присвоювання-ініціалізації.
 
-We typically think of that as a single statement, but that's not how our friend *Engine* sees it. In fact, JS treats these as two distinct operations, one which *Compiler* will handle during compilation, and the other which *Engine* will handle during execution.
+Зазвичай ми думаємо про це як про одне твердження, але це не так як бачить наш друг _Рушій_. Насправді JS розглядає їх як дві різні операції, одну з яких _Компілятор_ обробляє під час компіляції, у той же час іншу - _Рушій_ оброблює під час виконання.
 
-The first thing *Compiler* will do with this program is perform lexing to break it down into tokens, which it will then parse into a tree (AST).
+Перше, що _Компілятор_ зробить з цією програмою, - виконає лексинг, щоб розбити її на токени, які пізніше він розпарсить їх на дерево (АСД).
 
-Once *Compiler* gets to code generation, there's more detail to consider than may be obvious. A reasonable assumption would be that *Compiler* will produce code for the first statement such as: "Allocate memory for a variable, label it `students`, then stick a reference to the array into that variable." But that's not the whole story.
+Як тільки _Компілятор_ перейде до генерації коду, слід розглянути більше деталей, оскільни не все так очевидно. Розумним припущенням буде те, що _Компілятор_ створить код для першого твердження, таке як: "Виділіть пам'ять для змінної, позначте її як `студент`, а потім вставте посилання у масиві до цієї змінної." Але це ще не вся історія.
 
-Here's the steps *Compiler* will follow to handle that statement:
+Такі наступні дії _Компілятор_ буде виконувати для обробки цього твердження:
 
-1. Encountering `var students`, *Compiler* will ask *Scope Manager* to see if a variable named `students` already exists for that particular scope bucket. If so, *Compiler* would ignore this declaration and move on. Otherwise, *Compiler* will produce code that (at execution time) asks *Scope Manager* to create a new variable called `students` in that scope bucket.
+1. Зустрівши `var students`, _Компілятор_ попросить _Менеджера області видимості_ перевірити, чи вже існує змінна з назвою` students` для цього конкретного сегменту області видимості. Якщо так, _Компілятор_ проігнорує цю декларацію і піде далі. У іншому випадку _Компілятор_ видасть код, який (під час виконання) запросить у _Менеджера області видимості_ створити нову змінну під назвою `students` у цьому сегменті області видимості.
 
-2. *Compiler* then produces code for *Engine* to later execute, to handle the `students = []` assignment. The code *Engine* runs will first ask *Scope Manager* if there is a variable called `students` accessible in the current scope bucket. If not, *Engine* keeps looking elsewhere (see "Nested Scope" below). Once *Engine* finds a variable, it assigns the reference of the `[ .. ]` array to it.
+1. Потім _Компілятор_ створює код для _Рушія_ для подальшого виконання та обробки `students = []`. Спершу перед запуском код _Рушія_ запитає _Менеджера області видимості_, чи є в поточному сегменті області видимості доступна змінна під назвою `students`. Якщо ні, _Рушій_ продовжує шукати в іншому місці (див. "Вкладена область видимості" нижче). Після того, як _Рушій_ знаходить змінну, він присвоює їй посилання на масив `[..]`.
 
-In conversational form, the first phase of compilation for the program might play out between *Compiler* and *Scope Manager* like this:
+У розмовній формі перший етап компіляції для програми може відбутися між _Компілятор_ та _Менеджером області видимості_ наступним чином:
 
-> ***Compiler***: Hey, *Scope Manager* (of the global scope), I found a formal declaration for an identifier called `students`, ever heard of it?
+> **_Компілятор_**: Агов, _Менеджер області видимості_ (глобального сегменту), я знайшов зовнішню декларацію для ідентифікатора під назвою `students`, коли-небудь чув про це?
 
-> ***(Global) Scope Manager***: Nope, never heard of it, so I just created it for you.
+> **_(Глобальний) Менеджер області видимості_**: Ні, не приходилось, тому я створив його для тебе.
 
-> ***Compiler***: Hey, *Scope Manager*, I found a formal declaration for an identifier called `getStudentName`, ever heard of it?
+> **_Компілятор_**: Агов, _Менеджер області видимості_, я знайшов зовнішню декларацію для ідентифікатора під назвою `getStudentName`, коли-небудь чув про це?
 
-> ***(Global) Scope Manager***: Nope, but I just created it for you.
+> **_(Глобальний) Менеджер області видимості_**: Ні, але щойно створив його для тебе.
 
-> ***Compiler***: Hey, *Scope Manager*, `getStudentName` points to a function, so we need a new scope bucket.
+> **_Компілятор_**: Агов, _Менеджер області видимості_, `getStudentName` вказує на функцію, тому нам потрібен новий сегмент області видимості.
 
-> ***(Function) Scope Manager***: Got it, here's the scope bucket.
+> **_Менеджер області видимості функції_** Зрозумів, ось сегмент області видимості.
 
-> ***Compiler***: Hey, *Scope Manager* (of the function), I found a formal parameter declaration for `studentID`, ever heard of it?
+> **_Компілятор_**: Агов, _Менеджер області видимості_ (функції), я знайшов зовнішню декларацію параметра для `studentID`, коли-небудь чув про це?
 
-> ***(Function) Scope Manager***: Nope, but now it's created in this scope.
+> **_(Функціональний) Менеджер області видимості_**: Ні, але він вже створений у цій області видимості.
 
-> ***Compiler***: Hey, *Scope Manager* (of the function), I found a `for`-loop that will need its own scope bucket.
-
-> ...
-
-The conversation is a question-and-answer exchange, where **Compiler** asks the current *Scope Manager* if an encountered identifier declaration has already been encountered. If "no," *Scope Manager* creates that variable in that scope. If the answer is "yes," then it's effectively skipped over since there's nothing more for that *Scope Manager* to do.
-
-*Compiler* also signals when it runs across functions or block scopes, so that a new scope bucket and *Scope Manager* can be instantiated.
-
-Later, when it comes to execution of the program, the conversation will shift to *Engine* and *Scope Manager*, and might play out like this:
-
-> ***Engine***: Hey, *Scope Manager* (of the global scope), before we begin, can you look up the identifier `getStudentName` so I can assign this function to it?
-
-> ***(Global) Scope Manager***: Yep, here's the variable.
-
-> ***Engine***: Hey, *Scope Manager*, I found a *target* reference for `students`, ever heard of it?
-
-> ***(Global) Scope Manager***: Yes, it was formally declared for this scope, so here it is.
-
-> ***Engine***: Thanks, I'm initializing `students` to `undefined`, so it's ready to use.
-
-> Hey, *Scope Manager* (of the global scope), I found a *target* reference for `nextStudent`, ever heard of it?
-
-> ***(Global) Scope Manager***: Yes, it was formally declared for this scope, so here it is.
-
-> ***Engine***: Thanks, I'm initializing `nextStudent` to `undefined`, so it's ready to use.
-
-> Hey, *Scope Manager* (of the global scope), I found a *source* reference for `getStudentName`, ever heard of it?
-
-> ***(Global) Scope Manager***: Yes, it was formally declared for this scope. Here it is.
-
-> ***Engine***: Great, the value in `getStudentName` is a function, so I'm going to execute it.
-
-> ***Engine***: Hey, *Scope Manager*, now we need to instantiate the function's scope.
+> **_Компілятор_**: Агов, _Менеджер області видимості_ (функції), я знайшов цикл `for`, який потребуватиме власного сегмента області видимості.
 
 > ...
 
-This conversation is another question-and-answer exchange, where *Engine* first asks the current *Scope Manager* to look up the hoisted `getStudentName` identifier, so as to associate the function with it. *Engine* then proceeds to ask *Scope Manager* about the *target* reference for `students`, and so on.
+Розмова - це обмін запитаннями та відповідями, де **Компілятор** запитує поточного _Менеджера області видимості_ чи вже зустрічалася декларація ідентифікатора. Якщо "ні", _Менеджер області видимості_ створює цю змінну у цій області видимості. Якщо відповідь "так", то її фактично пропускають, оскільки _Менеджеру області видимості_ більше нічого робити.
 
-To review and summarize how a statement like `var students = [ .. ]` is processed, in two distinct steps:
+_Compiler_ also signals when it runs across functions or block scopes, so that a new scope bucket and _Scope Manager_ can be instantiated.
 
-1. *Compiler* sets up the declaration of the scope variable (since it wasn't previously declared in the current scope).
+_Компілятор_ також повідомляє, коли він запускається через функції або блоки області видимості, тож можна створити нові сегмент області видимості та _Менеджера області видимості_.
 
-2. While *Engine* is executing, to process the assignment part of the statement, *Engine* asks *Scope Manager* to look up the variable, initializes it to `undefined` so it's ready to use, and then assigns the array value to it.
+Пізніше, коли справа стосується виконання програми, розмова відбудеться між _Рушієм_ та _Менеджером області видимості_, і може розігратися так:
 
-## Nested Scope
+> **_Рушій_**: Агов, _Менеджер області видимості_ (глобального сегменту), перед тим, як ми розпочнемо, чи можеш ти знайти ідентифікатор `getStudentName`, щоб я міг призначити йому цю функцію?
 
-When it comes time to execute the `getStudentName()` function, *Engine* asks for a *Scope Manager* instance for that function's scope, and it will then proceed to look up the parameter (`studentID`) to assign the `73` argument value to, and so on.
+> **_(Глобальний) Менеджер області видимості_**: Так, ось така змінна.
 
-The function scope for `getStudentName(..)` is nested inside the global scope. The block scope of the `for`-loop is similarly nested inside that function scope. Scopes can be lexically nested to any arbitrary depth as the program defines.
+> **_Рушій_**: Агов, _Менеджер області видимості_, я знайшов _цільове_ посилання для `students`, коли-небудь чув про це?
 
-Each scope gets its own *Scope Manager* instance each time that scope is executed (one or more times). Each scope automatically has all its identifiers registered at the start of the scope being executed (this is called "variable hoisting"; see Chapter 5).
+> **_(Глобальний) Менеджер області видимості_**: Так, це було формально оголошено для цієї області видимості, ось воно.
 
-At the beginning of a scope, if any identifier came from a `function` declaration, that variable is automatically initialized to its associated function reference. And if any identifier came from a `var` declaration (as opposed to `let`/`const`), that variable is automatically initialized to `undefined` so that it can be used; otherwise, the variable remains uninitialized (aka, in its "TDZ," see Chapter 5) and cannot be used until its full declaration-and-initialization are executed.
+> **_Рушій_**: Дякую, я ініціюю `students` до `undefined`, тому він готовий до використання.
 
-In the `for (let student of students) {` statement, `students` is a *source* reference that must be looked up. But how will that lookup be handled, since the scope of the function will not find such an identifier?
+> Гей, _Менеджер області видимості_ (глобальний), я знайшов _цільове_ посилання для `nextStudent`, коли-небудь чув про це?
 
-To explain, let's imagine that bit of conversation playing out like this:
+> **_(Глобальний) Менеджер області видимості_**: Так, це було формально оголошено для цього обсягу, тому ось воно.
 
-> ***Engine***: Hey, *Scope Manager* (for the function), I have a *source* reference for `students`, ever heard of it?
+> **_Рушій_**: Дякую, я ініціалізую `nextStudent` до` undefined`, тому він готовий до використання.
 
-> ***(Function) Scope Manager***: Nope, never heard of it. Try the next outer scope.
+> Гей, **_(Глобальний) Менеджер області видимості_**, я знайшов посилання на _source_ для `getStudentName`, коли-небудь чув про це?
 
-> ***Engine***: Hey, *Scope Manager* (for the global scope), I have a *source* reference for `students`, ever heard of it?
+> **_(Глобальний) Менеджер області видимості_**: Так, це було формально оголошено для цієї області видимості. Ось воно.
 
-> ***(Global) Scope Manager***: Yep, it was formally declared, here it is.
+> **_Рушій_**: Чудово, значення в `getStudentName` є функцією, тому я збираюся її виконати.
+
+> **_Рушій_**: Агов, _Менеджер області видимості_, тепер нам потрібно створити функційну область видимості.
 
 > ...
 
-One of the key aspects of lexical scope is that any time an identifier reference cannot be found in the current scope, the next outer scope in the nesting is consulted; that process is repeated until an answer is found or there are no more scopes to consult.
+Ця розмова є черговим обміном запитаннями та відповідями, де _Рушій_ спершу запрошує поточного _Менеджера області видимості_ знайти піднятий ідентифікатор `getStudentName`, щоб пов'язати з ним функцію. Потім _Рушій_ запитує _Менеджера області видимості_ про _цільове_ посилання для `students` тощо.
 
-### Lookup Failures
+Переглянемо та підсумуємо, як обробляється твердження типу `var students = [..]`, у два окремі кроки:
 
-When *Engine* exhausts all *lexically available* scopes (moving outward) and still cannot resolve the lookup of an identifier, an error condition then exists. However, depending on the mode of the program (strict-mode or not) and the role of the variable (i.e., *target* vs. *source*; see Chapter 1), this error condition will be handled differently.
+1. _Компілятор_ встановлює оголошення змінної області видимості (оскільки вона раніше не була оголошена в поточній області видимості).
 
-#### Undefined Mess
+1. Поки _Рушій_ виконується, щоб обробити частину присвоєного оператора, _Рушій_ просить _Менеджера області видимості_ для пошуку змінної, він ініціалізує її до `undefined`, щоб вона була готова до використання, а потім присвоює їй значення масиву.
 
-If the variable is a *source*, an unresolved identifier lookup is considered an undeclared (unknown, missing) variable, which always results in a `ReferenceError` being thrown. Also, if the variable is a *target*, and the code at that moment is running in strict-mode, the variable is considered undeclared and similarly throws a `ReferenceError`.
+## Вкладена область видимості
 
-The error message for an undeclared variable condition, in most JS environments, will look like, "Reference Error: XYZ is not defined." The phrase "not defined" seems almost identical to the word "undefined," as far as the English language goes. But these two are very different in JS, and this error message unfortunately creates a persistent confusion.
+Коли настає час виконати функцію `getStudentName ()`, _Рушій_ запитує _Менеджера області видимості_ екземпляр області видимості цієї функції, а пізніше він продовжить пошук параметра (`studentID`), щоб присвоїти значення аргументу` 73` , і так далі.
 
-"Not defined" really means "not declared"—or, rather, "undeclared," as in a variable that has no matching formal declaration in any *lexically available* scope. By contrast, "undefined" really means a variable was found (declared), but the variable otherwise has no other value in it at the moment, so it defaults to the `undefined` value.
+Область видимості функції для `getStudentName (..)` вкладена всередину глобальної області видимості. Аналогічно область видимості блоку циклу `for` вкладена всередину області видимості цієї функції. Області видимості можуть бути лексично вкладені на будь-яку довільну глибину, як це визначає сама програма.
 
-To perpetuate the confusion even further, JS's `typeof` operator returns the string `"undefined"` for variable references in either state:
+Кожного разу, коли виконується область видимості, кожна з них отримує свій власний екземпляр _Менеджера області видимості_ (один або кілька разів). Кожна область видимості автоматично реєструє всі свої ідентифікатори на початку виконання свого сегменту області видимості (це називається "підняття змінної"; див. Розділ 5).
+
+На початку області видимості, якщо будь-який ідентифікатор походить з оголошення `function`, ця змінна автоматично ініціалізується до пов'язаного з нею посиланням на функцію. І якщо будь-який ідентифікатор має походження від декларації `var` (на відміну від` let` / `const`), ця змінна автоматично ініціалізується до `undefined`, щоб її можна було використовувати; в іншому випадку змінна залишається неініціалізованою (вона перебуває у своїй Тимчасово мертвій зоні "ТМЗ"("TDZ"), див. розділ 5) і не може бути використана, поки не буде повністю виконано її декларування та ініціалізація.
+
+У твердженні `for (let student of students) {`statement, `students` - це _першо_ посилання, яке потрібно шукати. Але як буде оброблятися цей пошук, якщо область видимості функції не знайде такого ідентифікатора?
+
+Щоб пояснити, давайте уявимо розмову, яка розігрується ось так:
+
+> **_Рушій_**: Агов, _Менеджер області видимості_(функції), у мене є _першо_ посилання для `students`, коли-небудь чув про це?
+
+> **_(Функціональний) Менеджер області видимості_**: Ні, ніколи про це не чув. Спробуй наступну зовнішню область видимості.
+
+> **_Рушій_**: Агов, _Менеджер області видимості_ (глобальний), у мене є _першо_ посилання для `students`, коли-небудь чув про це?
+
+> **_(Глобальний) Менеджер області видимості_**: Так, це було формально оголошено, ось воно.
+
+> ...
+
+Одним з ключових аспектів лексичної області видимості є те, що кожного разу, коли посилання на ідентифікатор не може бути знайдене в поточній області видимості, проводиться консультація щодо наступного зовнішнього обсягу видимості; цей процес повторюється до тих пір, поки не буде знайдена відповідь або не буде більше областей видимості для консультацій.
+
+### Хибність пошуку
+
+Коли _Рушій_ вичерпує всі _лексично доступні_ області видимості (рухаючись назовні) і все ще не зможе завершити пошук ідентифікатора, тоді виникає стан помилки. Однак, залежно від режиму програми (строгий режим чи ні) та ролі змінної (тобто _цільова_ (подія) проти _початковий_; див. Розділ 1), ця умова помилки буде оброблятися по-різному.
+
+#### Невизначений безлад
+
+Якщо змінна є _джерелом призначення_, невирішений пошук ідентифікатора вважається незадекларованою (невідомою, відсутнею) змінною, що завжди призводить до "ReferenceError". Крім того, якщо змінна є _ціллю призначення_, а код на той момент працює в строгому режимі, змінна вважається незадекларованою і аналогічно видає `ReferenceError`.
+
+Повідомлення про помилку для незадекларованої умови змінної у більшості середовищ JS буде виглядати так: "Помилка посилання: XYZ не визначено". Фраза "не визначено" здається майже ідентичною слову "невизначений", що стосується англійської мови. Але ці двоє дуже різні в JS, і це повідомлення про помилку, на жаль, створює стійке непорозуміння.
+
+"Не визначено" насправді означає "не оголошено" - або, швидше, "незадекларовано", як у змінній, яка не має відповідного (формального) оголошення в жодній _лексично доступній_ області видимості. На відміну від цього, "невизначений" насправді означає, що змінна була знайдена (оголошена), але в іншому випадку змінна не має іншого значення на даний момент, тому за замовчуванням вона має значення `невизначений`.
+
+Щоб створити ще більше непорозуміння, оператор JS `typeof` повертає рядок `undefined` для посилань на змінні в будь-якому стані:
 
 ```js
 var studentName;
-typeof studentName;     // "undefined"
+typeof studentName; // "undefined"
 
-typeof doesntExist;     // "undefined"
+typeof doesntExist; // "undefined"
 ```
 
-These two variable references are in very different conditions, but JS sure does muddy the waters. The terminology mess is confusing and terribly unfortunate. Unfortunately, JS developers just have to pay close attention to not mix up *which kind* of "undefined" they're dealing with!
+Ці два посилання на змінні знаходяться в дуже різних умовах, але JS впевнено робить ці води каламутними. Термінологічний безлад завжди призводить до плутани, і є страшенно незручним для використання. На жаль, розробникам JS потрібно просто більше приділяти уваги, щоб не перемішувати _з якими_ "невизначеними" вони мають справу!
 
-#### Global... What!?
+#### Глобальне... Що!?
 
-If the variable is a *target* and strict-mode is not in effect, a confusing and surprising legacy behavior kicks in. The troublesome outcome is that the global scope's *Scope Manager* will just create an **accidental global variable** to fulfill that target assignment!
+Якщо змінна є _цільовою_, а строгий режим не діє, починається заплутана та дивовижна застаріла поведінка. Проблемним наслідком стане те, що _Менеджер області видимості_ глобальної області видимості просто створить **випадкову глобальну змінну** для виконання цього цільового призначення !
 
-Consider:
+Розглянемо:
 
 ```js
 function getStudentName() {
-    // assignment to an undeclared variable :(
-    nextStudent = "Suzy";
+  // assignment to an undeclared variable  присвоєння незадекларованій змінній :(
+  nextStudent = "Сюзі";
 }
 
 getStudentName();
 
 console.log(nextStudent);
-// "Suzy" -- oops, an accidental-global variable!
+// "Сюзі" -- oops, an accidental-global variable! ой, випадково-глобальна змінна!
 ```
 
-Here's how that *conversation* will proceed:
+Ось як відбудеться ця _розмова_:
 
-> ***Engine***: Hey, *Scope Manager* (for the function), I have a *target* reference for `nextStudent`, ever heard of it?
+> **_Рушій_**: Агов, _Менеджер області видимості_ (для функції), у мене є _цільове_ посилання для `nextStudent`, коли-небудь чув про це?
 
-> ***(Function) Scope Manager***: Nope, never heard of it. Try the next outer scope.
+> **_(Функціональний) Менеджер області видимості_**: Ні, ніколи про це не чув. Спробуй наступну зовнішню область видимості.
 
-> ***Engine***: Hey, *Scope Manager* (for the global scope), I have a *target* reference for `nextStudent`, ever heard of it?
+> **_Рушій_**: Агов, _Менеджер області видимості_ (для глобальної), у мене є _цільове_ посилання для `nextStudent`, коли-небудь чув про це?
 
-> ***(Global) Scope Manager***: Nope, but since we're in non-strict-mode, I helped you out and just created a global variable for you, here it is!
+> **_(Глобальний) завідувач області видимості_**: Ні, але оскільки ми перебуваємо в нестрогому режимі, я зробив тобі послугу та просто створив для тебе глобальну змінну, ось вона!
 
-Yuck.
+Гидота.
 
-This sort of accident (almost certain to lead to bugs eventually) is a great example of the beneficial protections offered by strict-mode, and why it's such a bad idea *not* to be using strict-mode. In strict-mode, the ***Global Scope Manager*** would instead have responded:
+Такий випалок (майже напевно призведе до помилок врешті-решт) є чудовим прикладом корисного захисту, який пропонує строгий режим, і чому _не_ використання строгого режиму є настільки поганою ідеєю. У суворому режимі **_Глобальний Менеджер області видимості_** натомість відповів би:
 
-> ***(Global) Scope Manager***: Nope, never heard of it. Sorry, I've got to throw a `ReferenceError`.
+> **_(Глобальний) завідувач області видимості_**: Ні, ніколи про це не чув. Вибачай, але я мушу видати `ReferenceError`.
 
-Assigning to a never-declared variable *is* an error, so it's right that we would receive a `ReferenceError` here.
+Призначення ніколи-не-оголошеної змінної _є_ помилкою, тому правильно, що ми отримаємо тут `ReferenceError`.
 
-Never rely on accidental global variables. Always use strict-mode, and always formally declare your variables. You'll then get a helpful `ReferenceError` if you ever mistakenly try to assign to a not-declared variable.
+Ніколи не покладайтесь на випадкові глобальні змінні. Завжди використовуйте строгий режим і завжди формально заявляйте про свої змінні. Тоді ви отримаєте корисну `ReferenceError`, якщо коли-небудь помилково спробуєте призначити не оголошену змінну.
 
-### Building On Metaphors
+### Беремо за основи метафори
 
-To visualize nested scope resolution, I prefer yet another metaphor, an office building, as in Figure 3:
+Для візуалізації вкладеної роздільної здатності я віддаю перевагу ще одній метафорі - офісна будівля, як на малюнку 3:
 
 <figure>
     <img src="images/fig3.png" width="250" alt="Scope &quot;Building&quot;" align="center">
@@ -307,14 +316,14 @@ To visualize nested scope resolution, I prefer yet another metaphor, an office b
     <br><br>
 </figure>
 
-The building represents our program's nested scope collection. The first floor of the building represents the currently executing scope. The top level of the building is the global scope.
+Будівля представляє вкладену колекцію областей видимості нашої програми. Перший поверх будівлі відповідає поточному об'єкту. Верхній рівень будівлі - це глобальна область видимості.
 
-You resolve a *target* or *source* variable reference by first looking on the current floor, and if you don't find it, taking the elevator to the next floor (i.e., an outer scope), looking there, then the next, and so on. Once you get to the top floor (the global scope), you either find what you're looking for, or you don't. But you have to stop regardless.
+Ви вирішуєте посилання на _цільову_ або _початкову_ змінну , спершу переглянувши поточний поверх, і якщо не знайдете її, піднімаєтесь ліфтом на наступний поверх (тобто на зовнішню область видимості), заглянувши туди, потім на наступний, і так далі . Дійшовши до останнього поверху (глобальної області видимості), ви або знайдете те, що шукаєте, або ні. Але зупинятися доводеться незалежно.
 
-## Continue the Conversation
+## Продовжуємо розмову
 
-By this point, you should be developing richer mental models for what scope is and how the JS engine determines and uses it from your code.
+До цього моменту у вас повинно бути набагато більше розуміння ідеї: що таке область вилимості, та як рушій JS визначає та використовує його з вашого коду.
 
-Before *continuing*, go find some code in one of your projects and run through these conversations. Seriously, actually speak out loud. Find a friend and practice each role with them. If either of you find yourself confused or tripped up, spend more time reviewing this material.
+Перш ніж _продовжувати_, гляньте на код в одному зі своїх проектів і пройдіться цими розмовами. Серйозно, проговоріть це вголос. Покличте друга та попрактикуйте з ними кожну роль. Якщо хтось із вас виявився розгубленим або невпевненим, витратьте більше часу на засвоєння цього матеріалу.
 
-As we move (up) to the next (outer) chapter, we'll explore how the lexical scopes of a program are connected in a chain.
+Переходячи (вгору) до наступного (зовнішнього) розділу, ми дослідимо, як лексичні області видимості програм пов’язані одним ланцюгом.
